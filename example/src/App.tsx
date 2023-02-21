@@ -54,7 +54,6 @@ export default function App() {
         params={{
           topLeftRightCornerRadius: 20,
           backgroundColor: 'purple',
-          maxHeight: 400,
         }}
         ref={sheetRef}
       >

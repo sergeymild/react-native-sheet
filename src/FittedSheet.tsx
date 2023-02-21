@@ -73,6 +73,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   onLayout = (event: LayoutChangeEvent) => {
+    if (Platform.OS === 'android') return;
     console.log('[FittedSheet.onLayout]', event.nativeEvent.layout.height);
     this.setHeight(event.nativeEvent.layout.height);
   };

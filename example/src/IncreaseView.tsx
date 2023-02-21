@@ -7,7 +7,6 @@ interface Props {}
 export const IncreaseView: React.FC<Props> = () => {
   const sheetContext = useFittedSheetContext();
   const [text, setText] = useState('lorem\n');
-  console.log('[IncreaseView.IncreaseView]', sheetContext);
 
   return (
     <View style={{}} onLayout={sheetContext.onLayout}>
