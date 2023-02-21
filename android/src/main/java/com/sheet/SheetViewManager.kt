@@ -1,20 +1,84 @@
 package com.sheet
 
-import android.graphics.Color
-import android.view.View
-import com.facebook.react.uimanager.SimpleViewManager
-import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.common.MapBuilder
+import com.facebook.react.uimanager.*
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.yoga.YogaPositionType
 
-class SheetViewManager : SimpleViewManager<View>() {
+internal class ModalHostShadowNode : LayoutShadowNode() {
+  /**
+   * We need to set the styleWidth and styleHeight of the one child (represented by the <View></View>
+   * within the <RCTModalHostView></RCTModalHostView> in Modal.js. This needs to fill the entire window.
+   */
+  override fun addChildAt(child: ReactShadowNodeImpl, i: Int) {
+    super.addChildAt(child, i)
+    println("🥲shadowNode.addChildAt")
+    val modalSize = ModalHostHelper.getModalHostSize(themedContext)
+    child.setStyleWidth(modalSize.x.toFloat())
+    //child.setStyleHeight(modalSize.y.toFloat())
+    child.setPositionType(YogaPositionType.ABSOLUTE)
+  }
+}
+
+class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
   override fun getName() = "SheetView"
 
-  override fun createViewInstance(reactContext: ThemedReactContext): View {
-    return View(reactContext)
+  override fun createViewInstance(reactContext: ThemedReactContext): AppFittedSheet {
+    return AppFittedSheet(reactContext)
   }
 
-  @ReactProp(name = "color")
-  fun setColor(view: View, color: String) {
-    view.setBackgroundColor(Color.parseColor(color))
+  @ReactProp(name = "sheetHeight")
+  fun sheetHeight(view: AppFittedSheet, size: Double) {
+    println("🥲 sheetHeight $size")
+    view.sheetHeight = if (size < 0) -1 else PixelUtil.toPixelFromDIP(size).toInt()
+  }
+
+  @ReactProp(name = "fittedSheetParams")
+  fun fittedSheetParams(view: AppFittedSheet, params: ReadableMap) {
+    println("🥲 fittedSheetParams $params")
+    //view.sheetSize = if (size < 0) -1 else PixelUtil.toPixelFromDIP(size).toInt()
+    view.params = params
+  }
+
+  @ReactProp(name = "increaseHeight")
+  fun setIncreaseHeight(view: AppFittedSheet, by: Double) {
+    if (by == 0.0) return
+    val newHeight = view.mHostView.reactHeight + PixelUtil.toPixelFromDIP(by)
+    println("🥲increaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
+    view.sheetHeight = newHeight.toInt()
+  }
+
+  @ReactProp(name = "decreaseHeight")
+  fun setDecreaseHeight(view: AppFittedSheet, by: Double) {
+    if (by == 0.0) return
+    val newHeight = view.mHostView.reactHeight - PixelUtil.toPixelFromDIP(by)
+    println("🥲decreaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
+    view.sheetHeight = newHeight.toInt()
+  }
+
+  override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
+    return MapBuilder.builder<String, Any>()
+      .put("onSheetDismiss", MapBuilder.of("registrationName", "onSheetDismiss"))
+      .build()
+  }
+
+  override fun getShadowNodeClass(): Class<LayoutShadowNode> {
+    return ModalHostShadowNode::class.java as Class<LayoutShadowNode>
+  }
+
+  override fun createShadowNodeInstance(): LayoutShadowNode {
+    return ModalHostShadowNode()
+  }
+
+  override fun createShadowNodeInstance(context: ReactApplicationContext): LayoutShadowNode {
+    println("🥲createShadowNodeInstance")
+    return ModalHostShadowNode()
+  }
+
+  override fun onAfterUpdateTransaction(view: AppFittedSheet) {
+    super.onAfterUpdateTransaction(view)
+    view.showOrUpdate()
   }
 }

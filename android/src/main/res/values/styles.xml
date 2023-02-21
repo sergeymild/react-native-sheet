@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+  <style name="BottomSheet.Theme" parent="Theme.MaterialComponents.Light.NoActionBar"/>
+
+  <style name="AppBottomSheetDialog" parent="Theme.AppCompat.Dialog">
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
+    <item name="bottomSheetStyle">@style/AppBottomSheetModalBehavior</item>
+  </style>
+
+  <style name="AppBottomSheetModalBehavior" parent="android:Widget">
+    <item name="android:background">@android:color/transparent</item>
+    <item name="android:elevation" tools:ignore="NewApi">16dp</item>
+    <item name="behavior_hideable">true</item>
+    <item name="behavior_skipCollapsed">true</item>
+  </style>
+
+</resources>
