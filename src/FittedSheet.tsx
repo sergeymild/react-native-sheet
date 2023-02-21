@@ -7,6 +7,7 @@ import React, {
 import {
   findNodeHandle,
   FlatList,
+  LayoutChangeEvent,
   Platform,
   processColor,
   requireNativeComponent,
@@ -46,13 +47,14 @@ export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 interface Context {
   hide: () => void;
   setHeight: (size: number) => void;
+  onLayout: (event: LayoutChangeEvent) => void;
   passScrollViewReactTag: (tag: React.RefObject<ScrollView | FlatList>) => void;
 }
 
 const FittedSheetContext = createContext<Context | null>(null);
 
 export const useFittedSheetContext = () => {
-  return useContext(FittedSheetContext);
+  return useContext(FittedSheetContext)!;
 };
 
 export class FittedSheet extends React.PureComponent<Props, State> {
@@ -68,6 +70,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   show = (data?: any) => {
     console.log('[FittedSheet.show]', this.state);
     this.setState({ show: true, data });
+  };
+
+  onLayout = (event: LayoutChangeEvent) => {
+    console.log('[FittedSheet.onLayout]', event.nativeEvent.layout.height);
+    this.setHeight(event.nativeEvent.layout.height);
   };
 
   setElement = (view: LazyView, props?: any) => {

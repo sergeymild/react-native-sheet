@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 import React
 import FittedSheets
+import FrameObserver
 
 
 class ModalHostShadowView: RCTShadowView {
@@ -49,7 +50,7 @@ class SheetViewManager: RCTViewManager {
 }
 
 
-class HostFittedSheet: UIView {
+class HostFittedSheet: UIView, FrameChangeDelegate {
     var _modalViewController: SheetViewController?
     let viewController = UIViewController()
     var _touchHandler: RCTTouchHandler?
@@ -158,6 +159,10 @@ class HostFittedSheet: UIView {
           _bridge?.uiManager.setSize(.init(width: newBounds.width, height: newBounds.height), for: _reactSubview!)
       }
     }
+    
+    func frameChangeDelegateDidChange(for view: UIView, _ frame: CGRect, _ bounds: CGRect) {
+        debugPrint("+++++++ \(frame)")
+    }
 
     override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
         debugPrint("🥲insertReactSubview")
@@ -165,12 +170,14 @@ class HostFittedSheet: UIView {
         _touchHandler?.attach(to: subview)
         viewController.view.insertSubview(subview, at: 0)
         _reactSubview = subview
+        subview.addFrameObserver(with: self)
     }
 
     override func removeReactSubview(_ subview: UIView!) {
         debugPrint("🥲removeReactSubview")
         super.removeReactSubview(subview)
         _touchHandler?.detach(from: subview)
+        _reactSubview?.removeFrameObserver()
         _reactSubview = nil
         //destroy()
     }
@@ -265,6 +272,7 @@ class HostFittedSheet: UIView {
                 return
             }
             self._modalViewController = nil
+            self._reactSubview?.removeFrameObserver()
             self._reactSubview?.removeFromSuperview()
             self._touchHandler?.detach(from: self._reactSubview)
             self._touchHandler = nil

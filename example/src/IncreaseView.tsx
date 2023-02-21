@@ -4,12 +4,13 @@ import { useFittedSheetContext } from 'react-native-sheet';
 
 interface Props {}
 
-export const IncreaseView: React.FC<Props> = (props) => {
+export const IncreaseView: React.FC<Props> = () => {
   const sheetContext = useFittedSheetContext();
   const [text, setText] = useState('lorem\n');
+  console.log('[IncreaseView.IncreaseView]', sheetContext);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{}} onLayout={sheetContext.onLayout}>
       <TouchableOpacity
         style={{ width: '100%', height: 50 }}
         onLayout={(e) =>
