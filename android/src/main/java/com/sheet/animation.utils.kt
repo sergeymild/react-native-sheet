@@ -20,3 +20,11 @@ fun Int.toDP(): Int {
 fun Double.toDP(): Int {
   return PixelUtil.toDIPFromPixel(this.toFloat()).toInt()
 }
+
+fun Double.toPx(): Int {
+  return PixelUtil.toPixelFromDIP(this.toFloat()).toInt()
+}
+
+fun Double.toPxD(): Double {
+  return PixelUtil.toPixelFromDIP(this.toFloat()).toDouble()
+}

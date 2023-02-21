@@ -32,13 +32,13 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
   @ReactProp(name = "sheetHeight")
   fun sheetHeight(view: AppFittedSheet, size: Double) {
     println("🥲 sheetHeight $size")
-    view.sheetHeight = if (size < 0) -1 else PixelUtil.toPixelFromDIP(size).toInt()
+    view.mHostView.sheetMaxHeightSize = if (size < 0) -1.0 else size.toPxD()
+    view.mHostView.setVirtualHeight(if (size < 0) -1 else size.toPx())
   }
 
   @ReactProp(name = "fittedSheetParams")
   fun fittedSheetParams(view: AppFittedSheet, params: ReadableMap) {
     println("🥲 fittedSheetParams $params")
-    //view.sheetSize = if (size < 0) -1 else PixelUtil.toPixelFromDIP(size).toInt()
     view.params = params
   }
 
@@ -46,8 +46,8 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
   fun setIncreaseHeight(view: AppFittedSheet, by: Double) {
     if (by == 0.0) return
     val newHeight = view.mHostView.reactHeight + PixelUtil.toPixelFromDIP(by)
-    println("🥲increaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
-    view.sheetHeight = newHeight.toInt()
+    view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
+    view.mHostView.setVirtualHeight(newHeight.toInt())
   }
 
   @ReactProp(name = "decreaseHeight")
@@ -55,7 +55,8 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     if (by == 0.0) return
     val newHeight = view.mHostView.reactHeight - PixelUtil.toPixelFromDIP(by)
     println("🥲decreaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
-    view.sheetHeight = newHeight.toInt()
+    view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
+    view.mHostView.setVirtualHeight(newHeight.toInt())
   }
 
   override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {

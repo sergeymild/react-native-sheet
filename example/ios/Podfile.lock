@@ -10,6 +10,7 @@ PODS:
     - React-Core (= 0.71.3)
     - React-jsi (= 0.71.3)
     - ReactCommon/turbomodule/core (= 0.71.3)
+  - FittedSheets (2.5.3)
   - Flipper (0.125.0):
     - Flipper-Folly (~> 2.6)
     - Flipper-RSocket (~> 1.4)
@@ -330,6 +331,7 @@ PODS:
   - React-logger (0.71.3):
     - glog
   - react-native-sheet (0.1.0):
+    - FittedSheets
     - React-Core
   - React-perflogger (0.71.3)
   - React-RCTActionSheet (0.71.3):
@@ -485,6 +487,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
+    - FittedSheets
     - Flipper
     - Flipper-Boost-iOSX
     - Flipper-DoubleConversion
@@ -578,6 +581,7 @@ SPEC CHECKSUMS:
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: 60195509584153283780abdac5569feffb8f08cc
   FBReactNativeSpec: 9c191fb58d06dc05ab5559a5505fc32139e9e4a2
+  FittedSheets: c22df4c06036515f247951fa174912e8a65c8ce4
   Flipper: 26fc4b7382499f1281eb8cb921e5c3ad6de91fe0
   Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
   Flipper-DoubleConversion: 2dc99b02f658daf147069aad9dbd29d8feb06d30
@@ -606,7 +610,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 515b703d23ffadeac7687bc2d12fb08b90f0aaa1
   React-jsinspector: 9f7c9137605e72ca0343db4cea88006cb94856dd
   React-logger: 957e5dc96d9dbffc6e0f15e0ee4d2b42829ff207
-  react-native-sheet: a70a9b96a808c4fdecd7fda398017869ee7c1172
+  react-native-sheet: 89a4e7da17f3765b87f83d32793e730b8c3eaa3c
   React-perflogger: af8a3d31546077f42d729b949925cc4549f14def
   React-RCTActionSheet: 57cc5adfefbaaf0aae2cf7e10bccd746f2903673
   React-RCTAnimation: 11c61e94da700c4dc915cf134513764d87fc5e2b

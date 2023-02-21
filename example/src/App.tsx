@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FittedSheet } from 'react-native-sheet';
+import { IncreaseView } from './IncreaseView';
 import { TestView } from './TestView';
 
 export default function App() {
@@ -27,12 +28,24 @@ export default function App() {
         </Text>
 
         <TouchableOpacity
+          style={{ height: 56, justifyContent: 'center' }}
           onPress={() => {
             // sheetRef.current?.show('dsdsds')
             sheetRef.current?.show();
           }}
         >
-          <Text>Show</Text>
+          <Text children={'Show'} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ height: 56, justifyContent: 'center' }}
+          onPress={() => {
+            sheetRef.current?.setElement(
+              () => require('./IncreaseView').IncreaseView
+            );
+            sheetRef.current?.show();
+          }}
+        >
+          <Text children={'Show2'} />
         </TouchableOpacity>
       </View>
 
@@ -45,6 +58,7 @@ export default function App() {
         ref={sheetRef}
       >
         {() => <TestView data={'some da'} styles={{ width: '100%' }} />}
+        {/*{() => <IncreaseView />}*/}
       </FittedSheet>
     </>
   );

@@ -24,27 +24,13 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       if (value?.hasKey("topLeftRightCornerRadius") == true) {
         topLeftRightCornerRadius = value.getDouble("topLeftRightCornerRadius")
       }
-      if (value?.hasKey("sheetHeight") == true) {
-        val value = value.getDouble("sheetHeight")
-        sheetHeight = if (value == -1.0) -1
-        else PixelUtil.toPixelFromDIP(value).toInt()
-      }
 
       if (value?.hasKey("maxHeight") == true) {
-        mHostView.sheetMaxHeightSize = PixelUtil.toPixelFromDIP(value.getDouble("maxHeight")).toDouble()
-        sheetHeight = mHostView.sheetMaxHeightSize.toInt()
+        mHostView.sheetMaxHeightSize = value.getDouble("maxHeight").toPxD()
       }
 
       field = value
     }
-
-  var sheetHeight: Int = -1
-    set(value) {
-      mHostView.reactHeight = value
-      if (field != value) mHostView.setVirtualHeight(value)
-      field = value
-    }
-    get() = mHostView.reactHeight
 
   private var topLeftRightCornerRadius: Double = -1.0
     set(value) {

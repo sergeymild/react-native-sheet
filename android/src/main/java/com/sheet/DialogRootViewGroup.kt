@@ -52,11 +52,15 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
       return min(reactHeight, screenHeight)
     }
 
-    return min(sheetMaxHeightSize.toInt(), reactHeight)
+    return min(min(sheetMaxHeightSize.toInt(), screenHeight), reactHeight)
   }
 
   private var pendingHeight: Int? = null
   var reactHeight: Int = -1
+  set(value) {
+    field = value
+    println("😀 DialogRootViewGroup.reactHeight $value")
+  }
 
   fun setVirtualHeight(h: Int) {
     if (reactView == null) {
@@ -105,6 +109,7 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
     if (sheetMaxHeightSize < 0.0) {
       reactView!!.addOnLayoutChangeListener(this)
     } else {
+      setVirtualHeight(sheetMaxHeightSize.toInt())
       //ReactNativeReflection.setSize(reactView, measuredWidth, allowedHeight())
     }
   }
