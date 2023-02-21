@@ -30,6 +30,7 @@ export default function App() {
         <TouchableOpacity
           style={{ height: 56, justifyContent: 'center' }}
           onPress={() => {
+            console.log('[App.--]');
             // sheetRef.current?.show('dsdsds')
             sheetRef.current?.show();
           }}

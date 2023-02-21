@@ -66,6 +66,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   }
 
   show = (data?: any) => {
+    console.log('[FittedSheet.show]', this.state);
     this.setState({ show: true, data });
   };
 
@@ -126,6 +127,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   render() {
+    console.log('[FittedSheet.render]');
     if (!this.state.show) {
       console.log('[FittedSheet.render.remove]');
       return null;
