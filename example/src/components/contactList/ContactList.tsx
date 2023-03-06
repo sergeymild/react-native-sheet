@@ -2,7 +2,7 @@ import React, { memo, useCallback, useMemo } from 'react';
 import type { ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
-import { FlatList } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet';
 
 export interface ContactListProps {
@@ -28,14 +28,43 @@ const ContactListComponent = ({
 
   // renders
   const renderFlatListItem = useCallback(
-    ({ item, index }) => (
-      <ContactItem
-        key={`${item.name}.${index}`}
-        title={`${index}: ${item.name}`}
-        subTitle={item.jobTitle}
-        onPress={onItemPress}
-      />
-    ),
+    ({ item, index }) => {
+      if (index === 10) {
+        return (
+          <View style={{ height: 72 }}>
+            <FlatList
+              data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={(info) => {
+                return (
+                  <View
+                    style={{
+                      height: 72,
+                      width: 72,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderWidth: 1,
+                    }}
+                  >
+                    <Text children={info.index.toString()} />
+                  </View>
+                );
+              }}
+            />
+          </View>
+        );
+      }
+
+      return (
+        <ContactItem
+          key={`${item.name}.${index}`}
+          title={`${index}: ${item.name}`}
+          subTitle={item.jobTitle}
+          onPress={onItemPress}
+        />
+      );
+    },
     [onItemPress]
   );
 
@@ -43,6 +72,7 @@ const ContactListComponent = ({
     <FlatList
       {...rest}
       data={data}
+      style={{ backgroundColor: 'white' }}
       nestedScrollEnabled
       nativeID={FITTED_SHEET_SCROLL_VIEW}
       accessibilityLabel={FITTED_SHEET_SCROLL_VIEW}

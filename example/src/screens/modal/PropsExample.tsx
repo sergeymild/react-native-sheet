@@ -1,14 +1,15 @@
 import React, { useCallback, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button } from '../../components/button';
-import { ContactList } from '../../components/contactList';
-import { FittedSheet } from 'react-native-sheet';
+import { StyleSheet, View } from 'react-native';
 
-const ListExample = () => {
+import { Button } from '../../components/button';
+import { FittedSheet } from 'react-native-sheet';
+import { ContactList } from '../../components/contactList';
+
+export const PropsExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
 
   const handlePresentPress = useCallback(() => {
-    bottomSheetRef.current?.show();
+    bottomSheetRef.current?.show({ count: 4 });
   }, []);
   const handleDismissPress = useCallback(() => {
     bottomSheetRef.current?.hide();
@@ -19,21 +20,10 @@ const ListExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 500 }}>
-        <View style={styles.contentContainerStyle}>
-          <Text>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
-            eligendi nesciunt nulla ullam voluptatem voluptates. Aliquam aut
-            eveniet excepturi laboriosam minus optio pariatur quis. Ea hic
-            obcaecati provident quisquam voluptate. Lorem ipsum dolor sit amet,
-            consectetur adipisicing elit. Dolorem eligendi nesciunt nulla ullam
-            voluptatem voluptates. Aliquam aut eveniet excepturi laboriosam
-            minus optio pariatur quis. Ea hic obcaecati provident quisquam
-            voluptate.
-          </Text>
-
-          <ContactList count={50} />
-        </View>
+      <FittedSheet params={{ maxHeight: 600 }} ref={bottomSheetRef}>
+        {(data) => {
+          return <ContactList count={data.count} />;
+        }}
       </FittedSheet>
     </View>
   );
@@ -45,10 +35,10 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   contentContainerStyle: {
+    flex: 1,
     paddingTop: 12,
     paddingHorizontal: 24,
     backgroundColor: 'white',
-    flex: 1,
   },
   message: {
     fontSize: 24,
@@ -66,5 +56,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-export default ListExample;
