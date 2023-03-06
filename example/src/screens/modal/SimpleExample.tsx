@@ -38,7 +38,7 @@ export const SimpleExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet ref={bottomSheetRef}>
+      <FittedSheet ref={bottomSheetRef} params={{ sheetHeight: 1 }}>
         {() => (
           <View style={styles.contentContainerStyle}>
             <Sim />

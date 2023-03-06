@@ -22,20 +22,25 @@ const KeyboardExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet params={{ maxHeight: 500 }} ref={bottomSheetRef}>
+      <FittedSheet
+        params={{ maxHeight: 800, sheetHeight: 1 }}
+        ref={bottomSheetRef}
+        onSheetDismiss={() => setKH(0)}
+      >
         {() => (
           <View style={styles.contentContainerStyle}>
             <TextInput
               style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
             />
             <ContactList count={100} />
-            {/*<KeyboardSpacer*/}
-            {/*  handleAndroid*/}
-            {/*  onToggle={(e) => {*/}
-            {/*    setKH(e);*/}
-            {/*    console.log('[KeyboardExample.]', e);*/}
-            {/*  }}*/}
-            {/*/>*/}
+            <View style={{ height: keyboardHeight }} />
+            <KeyboardSpacer
+              handleAndroid
+              onToggle={(e) => {
+                setKH(e);
+                console.log('[KeyboardExample.]', e);
+              }}
+            />
           </View>
         )}
       </FittedSheet>

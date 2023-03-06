@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { FittedSheet } from 'react-native-sheet';
@@ -19,17 +19,24 @@ const ListExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 500 }}>
+      <FittedSheet
+        ref={bottomSheetRef}
+        params={{ sheetHeight: 1, maxHeight: 500 }}
+      >
         {() => (
           <View style={styles.contentContainerStyle}>
             <Text>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
               eligendi nesciunt nulla ullam voluptatem voluptates. Aliquam aut
               eveniet excepturi laboriosam minus optio pariatur quis. Ea hic
-              obcaecati provident quisquam voluptate.
+              obcaecati provident quisquam voluptate. Lorem ipsum dolor sit
+              amet, consectetur adipisicing elit. Dolorem eligendi nesciunt
+              nulla ullam voluptatem voluptates. Aliquam aut eveniet excepturi
+              laboriosam minus optio pariatur quis. Ea hic obcaecati provident
+              quisquam voluptate.
             </Text>
 
-            <ContactList count={30} />
+            <ContactList count={130} />
           </View>
         )}
       </FittedSheet>
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingHorizontal: 24,
     backgroundColor: 'white',
-    maxHeight: Dimensions.get('window').height * 0.8,
+    flex: 1,
   },
   message: {
     fontSize: 24,

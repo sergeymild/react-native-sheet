@@ -91,21 +91,6 @@ class HostFittedSheet: UIView {
     private var onSheetDismiss: RCTBubblingEventBlock?
 
     @objc
-    func setSheetHeight(_ value: NSNumber) {
-        if value == -1 { return }
-        _sheetSize = value
-        if _isPresented, let reactSubView = _reactSubview {
-            let newHeight = CGFloat(value.floatValue)
-            if reactSubView.frame.height == newHeight { return }
-            let sizes: [SheetSize] = [.fixed(newHeight)]
-            self._modalViewController?.sizes = sizes
-            self._modalViewController?.resize(to: sizes[0], animated: true)
-            self.notifyForBoundsChange(newBounds: .init(width: reactSubView.frame.width, height: newHeight))
-            debugPrint("updateVisibleFittedSheetSize", newHeight)
-        }
-    }
-
-    @objc
     func setIncreaseHeight(_ by: NSNumber) {
         if by.floatValue == 0 { return }
         debugPrint("setIncreaseHeight", by.floatValue)
@@ -159,9 +144,6 @@ class HostFittedSheet: UIView {
             sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
             topLeftRightCornerRadius = (fittedSheetParams?["topLeftRightCornerRadius"] as? NSNumber)
             sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
-            if let sheetHeight = fittedSheetParams?["sheetHeight"] as? NSNumber {
-                setSheetHeight(sheetHeight)
-            }
         }
     }
 

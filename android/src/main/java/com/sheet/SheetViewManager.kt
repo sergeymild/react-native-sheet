@@ -20,6 +20,11 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
     //child.setStyleHeight(modalSize.y.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
+
+  override fun calculateLayoutOnChildren(): MutableIterable<ReactShadowNode<ReactShadowNode<*>>> {
+    return super.calculateLayoutOnChildren()
+    println("🥲calculateLayoutOnChildren ${getChildAt(0).layoutHeight}")
+  }
 }
 
 class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
