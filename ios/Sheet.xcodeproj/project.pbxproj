@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9204E8DC29AC7BD4003B6594 /* SheetHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */; };
 		921D94C829A51C7D005C2CAB /* SheetViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921D94C629A51C7D005C2CAB /* SheetViewManager.swift */; };
 		921D94C929A51C7D005C2CAB /* SheetViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 921D94C729A51C7D005C2CAB /* SheetViewManager.m */; };
 		921D94CB29A51DC5005C2CAB /* SheetHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921D94CA29A51DC5005C2CAB /* SheetHostView.swift */; };
@@ -26,9 +27,27 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libSheet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSheet.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHostViewController.swift; sourceTree = "<group>"; };
 		921D94C629A51C7D005C2CAB /* SheetViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SheetViewManager.swift; sourceTree = "<group>"; };
 		921D94C729A51C7D005C2CAB /* SheetViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SheetViewManager.m; sourceTree = "<group>"; };
 		921D94CA29A51DC5005C2CAB /* SheetHostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHostView.swift; sourceTree = "<group>"; };
+		9256A1D129ABCC9E000336F7 /* BottomSheet.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BottomSheet.storyboard; sourceTree = "<group>"; };
+		9256A1D229ABCC9E000336F7 /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
+		9256A1D629ABCC9E000336F7 /* UIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extension.swift"; sourceTree = "<group>"; };
+		9256A1D729ABCC9E000336F7 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		9256A1D829ABCC9E000336F7 /* CACornerMask+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CACornerMask+Extension.swift"; sourceTree = "<group>"; };
+		9256A1D929ABCC9E000336F7 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		9256A1DA29ABCC9E000336F7 /* UIGestureRecognizer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIGestureRecognizer+Extensions.swift"; sourceTree = "<group>"; };
+		9256A1DB29ABCC9E000336F7 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
+		9256A1DC29ABCC9E000336F7 /* UIScreen+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScreen+Extension.swift"; sourceTree = "<group>"; };
+		9256A1DD29ABCC9E000336F7 /* Mirror+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mirror+Extension.swift"; sourceTree = "<group>"; };
+		9256A1DE29ABCC9E000336F7 /* UIScrollView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Extension.swift"; sourceTree = "<group>"; };
+		9256A1E029ABCC9E000336F7 /* ForwardingEventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardingEventsView.swift; sourceTree = "<group>"; };
+		9256A1E229ABCC9E000336F7 /* BottomSheetController+Behavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BottomSheetController+Behavior.swift"; sourceTree = "<group>"; };
+		9256A1E329ABCC9E000336F7 /* BottomSheetController+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BottomSheetController+Theme.swift"; sourceTree = "<group>"; };
+		9256A1E529ABCC9E000336F7 /* BottomSheetPositionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetPositionDelegate.swift; sourceTree = "<group>"; };
+		9256A1E629ABCC9E000336F7 /* BottomSheetInteractionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetInteractionDelegate.swift; sourceTree = "<group>"; };
+		9256A1E729ABCC9E000336F7 /* BottomSheetConstant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetConstant.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Sheet-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Sheet-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,12 +73,86 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */,
 				921D94CA29A51DC5005C2CAB /* SheetHostView.swift */,
 				921D94C729A51C7D005C2CAB /* SheetViewManager.m */,
 				921D94C629A51C7D005C2CAB /* SheetViewManager.swift */,
 				F4FF95D5245B92E700C19C63 /* Sheet-Bridging-Header.h */,
+				9256A1CF29ABCC9E000336F7 /* LBBottomSheet */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		9256A1CF29ABCC9E000336F7 /* LBBottomSheet */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1D029ABCC9E000336F7 /* UI */,
+				9256A1D429ABCC9E000336F7 /* Utils */,
+				9256A1E129ABCC9E000336F7 /* Model */,
+				9256A1E429ABCC9E000336F7 /* Protocols */,
+				9256A1E729ABCC9E000336F7 /* BottomSheetConstant.swift */,
+			);
+			path = LBBottomSheet;
+			sourceTree = "<group>";
+		};
+		9256A1D029ABCC9E000336F7 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1D129ABCC9E000336F7 /* BottomSheet.storyboard */,
+				9256A1D229ABCC9E000336F7 /* BottomSheetController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		9256A1D429ABCC9E000336F7 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1D529ABCC9E000336F7 /* Extensions */,
+				9256A1DF29ABCC9E000336F7 /* Components */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		9256A1D529ABCC9E000336F7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1D629ABCC9E000336F7 /* UIApplication+Extension.swift */,
+				9256A1D729ABCC9E000336F7 /* UIColor+Extension.swift */,
+				9256A1D829ABCC9E000336F7 /* CACornerMask+Extension.swift */,
+				9256A1D929ABCC9E000336F7 /* UIView+Extension.swift */,
+				9256A1DA29ABCC9E000336F7 /* UIGestureRecognizer+Extensions.swift */,
+				9256A1DB29ABCC9E000336F7 /* UIViewController+Extension.swift */,
+				9256A1DC29ABCC9E000336F7 /* UIScreen+Extension.swift */,
+				9256A1DD29ABCC9E000336F7 /* Mirror+Extension.swift */,
+				9256A1DE29ABCC9E000336F7 /* UIScrollView+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		9256A1DF29ABCC9E000336F7 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1E029ABCC9E000336F7 /* ForwardingEventsView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		9256A1E129ABCC9E000336F7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1E229ABCC9E000336F7 /* BottomSheetController+Behavior.swift */,
+				9256A1E329ABCC9E000336F7 /* BottomSheetController+Theme.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		9256A1E429ABCC9E000336F7 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				9256A1E529ABCC9E000336F7 /* BottomSheetPositionDelegate.swift */,
+				9256A1E629ABCC9E000336F7 /* BottomSheetInteractionDelegate.swift */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -121,6 +214,7 @@
 			files = (
 				921D94C929A51C7D005C2CAB /* SheetViewManager.m in Sources */,
 				921D94C829A51C7D005C2CAB /* SheetViewManager.swift in Sources */,
+				9204E8DC29AC7BD4003B6594 /* SheetHostViewController.swift in Sources */,
 				921D94CB29A51DC5005C2CAB /* SheetHostView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

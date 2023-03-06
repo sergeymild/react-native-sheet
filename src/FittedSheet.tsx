@@ -46,6 +46,7 @@ export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 
 interface Context {
   hide: () => void;
+  replace: (height: number) => void;
   setHeight: (size: number) => void;
   onLayout: (event: LayoutChangeEvent) => void;
   passScrollViewReactTag: (tag: React.RefObject<ScrollView | FlatList>) => void;
@@ -70,6 +71,10 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   show = (data?: any) => {
     console.log('[FittedSheet.show]', this.state);
     this.setState({ show: true, data });
+  };
+
+  replace = (height: number) => {
+    this.sheetRef.current?.setNativeProps({ availableSize: height });
   };
 
   onLayout = (event: LayoutChangeEvent) => {

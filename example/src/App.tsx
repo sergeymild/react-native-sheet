@@ -1,77 +1,31 @@
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
 
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { FittedSheet } from 'react-native-sheet';
-import { IncreaseView } from './IncreaseView';
-import { TestView } from './TestView';
+import { StyleSheet, View } from 'react-native';
+import { ShowcaseApp } from '@gorhom/showcase-template';
+import { screens } from './screens';
+
+const author = {
+  username: 'SergeyMild',
+  url: 'https://github.com/sergeymild',
+};
 
 export default function App() {
-  const ref = useRef<TouchableOpacity>(null);
-  const ref2 = useRef<TouchableOpacity>(null);
-
-  const sheetRef = useRef<FittedSheet>(null);
-  useEffect(() => {
-    // sheetRef.current?.setElement(() => require('./TestView').TestView, {
-    //   data: 'one',
-    // });
-  }, []);
-
   return (
-    <>
-      <View style={styles.container} accessibilityLabel={'container'}>
-        <Text style={{ marginBottom: 10 }} accessibilityLabel={'text'}>
-          The constructor is init(controller:, sizes:, options:). Sizes is
-          optional, but if specified, the first size in the array will determine
-          the initial size of the sheet. Options is also optional, if not
-          specified, the default options will be used.
-        </Text>
-
-        <TouchableOpacity
-          style={{ height: 56, justifyContent: 'center' }}
-          onPress={() => {
-            console.log('[App.--]');
-            // sheetRef.current?.show('dsdsds')
-            sheetRef.current?.show();
-          }}
-        >
-          <Text children={'Show'} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ height: 56, justifyContent: 'center' }}
-          onPress={() => {
-            sheetRef.current?.setElement(
-              () => require('./IncreaseView').IncreaseView
-            );
-            sheetRef.current?.show();
-          }}
-        >
-          <Text children={'Show2'} />
-        </TouchableOpacity>
-      </View>
-
-      <FittedSheet
-        params={{
-          topLeftRightCornerRadius: 20,
-          backgroundColor: 'purple',
-        }}
-        ref={sheetRef}
-      >
-        {() => <TestView data={'some da'} styles={{ width: '100%' }} />}
-        {/*{() => <IncreaseView />}*/}
-      </FittedSheet>
-    </>
+    <View style={styles.container}>
+      <ShowcaseApp
+        name="Bottom Sheet"
+        description={''}
+        version={'0.0'}
+        author={author}
+        data={screens}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
     flex: 1,
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+    flexGrow: 1,
   },
 });

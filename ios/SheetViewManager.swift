@@ -1,17 +1,43 @@
+//
+//  AppFittedSheet.swift
+//  PopupMenu
+//
+//  Created by Sergei Golishnikov on 14/02/2022.
+//  Copyright © 2022 Facebook. All rights reserved.
+//
+
 import Foundation
 import UIKit
 import React
 import FittedSheets
-import FrameObserver
 
 
 class ModalHostShadowView: RCTShadowView {
+    static var attachedViews: [Int: HostFittedSheet] = [:]
     override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
         super.insertReactSubview(subview, at: atIndex)
         if subview != nil {
             (subview as RCTShadowView).width = YGValue.init(value: Float(RCTScreenSize().width), unit: .point)
             subview.position = .absolute
         }
+    }
+    
+    override func layoutSubviews(with layoutContext: RCTLayoutContext) {
+        super.layoutSubviews(with: layoutContext)
+        let tag = self.reactTag.intValue
+        var size = reactSubviews()[0].contentFrame.size
+        let view = ModalHostShadowView.attachedViews[tag]
+        let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? Double.infinity
+        
+        DispatchQueue.main.async {
+            if size.height > maxheight {
+                debugPrint("😀 constraint \(tag) \(size) \(maxheight)")
+                size.height = maxheight
+                view!.notifyForBoundsChange(newBounds: size)
+            }
+            view?._modalViewController?.setSizes([.fixed(size.height)])
+        }
+        debugPrint("😀 layout(with \(tag) \(size) \(maxheight)")
     }
 }
 
@@ -37,7 +63,7 @@ class SheetViewManager: RCTViewManager {
 
     @objc
     func dismiss() {
-        debugPrint("🥲dismiss")
+        debugPrint("😀dismiss")
     }
 
     override func shadowView() -> RCTShadowView! {
@@ -45,12 +71,12 @@ class SheetViewManager: RCTViewManager {
     }
 
     deinit {
-        debugPrint("🥲 deinit view manager")
+        debugPrint("😀 deinit view manager")
     }
 }
 
 
-class HostFittedSheet: UIView, FrameChangeDelegate {
+class HostFittedSheet: UIView {
     var _modalViewController: SheetViewController?
     let viewController = UIViewController()
     var _touchHandler: RCTTouchHandler?
@@ -95,14 +121,14 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
     
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
-        debugPrint("🥲 setPassScrollViewReactTag", tag)
+        debugPrint("😀 setPassScrollViewReactTag", tag)
         guard let scrollView = self._bridge?.uiManager.view(forReactTag: tag) as? RCTScrollView else {
             return
         }
         if self._modalViewController == nil {
             self._scrollViewTag = tag
         }
-        debugPrint("🥲 setPassScrollViewReactTag found", scrollView, self._modalViewController)
+        debugPrint("😀 setPassScrollViewReactTag found", scrollView, self._modalViewController)
         self._modalViewController?.handleScrollView(scrollView.scrollView)
     }
 
@@ -122,7 +148,7 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
     }
 
     private var sheetMaxWidthSize: NSNumber?
-    private var sheetMaxHeightSize: NSNumber?
+    var sheetMaxHeightSize: NSNumber?
     private var topLeftRightCornerRadius: NSNumber?
     private var sheetBackgroundColor: UIColor?
 
@@ -156,28 +182,23 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
 
     func notifyForBoundsChange(newBounds: CGSize) {
       if (_reactSubview != nil && _isPresented) {
-          _bridge?.uiManager.setSize(.init(width: newBounds.width, height: newBounds.height), for: _reactSubview!)
+          debugPrint("😀notifyForBoundsChange \(newBounds)")
+          _bridge?.uiManager.setSize(newBounds, for: _reactSubview!)
       }
-    }
-    
-    func frameChangeDelegateDidChange(for view: UIView, _ frame: CGRect, _ bounds: CGRect) {
-        debugPrint("+++++++ \(frame)")
     }
 
     override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-        debugPrint("🥲insertReactSubview")
+        debugPrint("😀insertReactSubview")
         super.insertReactSubview(subview, at: atIndex)
         _touchHandler?.attach(to: subview)
         viewController.view.insertSubview(subview, at: 0)
         _reactSubview = subview
-        subview.addFrameObserver(with: self)
     }
 
     override func removeReactSubview(_ subview: UIView!) {
-        debugPrint("🥲removeReactSubview")
+        debugPrint("😀removeReactSubview")
         super.removeReactSubview(subview)
         _touchHandler?.detach(from: subview)
-        _reactSubview?.removeFrameObserver()
         _reactSubview = nil
         //destroy()
     }
@@ -211,10 +232,11 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
                 if size.width > self.sheetWidth {
                     size.width = self.sheetWidth
                 }
+                // if maxSize is present notify react native view
                 if self.sheetMaxHeightSize != nil && size.height > self.sheetMaxHeightSize!.doubleValue {
                     size.height = self.sheetMaxHeightSize!.doubleValue
+                    self.notifyForBoundsChange(newBounds: size)
                 }
-                self.notifyForBoundsChange(newBounds: size)
                 self._modalViewController = SheetViewController(
                     controller: self.viewController,
                     sizes: [.fixed(size.height)],
@@ -229,6 +251,8 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
                 self._modalViewController?.autoAdjustToKeyboard = false
                 self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius?.doubleValue ?? 12
                 self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
+                debugPrint("😀 attachedViews \(self.reactTag.intValue)")
+                ModalHostShadowView.attachedViews[self.reactTag.intValue] = self
 
                 if let tag = self._scrollViewTag {
                     self.setPassScrollViewReactTag(tag)
@@ -242,7 +266,7 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
                 self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
-                    debugPrint("🥲didDismiss")
+                    debugPrint("😀didDismiss")
                     self?.onSheetDismiss?([:])
                 }
             }
@@ -251,20 +275,20 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
 
     override func removeFromSuperview() {
         super.removeFromSuperview()
-        debugPrint("🥲removeFromSuperview")
+        debugPrint("😀removeFromSuperview")
         //destroy()
     }
 
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if _isPresented && superview == nil {
-            debugPrint("🥲didMoveToSuperview")
+            debugPrint("😀didMoveToSuperview")
             destroy()
         }
     }
 
     func destroy() {
-        debugPrint("🥲destroy")
+        debugPrint("😀destroy")
         _isPresented = false
         
         let cleanup = { [weak self] in
@@ -272,7 +296,6 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
                 return
             }
             self._modalViewController = nil
-            self._reactSubview?.removeFrameObserver()
             self._reactSubview?.removeFromSuperview()
             self._touchHandler?.detach(from: self._reactSubview)
             self._touchHandler = nil
@@ -284,7 +307,7 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
         }
         
         if self._modalViewController?.isBeingDismissed != true {
-            debugPrint("🥲dismissViewController")
+            debugPrint("😀dismissViewController")
             self._modalViewController?.dismiss(animated: true, completion: cleanup)
         } else {
             cleanup()
@@ -293,7 +316,7 @@ class HostFittedSheet: UIView, FrameChangeDelegate {
     }
 
     deinit {
-        debugPrint("🥲deinit")
+        debugPrint("😀deinit")
     }
 
 }
