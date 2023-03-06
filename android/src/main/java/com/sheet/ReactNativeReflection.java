@@ -8,7 +8,6 @@ import com.facebook.react.uimanager.UIManagerModule;
 
 public class ReactNativeReflection {
   static void setSize(View view, int width, int height) {
-    System.out.println("++++++++ " + height);
     final View v = view;
     ReactContext context = (ReactContext) v.getContext();
     context.runOnNativeModulesQueueThread(new GuardedRunnable(context) {

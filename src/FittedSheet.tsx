@@ -25,10 +25,12 @@ interface FittedSheetParams {
   readonly backgroundColor?: string;
 }
 
+type Children = ((data: any) => React.ReactNode) | React.ReactNode;
+
 interface Props {
   readonly params?: FittedSheetParams;
   readonly onSheetDismiss?: () => void;
-  readonly children?: (data: any) => React.ReactElement;
+  readonly children?: Children;
 }
 
 type LazyView = () => FunctionComponent<any> | ComponentClass<any, any>;
@@ -161,7 +163,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
                   ? processColor(this.props.params.backgroundColor)
                   : undefined,
               }
-            : undefined
+            : {}
         }
       >
         <FittedSheetContext.Provider value={this}>
@@ -173,7 +175,12 @@ export class FittedSheet extends React.PureComponent<Props, State> {
               )}
             {!this.state.view &&
               this.props.children &&
+              typeof this.props.children === 'function' &&
               this.props.children(this.state.data)}
+            {!this.state.view &&
+              this.props.children &&
+              typeof this.props.children !== 'function' &&
+              this.props.children}
           </View>
         </FittedSheetContext.Provider>
       </_FittedSheet>

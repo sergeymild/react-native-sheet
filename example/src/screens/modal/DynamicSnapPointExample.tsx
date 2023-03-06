@@ -37,7 +37,7 @@ const DynamicSnapPointExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet ref={bottomSheetRef} params={{ sheetHeight: 1 }}>
+      <FittedSheet ref={bottomSheetRef} params={{}}>
         {() => (
           <View
             style={{

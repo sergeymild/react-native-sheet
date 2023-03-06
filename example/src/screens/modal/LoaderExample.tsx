@@ -37,7 +37,7 @@ export const LoaderExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <FittedSheet ref={bottomSheetRef} params={{ sheetHeight: 1 }}>
+      <FittedSheet ref={bottomSheetRef} params={{}}>
         {() => (
           <View style={styles.contentContainerStyle}>
             {isLoading && (

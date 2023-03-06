@@ -34,13 +34,6 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     return AppFittedSheet(reactContext)
   }
 
-  @ReactProp(name = "sheetHeight")
-  fun sheetHeight(view: AppFittedSheet, size: Double) {
-    println("🥲 sheetHeight $size")
-    view.mHostView.sheetMaxHeightSize = if (size < 0) -1.0 else size.toPxD()
-    view.mHostView.setVirtualHeight(if (size < 0) -1 else size.toPx())
-  }
-
   @ReactProp(name = "fittedSheetParams")
   fun fittedSheetParams(view: AppFittedSheet, params: ReadableMap) {
     println("🥲 fittedSheetParams $params")

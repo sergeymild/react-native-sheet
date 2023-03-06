@@ -23,7 +23,7 @@ const KeyboardExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
       <FittedSheet
-        params={{ maxHeight: 800, sheetHeight: 1 }}
+        params={{ maxHeight: 800 }}
         ref={bottomSheetRef}
         onSheetDismiss={() => setKH(0)}
       >
