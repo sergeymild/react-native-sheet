@@ -60,10 +60,19 @@ class SheetViewManager: RCTViewManager {
         sheetView = v
         return v
     }
+    
+    private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet {
+        // swiftlint:disable force_cast
+        return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet
+    }
 
     @objc
-    func dismiss() {
-        debugPrint("😀dismiss")
+    final func dismiss(_ node: NSNumber) {
+        DispatchQueue.main.async {
+            let component = self.getSheetView(withTag: node)
+            component._modalViewController?.dismiss(animated: true)
+            debugPrint("😀dismiss")
+        }
     }
 
     override func shadowView() -> RCTShadowView! {
@@ -248,7 +257,7 @@ class HostFittedSheet: UIView {
                 self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
-                    debugPrint("😀didDismiss")
+                    debugPrint("😀didDismiss \(self?.onSheetDismiss)")
                     self?.onSheetDismiss?([:])
                 }
             }
@@ -274,9 +283,9 @@ class HostFittedSheet: UIView {
         _isPresented = false
         
         let cleanup = { [weak self] in
-            guard let self = self else {
-                return
-            }
+            guard let self = self else { return }
+            debugPrint("😀 cleanup")
+            ModalHostShadowView.attachedViews.removeValue(forKey: self.reactTag.intValue)
             self._modalViewController = nil
             self._reactSubview?.removeFromSuperview()
             self._touchHandler?.detach(from: self._reactSubview)
@@ -286,6 +295,7 @@ class HostFittedSheet: UIView {
             self.onSheetDismiss = nil
             self._sheetSize = nil
             self.sheetMaxWidthSize = nil
+            self._reactSubview = nil
         }
         
         if self._modalViewController?.isBeingDismissed != true {

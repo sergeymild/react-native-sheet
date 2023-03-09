@@ -8,6 +8,7 @@ import {
   findNodeHandle,
   FlatList,
   LayoutChangeEvent,
+  NativeModules,
   Platform,
   processColor,
   requireNativeComponent,
@@ -93,11 +94,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.setState({ show: true, view: { view, props } });
   };
 
-  hide = () => {
-    console.log('[FittedSheet.hide]');
-    this.setState({ show: false, view: undefined });
-  };
-
   data = () => this.state.data;
 
   toggle = () => {
@@ -135,21 +131,28 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
   };
 
+  hide = () => {
+    if (!this.state.show) return
+    const tag = findNodeHandle(this.sheetRef.current)
+    if (!tag) return;
+    console.log('[FittedSheet.hide]', tag);
+    NativeModules.SheetView.dismiss(tag)
+  };
+
   private onDismiss = () => {
     console.log('[FittedSheet.onDismiss]');
-    this.hide();
+    this.setState({ show: false, view: undefined });
     this.props.onSheetDismiss?.();
   };
 
   render() {
-    console.log('[FittedSheet.render]');
     if (!this.state.show) {
       console.log('[FittedSheet.render.remove]');
       return null;
     }
     let height = this.props.params?.sheetHeight ?? -1;
     if (height === undefined && Platform.OS === 'android') height = -1;
-    console.log('[FittedSheet.render]', height);
+    console.log('[FittedSheet.render]', height, this.props.onSheetDismiss);
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}

@@ -1,6 +1,5 @@
 package com.sheet
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.uimanager.events.RCTEventEmitter
+
+fun AppFittedSheet.onSheetDismiss() {
+  (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
+    .receiveEvent(id, "onSheetDismiss", Arguments.createMap())
+}
 
 class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
@@ -46,7 +50,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = getCurrentActivity().supportFragmentManager.findFragmentByTag(fragmentTag) as FragmentModalBottomSheet?
 
   fun showOrUpdate() {
-    println("🥲showOrUpdate")
+    println("🥲 showOrUpdate")
     UiThreadUtil.assertOnUiThread()
 
     val sheet = this.sheet
@@ -62,14 +66,15 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       }
 
       fragment.onDismiss = Runnable {
-        (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
-          .receiveEvent(id, "onSheetDismiss", Arguments.createMap())
+        println("😀 onDismiss")
+        val parent = mHostView.parent as? ViewGroup
+        parent?.removeViewAt(0)
+        onSheetDismiss()
       }
       fragment.show(getCurrentActivity().supportFragmentManager, fragmentTag)
     }
   }
 
-  @TargetApi(23)
   override fun dispatchProvideStructure(structure: ViewStructure?) {
     mHostView.dispatchProvideStructure(structure)
   }
@@ -90,7 +95,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   }
 
   override fun removeViewAt(index: Int) {
-    println("🥲removeViewAt: ")
+    println("🥲 removeViewAt: $index")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
@@ -112,9 +117,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     showOrUpdate()
   }
 
-  override fun onHostPause() {
-    // do nothing
-  }
+  override fun onHostPause() {}
 
   override fun onHostDestroy() {
     onDropInstance()
@@ -129,12 +132,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   fun dismiss() {
     println("🥲dismiss")
     UiThreadUtil.assertOnUiThread()
-    val sheet = this.sheet
-    if (sheet != null) {
-      sheet.dismissAllowingStateLoss()
-      val parent = mHostView.parent as? ViewGroup
-      parent?.removeViewAt(0)
-    }
+    this.sheet?.dismissAllowingStateLoss()
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
