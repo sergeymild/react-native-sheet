@@ -9,7 +9,7 @@ import React from 'react';
 
 const TopModalView = requireNativeComponent<any>('TopModalView');
 
-interface Props {
+interface Props extends PropsWithChildren {
   onModalDismiss?: () => void;
 }
 
