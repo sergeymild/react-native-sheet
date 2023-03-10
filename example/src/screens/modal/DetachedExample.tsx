@@ -7,6 +7,7 @@ import { FittedSheet } from 'react-native-sheet';
 
 const DetachedExample = () => {
   // refs
+
   const bottomSheetRef = useRef<FittedSheet>(null);
 
   // variables

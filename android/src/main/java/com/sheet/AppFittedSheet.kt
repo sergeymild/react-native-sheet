@@ -126,7 +126,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     onDropInstance()
   }
 
-  fun onDropInstance() {
+  private fun onDropInstance() {
     println("🥲onDropInstance")
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()

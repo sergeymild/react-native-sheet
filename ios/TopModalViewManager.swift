@@ -17,9 +17,10 @@ class TopModalShadowView: RCTShadowView {
     override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
         super.insertReactSubview(subview, at: atIndex)
         if subview != nil {
-            (subview as RCTShadowView).width = YGValue.init(value: Float(RCTScreenSize().width), unit: .point)
+            let size = RCTScreenSize()
+            subview.width = .init(value: Float(size.width), unit: .point)
+            subview.height = .init(value: Float(size.height), unit: .point)
             subview.position = .absolute
-            subview.alignItems = .flexEnd
         }
     }
 }
@@ -54,7 +55,7 @@ class TopModalViewManager: RCTViewManager {
     }
 
     override func shadowView() -> RCTShadowView! {
-        return ModalHostShadowView()
+        return TopModalShadowView()
     }
 
     deinit {
@@ -63,7 +64,7 @@ class TopModalViewManager: RCTViewManager {
 }
 
 
-class TopModalView: UIView {
+class TopModalView: RCTView {
     let viewController = UIViewController()
     var _touchHandler: RCTTouchHandler?
     var _reactSubview: UIView?
@@ -80,7 +81,7 @@ class TopModalView: UIView {
         _alertWindow?.windowLevel = UIWindow.Level.alert + 10
         _alertWindow?.isHidden = false
         viewController.modalPresentationStyle = .fullScreen
-        viewController.view.backgroundColor = .yellow
+        viewController.view.backgroundColor = .clear
         return controller
     }()
 

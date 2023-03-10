@@ -12,8 +12,10 @@ export const TopModalExample = () => {
   const data = useMemo(() => createContactListMockData(2), []);
 
   const handlePresentPress = useCallback(() => {
-    //bottomSheetRef.current?.show();
     modalRef.current!.show();
+    setTimeout(() => {
+      bottomSheetRef.current?.show();
+    }, 1000);
   }, []);
 
   const renderItem = useCallback(
@@ -30,21 +32,41 @@ export const TopModalExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
+
+      <View
+        style={{
+          position: 'absolute',
+          height: 20,
+          bottom: 10,
+          left: 0,
+          right: 0,
+          backgroundColor: 'green',
+        }}
+      />
+
       <TopModal
         ref={modalRef}
         onModalDismiss={() => console.log('[TopModalExample.---ibd]')}
       >
         <View
+          accessibilityLabel={'inModal'}
           style={{
-            height: 500,
-            width: '100%',
-            backgroundColor: 'red',
+            flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
           <TouchableOpacity onPress={() => modalRef.current?.hide()}>
-            <Text>Close</Text>
+            <Text
+              style={{
+                color: 'red',
+                backgroundColor: 'green',
+                height: 100,
+                width: 100,
+              }}
+            >
+              Close
+            </Text>
           </TouchableOpacity>
         </View>
       </TopModal>

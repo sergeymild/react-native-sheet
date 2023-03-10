@@ -2,6 +2,7 @@ import {
   findNodeHandle,
   NativeModules,
   requireNativeComponent,
+  StyleSheet,
   View,
 } from 'react-native';
 import React from 'react';
@@ -51,7 +52,12 @@ export class TopModal extends React.PureComponent<Props, State> {
     }
     return (
       <TopModalView onModalDismiss={this.onDismiss} ref={this.sheetRef}>
-        <View nativeID={'top-modal-root-view'} children={this.props.children} />
+        <View
+          accessibilityLabel={'top-modal-root-view'}
+          nativeID={'top-modal-root-view'}
+          style={StyleSheet.absoluteFill}
+          children={this.props.children}
+        />
       </TopModalView>
     );
   }
