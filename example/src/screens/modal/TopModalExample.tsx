@@ -1,21 +1,35 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+  AppState,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Button } from '../../components/button';
 import { FittedSheet, TopModal } from 'react-native-sheet';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../../components/contactItem';
+import { useNavigation } from '@react-navigation/native';
 
 export const TopModalExample = () => {
+  const navigation = useNavigation();
   // refs
   const modalRef = useRef<TopModal>(null);
   const bottomSheetRef = useRef<FittedSheet>(null);
   const data = useMemo(() => createContactListMockData(2), []);
 
+  useEffect(() => {
+    AppState.addEventListener('change', (state) => {
+      if (state === 'background') {
+        modalRef.current?.show();
+      }
+    });
+  }, []);
+
   const handlePresentPress = useCallback(() => {
+    //bottomSheetRef.current?.show();
     modalRef.current!.show();
-    setTimeout(() => {
-      bottomSheetRef.current?.show();
-    }, 1000);
   }, []);
 
   const renderItem = useCallback(
@@ -56,7 +70,11 @@ export const TopModalExample = () => {
             justifyContent: 'center',
           }}
         >
-          <TouchableOpacity onPress={() => modalRef.current?.hide()}>
+          <TouchableOpacity
+            onPress={() => {
+              modalRef.current?.hide();
+            }}
+          >
             <Text
               style={{
                 color: 'red',

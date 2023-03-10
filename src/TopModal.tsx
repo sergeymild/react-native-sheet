@@ -45,8 +45,14 @@ export class TopModal extends React.PureComponent<Props, State> {
     this.props.onModalDismiss?.();
   };
 
+  componentWillUnmount() {
+    this.hide();
+    console.log('[TopModal.componentWillUnmount]');
+  }
+
   render() {
     if (!this.state.show) {
+      this.hide();
       console.log('[TopModal.render.remove]');
       return null;
     }

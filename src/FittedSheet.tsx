@@ -145,6 +145,10 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.props.onSheetDismiss?.();
   };
 
+  componentWillUnmount() {
+    this.hide();
+  }
+
   render() {
     if (!this.state.show) {
       console.log('[FittedSheet.render.remove]');
