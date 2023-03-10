@@ -9,8 +9,9 @@ import React from 'react';
 
 const TopModalView = requireNativeComponent<any>('TopModalView');
 
-interface Props extends PropsWithChildren {
+interface Props {
   onModalDismiss?: () => void;
+  children: React.ReactNode;
 }
 
 interface State {
@@ -28,7 +29,7 @@ export class TopModal extends React.PureComponent<Props, State> {
   }
 
   show = () => {
-    if (this.state.show) return
+    if (this.state.show) return;
     this.setState({ show: true });
   };
 
