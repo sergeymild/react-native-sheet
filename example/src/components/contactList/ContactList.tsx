@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
@@ -7,9 +7,9 @@ import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet';
 
 export interface ContactListProps {
   count?: number;
-  style?: ViewStyle;
   onItemPress?: () => void;
   onRefresh?: () => void;
+  readonly contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 const keyExtractor = (item: any, index: number) => `${item.name}.${index}`;
@@ -80,13 +80,15 @@ const ContactListComponent = ({
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}
       initialNumToRender={5}
-      bounces={true}
       windowSize={10}
       maxToRenderPerBatch={5}
       renderItem={renderFlatListItem}
       keyboardDismissMode="interactive"
       indicatorStyle="black"
-      contentContainerStyle={{ paddingBottom: 34 }}
+      contentContainerStyle={[
+        { paddingBottom: 34 },
+        rest.contentContainerStyle,
+      ]}
     />
   );
 };

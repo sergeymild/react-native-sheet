@@ -2,8 +2,11 @@ package com.sheet
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Color
+import android.provider.CalendarContract.Colors
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.uimanager.JSPointerDispatcher
@@ -14,7 +17,7 @@ import com.facebook.react.uimanager.events.EventDispatcher
 import com.facebook.react.views.view.ReactViewGroup
 import kotlin.math.min
 
-class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
+class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView,
   View.OnLayoutChangeListener {
 
   private val reactContext: ReactContext
@@ -27,6 +30,7 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
     if (ReactFeatureFlags.dispatchPointerEvents) {
       mJSPointerDispatcher = JSPointerDispatcher(this)
     }
+    setBackgroundColor(Color.GREEN)
   }
 
   private val eventDispatcher: EventDispatcher
@@ -35,10 +39,6 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
       return reactContext.getNativeModule(UIManagerModule::class.java)!!.eventDispatcher
     }
   private var reactView: View? = null
-    set(value) {
-      field = value
-      if (value == null) pendingHeight = null
-    }
 
   var sheetMaxWidthSize: Double = -1.0
   var sheetMaxHeightSize: Double = -1.0
@@ -47,40 +47,34 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
   }
 
   private fun allowedHeight(): Int {
-    println("🥲 DialogRootViewGroup.allowedHeight reactHeight: ${reactHeight.toDP()}, sheetMaxHeightSize: ${sheetMaxHeightSize.toDP()}, screenHeight: ${screenHeight.toDP()}")
-    if (sheetMaxHeightSize == -1.0) {
-      return min(reactHeight, screenHeight)
+    val returnValue = if (sheetMaxHeightSize <= 0.0) {
+      min(reactHeight, screenHeight)
+    } else {
+      min(min(sheetMaxHeightSize.toInt(), screenHeight), reactHeight)
     }
-
-    return min(min(sheetMaxHeightSize.toInt(), screenHeight), reactHeight)
+    println("🥲 DialogRootViewGroup.allowedHeight reactHeight: ${reactHeight.toDP()}, sheetMaxHeightSize: ${sheetMaxHeightSize.toDP()}, screenHeight: ${screenHeight.toDP()} returnValue: ${returnValue.toDP()}")
+    return returnValue
   }
 
-  private var pendingHeight: Int? = null
   var reactHeight: Int = -1
-  set(value) {
-    field = value
-    println("😀 DialogRootViewGroup.reactHeight $value")
+
+  fun ensureLayoutParams() {
+    if (layoutParams != null) return
+    layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
   }
 
   fun setVirtualHeight(h: Int) {
-    if (reactView == null) {
-      pendingHeight = h
-      return
-    }
-    pendingHeight = null
-    if (layoutParams == null) {
-      layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-    }
+    if (reactView == null) return
+    ensureLayoutParams()
     this@DialogRootViewGroup.reactHeight = h
     var oldH = layoutParams?.height ?: -1
-    println("😀 DialogRootViewGroup.setVirtualHeight oldH.lp: $oldH")
     if (oldH <= 0) oldH = measuredHeight
-    println("😀 DialogRootViewGroup.setVirtualHeight oldH.mh: $oldH allowHeight: ${allowedHeight()}")
-    if (oldH < 0) {
-      layoutParams?.height = allowedHeight()
-      ReactNativeReflection.setSize(reactView, measuredWidth, allowedHeight())
-    } else {
-      playNewHeightAnimation(oldH = oldH, newH = allowedHeight())
+    val newHeight = allowedHeight()
+//    if (newHeight > 0 && newHeight != oldH) {
+    if (true) {
+      println("😀 DialogRootViewGroup.setVirtualHeight ${oldH.toDP()} -> ${newHeight.toDP()}")
+      layoutParams?.height = newHeight
+      ReactNativeReflection.setSize(reactView, measuredWidth, newHeight)
     }
   }
 
@@ -95,23 +89,21 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
     oldRight: Int,
     oldBottom: Int
   ) {
-    println("😀 DialogRootViewGroup.addOnLayoutChangeListener ${right - left} ${bottom - top}")
-    if (sheetMaxHeightSize > 0.0) {
-      return
-    }
+    println("😀 DialogRootViewGroup.onLayoutChange ${allowedHeight().toDP()} -> ${(bottom - top).toDP()}")
     setVirtualHeight(bottom - top)
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
+    println("😀 DialogRootViewGroup.addView $child")
     if (reactView != null) removeView(reactView)
     super.addView(child, -1, params)
     reactView = child
-    if (sheetMaxHeightSize < 0.0) {
-      reactView!!.addOnLayoutChangeListener(this)
-    } else {
-      setVirtualHeight(sheetMaxHeightSize.toInt())
+    reactView!!.addOnLayoutChangeListener(this)
+//    if (sheetMaxHeightSize < 0.0) {
+//    } else {
+//      setVirtualHeight(sheetMaxHeightSize.toInt())
       //ReactNativeReflection.setSize(reactView, measuredWidth, allowedHeight())
-    }
+//    }
   }
 
   override fun removeView(view: View?) {
@@ -167,31 +159,37 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
+    println("😀 onSizeChanged height: ${h.toDP()}")
+    //layoutParams?.height = h
     if (sheetMaxHeightSize >= 0.0) {
       reactView?.let {
-        ReactNativeReflection.setSize(it, w, allowedHeight())
+//        ReactNativeReflection.setSize(it, w, allowedHeight())
       }
     }
   }
 
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+
+  }
+
   private fun playNewHeightAnimation(oldH: Int, newH: Int) {
     //ReactNativeReflection.setSize(reactView, measuredWidth, newH)
-    animator?.let {
-      it.cancel()
-      it.removeAllListeners()
-    }
-    ValueAnimator.ofInt(oldH, newH).also {
-      it.duration = 250L
-      it.addUpdateListener { animator ->
-        val h = animator.animatedValue as Int
-        this@DialogRootViewGroup.reactHeight = h
-        layoutParams = layoutParams.also { lp -> lp.height = h }
-      }
-      it.finalListener {
-        it.removeAllListeners()
-        it.removeAllUpdateListeners()
-      }
-    }.start()
+//    animator?.let {
+//      it.cancel()
+//      it.removeAllListeners()
+//    }
+//    ValueAnimator.ofInt(oldH, newH).also {
+//      it.duration = 250L
+//      it.addUpdateListener { animator ->
+//        val h = animator.animatedValue as Int
+//        this@DialogRootViewGroup.reactHeight = h
+//        layoutParams = layoutParams.also { lp -> lp.height = h }
+//      }
+//      it.finalListener {
+//        it.removeAllListeners()
+//        it.removeAllUpdateListeners()
+//      }
+//    }.start()
   }
 
   private fun releaseReactView() {
@@ -201,7 +199,6 @@ class DialogRootViewGroup(context: Context) : ReactViewGroup(context), RootView,
     }
     sheetMaxHeightSize = -1.0
     sheetMaxWidthSize = -1.0
-    pendingHeight = null
     reactHeight = -1
     if (sheetMaxHeightSize < 0.0) {
       reactView?.removeOnLayoutChangeListener(this)

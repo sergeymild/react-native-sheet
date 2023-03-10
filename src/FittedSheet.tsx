@@ -5,6 +5,7 @@ import React, {
   useContext,
 } from 'react';
 import {
+  Dimensions,
   findNodeHandle,
   FlatList,
   LayoutChangeEvent,
@@ -22,6 +23,7 @@ interface FittedSheetParams {
   readonly sheetHeight?: number;
   readonly maxWidth?: number;
   readonly maxHeight?: number;
+  readonly minHeight?: number;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
 }
@@ -81,7 +83,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   onLayout = (event: LayoutChangeEvent) => {
-    if (Platform.OS === 'android') return;
     console.log('[FittedSheet.onLayout]', event.nativeEvent.layout.height);
     this.setHeight(event.nativeEvent.layout.height);
   };
@@ -103,7 +104,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   setHeight = (size: number) => {
     console.log('[FittedSheet.setSize]', size);
-    //this.setState({ sheetSize: size });
     this.sheetRef.current?.setNativeProps({ sheetHeight: size });
   };
 
@@ -132,11 +132,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   hide = () => {
-    if (!this.state.show) return
-    const tag = findNodeHandle(this.sheetRef.current)
+    if (!this.state.show) return;
+    const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
     console.log('[FittedSheet.hide]', tag);
-    NativeModules.SheetView.dismiss(tag)
+    NativeModules.SheetView.dismiss(tag);
   };
 
   private onDismiss = () => {
@@ -170,7 +170,15 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         }
       >
         <FittedSheetContext.Provider value={this}>
-          <View nativeID={'fitted-sheet-root-view'}>
+          <View
+            nativeID={'fitted-sheet-root-view'}
+            style={{
+              maxHeight:
+                this.props.params?.maxHeight ??
+                Dimensions.get('window').height * 0.95,
+              minHeight: this.props.params?.minHeight,
+            }}
+          >
             {!!this.state.view &&
               React.createElement(
                 this.state.view.view(),

@@ -20,11 +20,6 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
     //child.setStyleHeight(modalSize.y.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
-
-  override fun calculateLayoutOnChildren(): MutableIterable<ReactShadowNode<ReactShadowNode<*>>> {
-    return super.calculateLayoutOnChildren()
-    println("🥲calculateLayoutOnChildren ${getChildAt(0).layoutHeight}")
-  }
 }
 
 class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
@@ -46,6 +41,14 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     val newHeight = view.mHostView.reactHeight + PixelUtil.toPixelFromDIP(by)
     view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
     view.mHostView.setVirtualHeight(newHeight.toInt())
+  }
+
+  @ReactProp(name = "sheetHeight")
+  fun setHeight(view: AppFittedSheet, by: Double) {
+    if (by == 0.0) return
+    view.mHostView.reactHeight = PixelUtil.toPixelFromDIP(by).toInt()
+    //view.mHostView.sheetMaxHeightSize = view.mHostView.reactHeight.toDouble()
+    view.mHostView.setVirtualHeight(view.mHostView.reactHeight)
   }
 
   @ReactProp(name = "decreaseHeight")

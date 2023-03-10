@@ -1,10 +1,12 @@
 package com.sheet
 
 import android.content.Context
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.PixelUtil
@@ -75,6 +77,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     }
   }
 
+  @RequiresApi(Build.VERSION_CODES.M)
   override fun dispatchProvideStructure(structure: ViewStructure?) {
     mHostView.dispatchProvideStructure(structure)
   }

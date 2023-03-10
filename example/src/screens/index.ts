@@ -28,6 +28,12 @@ export const screens = [
         getScreen: () => require('./modal/ListExample').default,
       },
       {
+        name: 'ListDynamicExample',
+        slug: 'Modal/ListDynamicExample',
+        getScreen: () =>
+          require('./modal/ListDynamicExample').ListDynamicExample,
+      },
+      {
         name: 'KeyboardExample',
         slug: 'Modal/KeyboardExample',
         getScreen: () => require('./modal/KeyboardExample').default,

@@ -10,7 +10,7 @@ export const RequireExample = () => {
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.showElement(
       () => require('../../components/contactList').ContactList,
-      { count: 10 }
+      { count: 7 }
     );
   }, []);
   const handleDismissPress = useCallback(() => {
@@ -22,7 +22,7 @@ export const RequireExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet params={{ maxHeight: 600 }} ref={bottomSheetRef} />
+      <FittedSheet params={{ maxHeight: 500 }} ref={bottomSheetRef} />
     </View>
   );
 };

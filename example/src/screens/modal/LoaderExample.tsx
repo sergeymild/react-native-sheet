@@ -1,25 +1,12 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { ContactItem } from '../../components/contactItem';
-import { createContactListMockData } from '../../utilities/createMockData';
 import { FittedSheet } from 'react-native-sheet';
+import { ContactList } from '../../components/contactList';
 
 const Sim: React.FC = () => {
-  const data = useMemo(() => createContactListMockData(9), []);
-  const renderItem = useCallback(
-    (item, index) => (
-      <ContactItem
-        key={`${item.name}.${index}`}
-        title={`${index}: ${item.name}`}
-        subTitle={item.jobTitle}
-      />
-    ),
-    []
-  );
-
-  return <View>{data.map(renderItem)}</View>;
+  return <ContactList count={50} />;
 };
 
 export const LoaderExample = () => {
@@ -37,7 +24,7 @@ export const LoaderExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <FittedSheet ref={bottomSheetRef} params={{}}>
+      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 500 }}>
         {() => (
           <View style={styles.contentContainerStyle}>
             {isLoading && (
