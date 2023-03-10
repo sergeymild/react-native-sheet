@@ -12,6 +12,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import com.sheet.R
 
 class FullScreenDialog(
@@ -22,6 +23,12 @@ class FullScreenDialog(
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setStyle(STYLE_NORMAL, R.style.Theme_FullScreenDialog)
+  }
+
+  override fun show(manager: FragmentManager, tag: String?) {
+    val ft = manager.beginTransaction()
+    ft.add(this, tag)
+    ft.commitAllowingStateLoss()
   }
 
   override fun onStart() {
