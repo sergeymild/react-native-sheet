@@ -45,8 +45,6 @@ let FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView"
 
 @objc(SheetViewManager)
 class SheetViewManager: RCTViewManager {
-    var sheetView: UIView?
-
     override static func requiresMainQueueSetup() -> Bool {
         return true
     }
@@ -56,8 +54,7 @@ class SheetViewManager: RCTViewManager {
     }
 
     override func view() -> UIView! {
-        let v = HostFittedSheet(bridge: bridge, manager: self)
-        sheetView = v
+        let v = HostFittedSheet(bridge: bridge)
         return v
     }
     
@@ -91,10 +88,19 @@ class HostFittedSheet: UIView {
     var _touchHandler: RCTTouchHandler?
     var _reactSubview: UIView?
     var _bridge: RCTBridge?
-    weak var manager: SheetViewManager?
     var _isPresented = false
     var _sheetSize: NSNumber?
     var _scrollViewTag: NSNumber?
+    
+    private var _alertWindow: UIWindow?
+    private lazy var presentViewController: UIViewController = {
+        _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
+        let controller = UIViewController()
+        _alertWindow?.rootViewController = controller
+        _alertWindow?.windowLevel = UIWindow.Level.alert + 1
+        _alertWindow?.isHidden = false
+        return controller
+    }()
 
     @objc
     private var onSheetDismiss: RCTBubblingEventBlock?
@@ -160,9 +166,8 @@ class HostFittedSheet: UIView {
         return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(UIScreen.main.bounds.width))
     }
 
-    init(bridge: RCTBridge, manager: SheetViewManager) {
+    init(bridge: RCTBridge) {
         self._bridge = bridge
-        self.manager = manager
         super.init(frame: .zero)
         _touchHandler = RCTTouchHandler(bridge: bridge)
     }
@@ -254,7 +259,8 @@ class HostFittedSheet: UIView {
                     }
                 }
 
-                self.reactViewController().present(self._modalViewController!, animated: true)
+                self.presentViewController.present(self._modalViewController!, animated: true)
+                //self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
                     debugPrint("😀didDismiss \(self?.onSheetDismiss)")
@@ -291,11 +297,11 @@ class HostFittedSheet: UIView {
             self._touchHandler?.detach(from: self._reactSubview)
             self._touchHandler = nil
             self._bridge = nil
-            self.manager?.sheetView = nil
             self.onSheetDismiss = nil
             self._sheetSize = nil
             self.sheetMaxWidthSize = nil
             self._reactSubview = nil
+            self._alertWindow = nil
         }
         
         if self._modalViewController?.isBeingDismissed != true {

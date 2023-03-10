@@ -7,10 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9204E8DC29AC7BD4003B6594 /* SheetHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */; };
 		921D94C829A51C7D005C2CAB /* SheetViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921D94C629A51C7D005C2CAB /* SheetViewManager.swift */; };
 		921D94C929A51C7D005C2CAB /* SheetViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 921D94C729A51C7D005C2CAB /* SheetViewManager.m */; };
-		921D94CB29A51DC5005C2CAB /* SheetHostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921D94CA29A51DC5005C2CAB /* SheetHostView.swift */; };
+		92C982B229BB54B9005BA57D /* TopModalViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C982B129BB54B9005BA57D /* TopModalViewManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,10 +26,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libSheet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSheet.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHostViewController.swift; sourceTree = "<group>"; };
 		921D94C629A51C7D005C2CAB /* SheetViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SheetViewManager.swift; sourceTree = "<group>"; };
 		921D94C729A51C7D005C2CAB /* SheetViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SheetViewManager.m; sourceTree = "<group>"; };
-		921D94CA29A51DC5005C2CAB /* SheetHostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetHostView.swift; sourceTree = "<group>"; };
 		9256A1D129ABCC9E000336F7 /* BottomSheet.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BottomSheet.storyboard; sourceTree = "<group>"; };
 		9256A1D229ABCC9E000336F7 /* BottomSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetController.swift; sourceTree = "<group>"; };
 		9256A1D629ABCC9E000336F7 /* UIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extension.swift"; sourceTree = "<group>"; };
@@ -48,6 +45,7 @@
 		9256A1E529ABCC9E000336F7 /* BottomSheetPositionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetPositionDelegate.swift; sourceTree = "<group>"; };
 		9256A1E629ABCC9E000336F7 /* BottomSheetInteractionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetInteractionDelegate.swift; sourceTree = "<group>"; };
 		9256A1E729ABCC9E000336F7 /* BottomSheetConstant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetConstant.swift; sourceTree = "<group>"; };
+		92C982B129BB54B9005BA57D /* TopModalViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopModalViewManager.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Sheet-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Sheet-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,8 +71,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				9204E8DB29AC7BD4003B6594 /* SheetHostViewController.swift */,
-				921D94CA29A51DC5005C2CAB /* SheetHostView.swift */,
+				92C982B129BB54B9005BA57D /* TopModalViewManager.swift */,
 				921D94C729A51C7D005C2CAB /* SheetViewManager.m */,
 				921D94C629A51C7D005C2CAB /* SheetViewManager.swift */,
 				F4FF95D5245B92E700C19C63 /* Sheet-Bridging-Header.h */,
@@ -213,9 +210,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				921D94C929A51C7D005C2CAB /* SheetViewManager.m in Sources */,
+				92C982B229BB54B9005BA57D /* TopModalViewManager.swift in Sources */,
 				921D94C829A51C7D005C2CAB /* SheetViewManager.swift in Sources */,
-				9204E8DC29AC7BD4003B6594 /* SheetHostViewController.swift in Sources */,
-				921D94CB29A51DC5005C2CAB /* SheetHostView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
