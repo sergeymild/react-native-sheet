@@ -28,6 +28,7 @@ export class TopModal extends React.PureComponent<Props, State> {
   }
 
   show = () => {
+    if (this.state.show) return
     this.setState({ show: true });
   };
 
