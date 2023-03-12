@@ -58,6 +58,12 @@ export const screens = [
         slug: 'Modal/TopModalExample',
         getScreen: () => require('./modal/TopModalExample').TopModalExample,
       },
+      {
+        name: 'DismissPreventExample',
+        slug: 'Modal/DismissPreventExample',
+        getScreen: () =>
+          require('./modal/DismissPreventExample').DismissPreventExample,
+      },
     ],
   },
 ];

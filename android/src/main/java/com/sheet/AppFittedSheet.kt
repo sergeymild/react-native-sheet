@@ -23,6 +23,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
   var params: ReadableMap? = null
     set(value) {
+      if (value?.hasKey("dismissable") == true) {
+        mHostView.dismissable = value.getBoolean("dismissable")
+      }
       if (value?.hasKey("maxWidth") == true) {
         mHostView.sheetMaxWidthSize = PixelUtil.toPixelFromDIP(value.getDouble("maxWidth")).toDouble()
       }
@@ -57,8 +60,12 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
     val sheet = this.sheet
     if (sheet == null) {
-      val fragment = FragmentModalBottomSheet()
-      fragment.modalView = mHostView
+      val fragment = FragmentModalBottomSheet(mHostView, mHostView.dismissable) {
+        println("😀 onDismiss")
+        val parent = mHostView.parent as? ViewGroup
+        parent?.removeViewAt(0)
+        onSheetDismiss()
+      }
       fragment.handleRadius = topLeftRightCornerRadius.toFloat()
       params?.let {
         if (it.hasKey("backgroundColor")) {
@@ -67,12 +74,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         }
       }
 
-      fragment.onDismiss = Runnable {
-        println("😀 onDismiss")
-        val parent = mHostView.parent as? ViewGroup
-        parent?.removeViewAt(0)
-        onSheetDismiss()
-      }
+
       fragment.show(getCurrentActivity().supportFragmentManager, fragmentTag)
     }
   }

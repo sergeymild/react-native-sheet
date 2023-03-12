@@ -1,26 +1,8 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { ContactItem } from '../../components/contactItem';
-import { createContactListMockData } from '../../utilities/createMockData';
 import { FittedSheet } from 'react-native-sheet';
-
-const Sim: React.FC = () => {
-  const data = useMemo(() => createContactListMockData(5), []);
-  const renderItem = useCallback(
-    (item, index) => (
-      <ContactItem
-        key={`${item.name}.${index}`}
-        title={`${index}: ${item.name}`}
-        subTitle={item.jobTitle}
-      />
-    ),
-    []
-  );
-
-  return <View>{data.map(renderItem)}</View>;
-};
 
 export const QueueExample = () => {
   // refs

@@ -20,6 +20,7 @@ import {
 export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
 interface FittedSheetParams {
+  readonly dismissable?: boolean;
   readonly sheetHeight?: number;
   readonly maxWidth?: number;
   readonly maxHeight?: number;

@@ -1,20 +1,21 @@
 package com.modal
 
+import android.content.res.Resources
 import android.view.View
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
-import com.facebook.react.uimanager.*
-import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.LayoutShadowNode
+import com.facebook.react.uimanager.ReactShadowNodeImpl
+import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.yoga.YogaPositionType
-import com.sheet.ModalHostHelper
 
 private class ModalHostShadowNode : LayoutShadowNode() {
   override fun addChildAt(child: ReactShadowNodeImpl, i: Int) {
     super.addChildAt(child, i)
-    val modalSize = ModalHostHelper.getModalHostSize(themedContext)
-    child.setStyleWidth(modalSize.x.toFloat())
-    child.setStyleHeight(modalSize.y.toFloat())
+    val display = Resources.getSystem().displayMetrics
+    child.setStyleWidth(display.widthPixels.toFloat())
+    child.setStyleHeight(display.heightPixels.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
 }

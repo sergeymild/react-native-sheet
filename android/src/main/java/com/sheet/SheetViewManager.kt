@@ -1,5 +1,6 @@
 package com.sheet
 
+import android.content.res.Resources
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
@@ -15,8 +16,8 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
   override fun addChildAt(child: ReactShadowNodeImpl, i: Int) {
     super.addChildAt(child, i)
     println("🥲shadowNode.addChildAt")
-    val modalSize = ModalHostHelper.getModalHostSize(themedContext)
-    child.setStyleWidth(modalSize.x.toFloat())
+    val display = Resources.getSystem().displayMetrics
+    child.setStyleWidth(display.widthPixels.toFloat())
     //child.setStyleHeight(modalSize.y.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }

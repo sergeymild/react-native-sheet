@@ -148,6 +148,7 @@ class HostFittedSheet: UIView {
     }
 
     private var sheetMaxWidthSize: NSNumber?
+    private var dismissable = true
     var sheetMaxHeightSize: NSNumber?
     private var topLeftRightCornerRadius: NSNumber?
     private var sheetBackgroundColor: UIColor?
@@ -157,6 +158,7 @@ class HostFittedSheet: UIView {
         didSet {
             sheetMaxWidthSize = (fittedSheetParams?["maxWidth"] as? NSNumber)
             sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
+            dismissable = (fittedSheetParams?["dismissable"] as? Bool) ?? true
             topLeftRightCornerRadius = (fittedSheetParams?["topLeftRightCornerRadius"] as? NSNumber)
             sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
         }
@@ -244,7 +246,9 @@ class HostFittedSheet: UIView {
                     )
                 )
                 self._modalViewController?.allowPullingPastMaxHeight = false
+                self._modalViewController?.dismissOnOverlayTap = self.dismissable
                 self._modalViewController?.autoAdjustToKeyboard = false
+                self._modalViewController?.dismissOnPull = self.dismissable
                 self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius?.doubleValue ?? 12
                 self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
                 debugPrint("😀 attachedViews \(self.reactTag.intValue)")
