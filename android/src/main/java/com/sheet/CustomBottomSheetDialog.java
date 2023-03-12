@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatDialog;
 
+import com.behavior.BottomSheetBehavior;
+
 public class CustomBottomSheetDialog extends AppCompatDialog {
   private BottomSheetBehavior<FrameLayout> behavior;
   private FrameLayout container;

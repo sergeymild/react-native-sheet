@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sheet;
+package com.behavior;
 
 import com.facebook.react.views.scroll.ReactScrollView;
 import com.google.android.material.R;
@@ -46,7 +46,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
-import android.widget.ScrollView;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntDef;
@@ -65,7 +64,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat;
 import androidx.core.view.accessibility.AccessibilityViewCommand;
-import androidx.core.widget.NestedScrollView;
 import androidx.customview.view.AbsSavedState;
 import androidx.customview.widget.ViewDragHelper;
 import com.google.android.material.internal.ViewUtils;

@@ -13,21 +13,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class FragmentModalBottomSheet(
   private val modalView: DialogRootViewGroup,
   private val dismissable: Boolean,
+  private val handleRadius: Float,
+  private val sheetBackgroundColor: Int,
   private val onDismiss: () -> Unit
 ) : BottomSheetDialogFragment() {
-
-  var handleRadius: Float = 12F
-    set(value) {
-      field = value
-      (dialog as CustomBottomSheetDialog?)?.setCornerRadius(value)
-    }
-
-  @ColorInt
-  var sheetBackgroundColor: Int = Color.TRANSPARENT
-    set(value) {
-      field = value
-      (dialog as CustomBottomSheetDialog?)?.setSheetBackgroundColor(value)
-    }
 
   override fun onCreateView(
     inflater: LayoutInflater,

@@ -38,7 +38,7 @@ class TopModalView(context: Context?) : ReactViewGroup(context), LifecycleEventL
   override fun addView(child: View, index: Int) {
     rnView.addView(child)
     dialog = FullScreenDialog(rnView, ::onModalDismiss)
-    dialog?.show(getCurrentActivity().supportFragmentManager, "TopModalView")
+    dialog?.safeShow(getCurrentActivity().supportFragmentManager, "TopModalView")
     dialog?.isCancelable = true
 
   }
