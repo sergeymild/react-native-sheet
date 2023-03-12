@@ -49,6 +49,11 @@ export const screens = [
         getScreen: () => require('./modal/PropsExample').PropsExample,
       },
       {
+        name: 'QueueExample',
+        slug: 'Modal/QueueExample',
+        getScreen: () => require('./modal/QueueExample').QueueExample,
+      },
+      {
         name: 'TopModalExample',
         slug: 'Modal/TopModalExample',
         getScreen: () => require('./modal/TopModalExample').TopModalExample,
