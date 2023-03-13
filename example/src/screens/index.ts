@@ -28,6 +28,11 @@ export const screens = [
         getScreen: () => require('./modal/ListExample').default,
       },
       {
+        name: 'List2Example',
+        slug: 'Modal/List2Example',
+        getScreen: () => require('./modal/List2Example').List2Example,
+      },
+      {
         name: 'ListDynamicExample',
         slug: 'Modal/ListDynamicExample',
         getScreen: () =>
@@ -41,6 +46,7 @@ export const screens = [
       {
         name: 'RequireExample',
         slug: 'Modal/RequireExample',
+
         getScreen: () => require('./modal/RequireExample').RequireExample,
       },
       {
@@ -52,6 +58,11 @@ export const screens = [
         name: 'QueueExample',
         slug: 'Modal/QueueExample',
         getScreen: () => require('./modal/QueueExample').QueueExample,
+      },
+      {
+        name: 'Queue2Example',
+        slug: 'Modal/Queue2Example',
+        getScreen: () => require('./modal/Queue2Example').Queue2Example,
       },
       {
         name: 'TopModalExample',

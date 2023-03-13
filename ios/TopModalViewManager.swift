@@ -31,10 +31,6 @@ class TopModalViewManager: RCTViewManager {
         return true
     }
 
-    override func customBubblingEventTypes() -> [String]! {
-        return ["onTopModalDismiss"]
-    }
-
     override func view() -> UIView! {
         let v = TopModalView(bridge: bridge)
         return v
@@ -86,7 +82,7 @@ class TopModalView: RCTView {
     }()
 
     @objc
-    private var onModalDismiss: RCTBubblingEventBlock?
+    private var onModalDismiss: RCTDirectEventBlock?
     
     
     init(bridge: RCTBridge) {

@@ -157,7 +157,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     }
     let height = this.props.params?.sheetHeight ?? -1;
     if (height === undefined && Platform.OS === 'android') height = -1;
-    console.log('[FittedSheet.render]', height, this.props.onSheetDismiss);
+    console.log('[FittedSheet.render]');
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
@@ -176,9 +176,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       >
         <FittedSheetContext.Provider value={this}>
           <View
-            onLayout={(e) =>
-              console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height)
-            }
             nativeID={'fitted-sheet-root-view'}
             style={{
               maxHeight:

@@ -30,14 +30,10 @@ export const SimpleExample = () => {
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current!.show();
   }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current!.hide();
-  }, []);
 
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
         ref={bottomSheetRef}

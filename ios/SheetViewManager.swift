@@ -49,10 +49,6 @@ class SheetViewManager: RCTViewManager {
         return true
     }
 
-    override func customBubblingEventTypes() -> [String]! {
-        return ["onSheetDismiss"]
-    }
-
     override func view() -> UIView! {
         let v = HostFittedSheet(bridge: bridge)
         return v
@@ -103,7 +99,7 @@ class HostFittedSheet: UIView {
     }()
 
     @objc
-    private var onSheetDismiss: RCTBubblingEventBlock?
+    private var onSheetDismiss: RCTDirectEventBlock?
 
     @objc
     func setIncreaseHeight(_ by: NSNumber) {
