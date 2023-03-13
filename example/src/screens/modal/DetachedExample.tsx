@@ -40,7 +40,7 @@ const DetachedExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
       <Button label="Close" onPress={handleClosePress} />
-      <FittedSheet ref={bottomSheetRef} params={{}}>
+      <FittedSheet ref={bottomSheetRef}>
         {() => (
           <View style={styles.sheetContainer}>{data.map(renderItem)}</View>
         )}
