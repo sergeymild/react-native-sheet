@@ -29,7 +29,6 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView,
     if (ReactFeatureFlags.dispatchPointerEvents) {
       mJSPointerDispatcher = JSPointerDispatcher(this)
     }
-    setBackgroundColor(Color.GREEN)
   }
 
   private val eventDispatcher: EventDispatcher
