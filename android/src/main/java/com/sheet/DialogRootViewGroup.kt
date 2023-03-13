@@ -71,7 +71,7 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView,
     if (true) {
       println("😀 DialogRootViewGroup.setVirtualHeight ${oldH.toDP()} -> ${newHeight.toDP()}")
       layoutParams?.height = newHeight
-      ReactNativeReflection.setSize(reactView, measuredWidth, newHeight)
+      //ReactNativeReflection.setSize(reactView, measuredWidth, newHeight)
     }
   }
 

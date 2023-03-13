@@ -176,6 +176,9 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       >
         <FittedSheetContext.Provider value={this}>
           <View
+            onLayout={(e) =>
+              console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height)
+            }
             nativeID={'fitted-sheet-root-view'}
             style={{
               maxHeight:
