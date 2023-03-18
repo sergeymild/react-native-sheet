@@ -26,18 +26,25 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
 
+  private fun savePendingHeight() {
+    val newHeight = getChildAt(0).layoutHeight
+    println("😀 dispatchUpdates id: $reactTag savePendingHeight: ${newHeight.toInt().toDP()}")
+    pendingUpdateHeight[reactTag] = newHeight
+  }
+
   override fun dispatchUpdates(absoluteX: Float, absoluteY: Float, uiViewOperationQueue: UIViewOperationQueue?, nativeViewHierarchyOptimizer: NativeViewHierarchyOptimizer?): Boolean {
     val didChange = super.dispatchUpdates(absoluteX, absoluteY, uiViewOperationQueue, nativeViewHierarchyOptimizer)
     val newHeight = getChildAt(0).layoutHeight
     attachedViews[reactTag]?.mHostView?.let {
-      println("😀 dispatchUpdates id: $reactTag newHeight: ${newHeight.toInt().toDP()}")
-      it.setVirtualHeight(newHeight)
-      pendingUpdateHeight.remove(reactTag)
+      if (it.reactView == null) {
+        savePendingHeight()
+      } else {
+        println("😀 dispatchUpdates id: $reactTag newHeight: ${newHeight.toInt().toDP()}")
+        it.setVirtualHeight(newHeight)
+        pendingUpdateHeight.remove(reactTag)
+      }
     }
-    if (attachedViews[reactTag] == null) {
-      println("😀 dispatchUpdates id: $reactTag savePendingHeight: ${newHeight.toInt().toDP()}")
-      pendingUpdateHeight[reactTag] = newHeight
-    }
+    if (attachedViews[reactTag] == null) savePendingHeight()
     return didChange
   }
 }

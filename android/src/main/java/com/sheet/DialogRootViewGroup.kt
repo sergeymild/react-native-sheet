@@ -22,7 +22,7 @@ fun DialogRootViewGroup.eventDispatcher(): EventDispatcher {
 class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   private val mJSTouchDispatcher = JSTouchDispatcher(this)
   private var mJSPointerDispatcher: JSPointerDispatcher? = null
-  private var reactView: View? = null
+  var reactView: View? = null
 
   var sheetMaxHeightSize: Double = -1.0
   private val screenHeight: Int by lazy {
