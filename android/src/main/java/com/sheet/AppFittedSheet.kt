@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.facebook.react.views.view.ReactViewGroup
 import com.modal.safeShow
 
 fun AppFittedSheet.onSheetDismiss() {
@@ -73,34 +74,47 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   }
 
   override fun addView(child: View, index: Int) {
+    println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
+    ModalHostShadowNode.pendingUpdateHeight[id]?.let {
+      println("🥲 addView pending: $it")
+      mHostView.setVirtualHeight(it)
+      ModalHostShadowNode.pendingUpdateHeight.remove(id)
+    }
   }
 
   override fun getChildCount(): Int = mHostView.childCount
 
   override fun getChildAt(index: Int): View? = mHostView.getChildAt(index)
 
-  override fun removeView(child: View?) {
-    println("🥲removeView")
+  override fun removeView(child: View) {
+    println("🥲 removeView id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
 
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    println("🥲 onDetachedFromWindow: $id")
+    ModalHostShadowNode.attachedViews.remove(id)
+    ModalHostShadowNode.pendingUpdateHeight.remove(id)
+  }
+
   override fun removeViewAt(index: Int) {
-    println("🥲 removeViewAt: $index")
+    println("🥲 removeViewAt: $index id: ${mHostView.getChildAt(index).id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
 
   private fun onDropInstance() {
-    println("🥲onDropInstance")
+    println("🥲 onDropInstance")
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()
   }
 
   fun dismiss() {
-    println("🥲dismiss")
+    println("🥲 dismiss")
     UiThreadUtil.assertOnUiThread()
     this.sheet?.dismissAllowingStateLoss()
   }
