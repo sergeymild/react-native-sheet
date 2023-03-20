@@ -19,6 +19,7 @@ RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 @interface RCT_EXTERN_REMAP_MODULE(TopModalView, TopModalViewManager, RCTViewManager)
 
 RCT_EXPORT_VIEW_PROPERTY(onModalDismiss, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(animated, BOOL)
 RCT_EXTERN_METHOD(present:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 

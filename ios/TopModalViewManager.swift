@@ -83,6 +83,8 @@ class TopModalView: RCTView {
 
     @objc
     private var onModalDismiss: RCTDirectEventBlock?
+    @objc
+    private var animated: Bool = true
     
     
     init(bridge: RCTBridge) {
@@ -125,7 +127,7 @@ class TopModalView: RCTView {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {return}
                 self.viewController.view.addSubview(self._reactSubview!)
-                self.presentViewController.present(self.viewController, animated: true)
+                self.presentViewController.present(self.viewController, animated: self.animated)
             }
         }
     }
