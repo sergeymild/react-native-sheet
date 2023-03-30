@@ -1,7 +1,6 @@
 package com.sheet;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.graphics.Outline;
 import android.util.TypedValue;
 import android.view.View;
@@ -9,35 +8,24 @@ import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AppCompatDialog;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.behavior.BottomSheetBehavior;
 
-public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDialog {
-
+public class CustomBottomSheetDialog extends AppCompatDialog {
   private BottomSheetBehavior<FrameLayout> behavior;
-
   private FrameLayout container;
-
   boolean dismissWithAnimation;
-
   boolean cancelable = true;
-  private boolean canceledOnTouchOutside = true;
-  private boolean canceledOnTouchOutsideSet;
-
 
   protected int startState = BottomSheetBehavior.STATE_EXPANDED;
-  private float cornerRadius = 12;
-  @ColorInt
-  private int sheetBackgroundColor = Color.TRANSPARENT;
 
   public void setCornerRadius(final float r) {
-    this.cornerRadius = r;
     ViewGroup contentContainer = getContentContainer();
     if (contentContainer == null) return;
     contentContainer.setOutlineProvider(new ViewOutlineProvider() {
@@ -55,21 +43,11 @@ public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDia
     contentContainer.setClipToOutline(true);
   }
 
-  public float getCornerRadius() {
-    return cornerRadius;
-  }
-
   public void setSheetBackgroundColor(int sheetBackgroundColor) {
-    this.sheetBackgroundColor = sheetBackgroundColor;
     ViewGroup contentContainer = getContentContainer();
     if (contentContainer == null) return;
     contentContainer.setBackgroundColor(sheetBackgroundColor);
   }
-
-  public int getSheetBackgroundColor() {
-    return sheetBackgroundColor;
-  }
-
   public ViewGroup getContainerView() {
     ensureContainerAndBehavior();
     return container;
@@ -131,6 +109,7 @@ public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDia
       this.cancelable = cancelable;
       if (behavior != null) {
         behavior.setHideable(cancelable);
+        behavior.setDraggable(cancelable);
       }
     }
   }
@@ -171,16 +150,6 @@ public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDia
     } else {
       behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
-  }
-
-  @Override
-  public void setCanceledOnTouchOutside(boolean cancel) {
-    super.setCanceledOnTouchOutside(cancel);
-    if (cancel && !cancelable) {
-      cancelable = true;
-    }
-    canceledOnTouchOutside = cancel;
-    canceledOnTouchOutsideSet = true;
   }
 
   @NonNull
@@ -247,57 +216,10 @@ public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDia
     coordinator
       .findViewById(R.id.touch_outside)
       .setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            if (cancelable && isShowing() && shouldWindowCloseOnTouchOutside()) {
-              cancel();
-            }
-          }
-        });
+        view12 -> {if (cancelable && isShowing()) cancel();});
     // Handle accessibility events
-    androidx.core.view.ViewCompat.setAccessibilityDelegate(
-      bottomSheet,
-      new androidx.core.view.AccessibilityDelegateCompat() {
-        @Override
-        public void onInitializeAccessibilityNodeInfo(
-          View host, @NonNull androidx.core.view.accessibility.AccessibilityNodeInfoCompat info) {
-          super.onInitializeAccessibilityNodeInfo(host, info);
-          if (cancelable) {
-            info.addAction(androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_DISMISS);
-            info.setDismissable(true);
-          } else {
-            info.setDismissable(false);
-          }
-        }
-
-        @Override
-        public boolean performAccessibilityAction(View host, int action, android.os.Bundle args) {
-          if (action == androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_DISMISS && cancelable) {
-            cancel();
-            return true;
-          }
-          return super.performAccessibilityAction(host, action, args);
-        }
-      });
-    bottomSheet.setOnTouchListener(
-      (view1, event) -> {
-        // Consume the event and prevent it from falling through
-        return true;
-      });
+    bottomSheet.setOnTouchListener((view1, event) -> true);
     return container;
-  }
-
-  boolean shouldWindowCloseOnTouchOutside() {
-    if (!canceledOnTouchOutsideSet) {
-      android.content.res.TypedArray a =
-        getContext()
-          .obtainStyledAttributes(new int[]{android.R.attr.windowCloseOnTouchOutside});
-      canceledOnTouchOutside = a.getBoolean(0, true);
-      a.recycle();
-      canceledOnTouchOutsideSet = true;
-    }
-    return canceledOnTouchOutside;
   }
 
   private static int getThemeResId(@NonNull android.content.Context context, int themeId) {
@@ -312,10 +234,6 @@ public class CustomBottomSheetDialog extends androidx.appcompat.app.AppCompatDia
       }
     }
     return themeId;
-  }
-
-  void removeDefaultCallback() {
-    behavior.removeBottomSheetCallback(bottomSheetCallback);
   }
 
   @NonNull

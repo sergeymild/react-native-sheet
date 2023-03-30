@@ -1,14 +1,18 @@
 package com.sheet
 
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.*
-import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.facebook.react.views.view.ReactViewGroup
+import com.modal.safeShow
 
 fun AppFittedSheet.onSheetDismiss() {
   (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
@@ -21,14 +25,6 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
   var params: ReadableMap? = null
     set(value) {
-      if (value?.hasKey("maxWidth") == true) {
-        mHostView.sheetMaxWidthSize = PixelUtil.toPixelFromDIP(value.getDouble("maxWidth")).toDouble()
-      }
-
-      if (value?.hasKey("topLeftRightCornerRadius") == true) {
-        topLeftRightCornerRadius = value.getDouble("topLeftRightCornerRadius")
-      }
-
       if (value?.hasKey("maxHeight") == true) {
         mHostView.sheetMaxHeightSize = value.getDouble("maxHeight").toPxD()
       }
@@ -36,11 +32,13 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       field = value
     }
 
-  private var topLeftRightCornerRadius: Double = -1.0
-    set(value) {
-      field = value
-      sheet?.handleRadius = value.toFloat()
-    }
+  private val dismissable: Boolean
+  get() = params?.bool("dismissable") ?: true
+
+  private val topLeftRightCornerRadius: Float?
+    get() = params?.float("topLeftRightCornerRadius")
+  private val backgroundColor: Int
+    get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
 
   private fun getCurrentActivity(): AppCompatActivity {
     return (context as ReactContext).currentActivity as AppCompatActivity
@@ -55,87 +53,78 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
     val sheet = this.sheet
     if (sheet == null) {
-      val fragment = FragmentModalBottomSheet()
-      fragment.modalView = mHostView
-      fragment.handleRadius = topLeftRightCornerRadius.toFloat()
-      params?.let {
-        if (it.hasKey("backgroundColor")) {
-          val color = ColorPropConverter.getColor(it.getDouble("backgroundColor"), fragment.context)
-          fragment.sheetBackgroundColor = color
-        }
-      }
-
-      fragment.onDismiss = Runnable {
+      val fragment = FragmentModalBottomSheet(
+        modalView = mHostView,
+        dismissable = dismissable,
+        sheetBackgroundColor = backgroundColor,
+        handleRadius = topLeftRightCornerRadius ?: 0F
+      ) {
         println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup
         parent?.removeViewAt(0)
         onSheetDismiss()
       }
-      fragment.show(getCurrentActivity().supportFragmentManager, fragmentTag)
+      fragment.safeShow(getCurrentActivity().supportFragmentManager, fragmentTag)
     }
   }
 
+  @RequiresApi(Build.VERSION_CODES.M)
   override fun dispatchProvideStructure(structure: ViewStructure?) {
     mHostView.dispatchProvideStructure(structure)
   }
 
   override fun addView(child: View, index: Int) {
+    println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
+    ModalHostShadowNode.pendingUpdateHeight[id]?.let {
+      println("🥲 addView pending: $it")
+      mHostView.setVirtualHeight(it)
+      ModalHostShadowNode.pendingUpdateHeight.remove(id)
+    }
   }
 
   override fun getChildCount(): Int = mHostView.childCount
 
   override fun getChildAt(index: Int): View? = mHostView.getChildAt(index)
 
-  override fun removeView(child: View?) {
-    println("🥲removeView")
+  override fun removeView(child: View) {
+    println("🥲 removeView id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    println("🥲 onDetachedFromWindow: $id")
+    ModalHostShadowNode.attachedViews.remove(id)
+    ModalHostShadowNode.pendingUpdateHeight.remove(id)
   }
 
   override fun removeViewAt(index: Int) {
-    println("🥲 removeViewAt: $index")
+    println("🥲 removeViewAt: $index id: ${mHostView.getChildAt(index).id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
 
-  override fun addChildrenForAccessibility(outChildren: ArrayList<View?>?) {
-    // Explicitly override this to prevent accessibility events being passed down to children
-    // Those will be handled by the mHostView which lives in the dialog
-  }
-
-  override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?): Boolean {
-    // Explicitly override this to prevent accessibility events being passed down to children
-    // Those will be handled by the mHostView which lives in the dialog
-    return false
-  }
-
-  override fun onHostResume() {
-    println("🥲onHostResume")
-    // We show the dialog again when the host resumes
-    showOrUpdate()
-  }
-
-  override fun onHostPause() {}
-
-  override fun onHostDestroy() {
-    onDropInstance()
-  }
-
-  fun onDropInstance() {
-    println("🥲onDropInstance")
+  private fun onDropInstance() {
+    println("🥲 onDropInstance")
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()
   }
 
   fun dismiss() {
-    println("🥲dismiss")
+    println("🥲 dismiss")
     UiThreadUtil.assertOnUiThread()
     this.sheet?.dismissAllowingStateLoss()
   }
+  override fun addChildrenForAccessibility(outChildren: ArrayList<View?>?) {}
 
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+  override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?) = false
+  override fun onHostResume() { showOrUpdate() }
+  override fun onHostPause() {}
 
-  }
+  override fun onHostDestroy() { onDropInstance() }
+
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
 }

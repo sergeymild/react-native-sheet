@@ -21,14 +21,14 @@ class ModalHostShadowView: RCTShadowView {
             subview.position = .absolute
         }
     }
-    
+
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
         let tag = self.reactTag.intValue
         var size = reactSubviews()[0].contentFrame.size
         let view = ModalHostShadowView.attachedViews[tag]
         let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? Double.infinity
-        
+
         DispatchQueue.main.async {
             if size.height > maxheight {
                 debugPrint("😀 constraint \(tag) \(size) \(maxheight)")
@@ -45,22 +45,15 @@ let FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView"
 
 @objc(SheetViewManager)
 class SheetViewManager: RCTViewManager {
-    var sheetView: UIView?
-
     override static func requiresMainQueueSetup() -> Bool {
         return true
     }
 
-    override func customBubblingEventTypes() -> [String]! {
-        return ["onSheetDismiss"]
-    }
-
     override func view() -> UIView! {
-        let v = HostFittedSheet(bridge: bridge, manager: self)
-        sheetView = v
+        let v = HostFittedSheet(bridge: bridge)
         return v
     }
-    
+
     private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet {
         // swiftlint:disable force_cast
         return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet
@@ -91,13 +84,22 @@ class HostFittedSheet: UIView {
     var _touchHandler: RCTTouchHandler?
     var _reactSubview: UIView?
     var _bridge: RCTBridge?
-    weak var manager: SheetViewManager?
     var _isPresented = false
     var _sheetSize: NSNumber?
     var _scrollViewTag: NSNumber?
 
+    private var _alertWindow: UIWindow?
+    private lazy var presentViewController: UIViewController = {
+        _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
+        let controller = UIViewController()
+        _alertWindow?.rootViewController = controller
+        _alertWindow?.windowLevel = UIWindow.Level.alert
+        _alertWindow?.isHidden = false
+        return controller
+    }()
+
     @objc
-    private var onSheetDismiss: RCTBubblingEventBlock?
+    private var onSheetDismiss: RCTDirectEventBlock?
 
     @objc
     func setIncreaseHeight(_ by: NSNumber) {
@@ -112,7 +114,7 @@ class HostFittedSheet: UIView {
         debugPrint("setDecreaseHeight", -by.floatValue)
         changeHeight(-by.floatValue)
     }
-    
+
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
         debugPrint("😀 setPassScrollViewReactTag", tag)
@@ -142,6 +144,7 @@ class HostFittedSheet: UIView {
     }
 
     private var sheetMaxWidthSize: NSNumber?
+    private var dismissable = true
     var sheetMaxHeightSize: NSNumber?
     private var topLeftRightCornerRadius: NSNumber?
     private var sheetBackgroundColor: UIColor?
@@ -151,6 +154,7 @@ class HostFittedSheet: UIView {
         didSet {
             sheetMaxWidthSize = (fittedSheetParams?["maxWidth"] as? NSNumber)
             sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
+            dismissable = (fittedSheetParams?["dismissable"] as? Bool) ?? true
             topLeftRightCornerRadius = (fittedSheetParams?["topLeftRightCornerRadius"] as? NSNumber)
             sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
         }
@@ -160,9 +164,8 @@ class HostFittedSheet: UIView {
         return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(UIScreen.main.bounds.width))
     }
 
-    init(bridge: RCTBridge, manager: SheetViewManager) {
+    init(bridge: RCTBridge) {
         self._bridge = bridge
-        self.manager = manager
         super.init(frame: .zero)
         _touchHandler = RCTTouchHandler(bridge: bridge)
     }
@@ -239,7 +242,9 @@ class HostFittedSheet: UIView {
                     )
                 )
                 self._modalViewController?.allowPullingPastMaxHeight = false
+                self._modalViewController?.dismissOnOverlayTap = self.dismissable
                 self._modalViewController?.autoAdjustToKeyboard = false
+                self._modalViewController?.dismissOnPull = self.dismissable
                 self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius?.doubleValue ?? 12
                 self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
                 debugPrint("😀 attachedViews \(self.reactTag.intValue)")
@@ -254,7 +259,8 @@ class HostFittedSheet: UIView {
                     }
                 }
 
-                self.reactViewController().present(self._modalViewController!, animated: true)
+                self.presentViewController.present(self._modalViewController!, animated: true)
+                //self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
                     debugPrint("😀didDismiss \(self?.onSheetDismiss)")
@@ -281,7 +287,7 @@ class HostFittedSheet: UIView {
     func destroy() {
         debugPrint("😀destroy")
         _isPresented = false
-        
+
         let cleanup = { [weak self] in
             guard let self = self else { return }
             debugPrint("😀 cleanup")
@@ -291,20 +297,20 @@ class HostFittedSheet: UIView {
             self._touchHandler?.detach(from: self._reactSubview)
             self._touchHandler = nil
             self._bridge = nil
-            self.manager?.sheetView = nil
             self.onSheetDismiss = nil
             self._sheetSize = nil
             self.sheetMaxWidthSize = nil
             self._reactSubview = nil
+            self._alertWindow = nil
         }
-        
+
         if self._modalViewController?.isBeingDismissed != true {
             debugPrint("😀dismissViewController")
             self._modalViewController?.dismiss(animated: true, completion: cleanup)
         } else {
             cleanup()
         }
-        
+
     }
 
     deinit {

@@ -19,9 +19,15 @@ const ListExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 500 }}>
-        <View style={styles.contentContainerStyle}>
-          <Text>
+
+      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
+        <View
+          style={styles.contentContainerStyle}
+          onLayout={(e) =>
+            console.log('[ListExample.-----]', e.nativeEvent.layout.height)
+          }
+        >
+          <Text style={{ color: 'black' }}>
             Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
             eligendi nesciunt nulla ullam voluptatem voluptates. Aliquam aut
             eveniet excepturi laboriosam minus optio pariatur quis. Ea hic
@@ -48,7 +54,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingHorizontal: 24,
     backgroundColor: 'white',
-    flex: 1,
+    maxHeight: 600,
   },
   message: {
     fontSize: 24,

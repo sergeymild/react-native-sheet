@@ -5,6 +5,7 @@ import React, {
   useContext,
 } from 'react';
 import {
+  Dimensions,
   findNodeHandle,
   FlatList,
   LayoutChangeEvent,
@@ -19,9 +20,11 @@ import {
 export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
 interface FittedSheetParams {
+  readonly dismissable?: boolean;
   readonly sheetHeight?: number;
   readonly maxWidth?: number;
   readonly maxHeight?: number;
+  readonly minHeight?: number;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
 }
@@ -81,8 +84,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   onLayout = (event: LayoutChangeEvent) => {
-    if (Platform.OS === 'android') return;
-    console.log('[FittedSheet.onLayout]', event.nativeEvent.layout.height);
+    if (Platform.OS === 'ios') return;
     this.setHeight(event.nativeEvent.layout.height);
   };
 
@@ -103,7 +105,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   setHeight = (size: number) => {
     console.log('[FittedSheet.setSize]', size);
-    //this.setState({ sheetSize: size });
     this.sheetRef.current?.setNativeProps({ sheetHeight: size });
   };
 
@@ -132,11 +133,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   hide = () => {
-    if (!this.state.show) return
-    const tag = findNodeHandle(this.sheetRef.current)
+    if (!this.state.show) return;
+    const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
     console.log('[FittedSheet.hide]', tag);
-    NativeModules.SheetView.dismiss(tag)
+    NativeModules.SheetView.dismiss(tag);
   };
 
   private onDismiss = () => {
@@ -145,6 +146,10 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.props.onSheetDismiss?.();
   };
 
+  componentWillUnmount() {
+    this.hide();
+  }
+
   render() {
     if (!this.state.show) {
       console.log('[FittedSheet.render.remove]');
@@ -152,7 +157,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     }
     let height = this.props.params?.sheetHeight ?? -1;
     if (height === undefined && Platform.OS === 'android') height = -1;
-    console.log('[FittedSheet.render]', height, this.props.onSheetDismiss);
+    console.log('[FittedSheet.render]');
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
@@ -170,7 +175,15 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         }
       >
         <FittedSheetContext.Provider value={this}>
-          <View nativeID={'fitted-sheet-root-view'}>
+          <View
+            nativeID={'fitted-sheet-root-view'}
+            style={{
+              maxHeight:
+                this.props.params?.maxHeight ??
+                Dimensions.get('window').height * 0.95,
+              minHeight: this.props.params?.minHeight,
+            }}
+          >
             {!!this.state.view &&
               React.createElement(
                 this.state.view.view(),

@@ -1,60 +1,64 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { Button } from '../../components/button';
-import { ContactItem } from '../../components/contactItem';
-import { createContactListMockData } from '../../utilities/createMockData';
 import { FittedSheet } from 'react-native-sheet';
+import { ContactList } from '../../components/contactList';
 
 const Sim: React.FC = () => {
-  const data = useMemo(() => createContactListMockData(9), []);
-  const renderItem = useCallback(
-    (item, index) => (
-      <ContactItem
-        key={`${item.name}.${index}`}
-        title={`${index}: ${item.name}`}
-        subTitle={item.jobTitle}
-      />
-    ),
-    []
-  );
-
-  return <View>{data.map(renderItem)}</View>;
+  return <ContactList count={50} />;
 };
 
 export const LoaderExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState<-1 | 0 | 1>(-1);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current!.show();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
   }, []);
 
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <FittedSheet ref={bottomSheetRef} params={{}}>
-        {() => (
+      <FittedSheet
+        ref={bottomSheetRef}
+        params={{ backgroundColor: 'white', maxHeight: 500 }}
+        onSheetDismiss={() => setLoading(-1)}
+      >
+        {isLoading === -1 && (
+          <TouchableOpacity
+            style={{ height: 50, marginBottom: 50 }}
+            onPress={() => {
+              setLoading(0);
+              setTimeout(() => setLoading(1), 2000);
+            }}
+          >
+            <Text style={{ color: 'black' }}>Start</Text>
+          </TouchableOpacity>
+        )}
+        {isLoading === 0 && (
+          <View
+            accessibilityLabel={'loading'}
+            key={1}
+            style={{
+              width: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 200,
+            }}
+          >
+            <ActivityIndicator />
+          </View>
+        )}
+        {isLoading === 1 && (
           <View style={styles.contentContainerStyle}>
-            {isLoading && (
-              <View
-                accessibilityLabel={'loading'}
-                key={1}
-                style={{
-                  width: '100%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 100,
-                }}
-              >
-                <ActivityIndicator />
-              </View>
-            )}
-            {!isLoading && <Sim />}
+            <Sim />
           </View>
         )}
       </FittedSheet>

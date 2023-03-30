@@ -1,13 +1,9 @@
 import {
-  FittedSheet,
   FITTED_SHEET_SCROLL_VIEW,
+  FittedSheet,
   useFittedSheetContext,
-  _SheetHostView,
 } from './FittedSheet';
 
-export {
-  FittedSheet,
-  FITTED_SHEET_SCROLL_VIEW,
-  useFittedSheetContext,
-  _SheetHostView,
-};
+export { FittedSheet, FITTED_SHEET_SCROLL_VIEW, useFittedSheetContext };
+
+export { TopModal } from './TopModal';

@@ -1,5 +1,6 @@
 package com.sheet
 
+import android.content.res.Resources
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
@@ -8,6 +9,10 @@ import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.yoga.YogaPositionType
 
 internal class ModalHostShadowNode : LayoutShadowNode() {
+  companion object {
+    val attachedViews = mutableMapOf<Int, AppFittedSheet>()
+    val pendingUpdateHeight = mutableMapOf<Int, Float>()
+  }
   /**
    * We need to set the styleWidth and styleHeight of the one child (represented by the <View></View>
    * within the <RCTModalHostView></RCTModalHostView> in Modal.js. This needs to fill the entire window.
@@ -15,15 +20,32 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
   override fun addChildAt(child: ReactShadowNodeImpl, i: Int) {
     super.addChildAt(child, i)
     println("🥲shadowNode.addChildAt")
-    val modalSize = ModalHostHelper.getModalHostSize(themedContext)
-    child.setStyleWidth(modalSize.x.toFloat())
+    val display = Resources.getSystem().displayMetrics
+    child.setStyleWidth(display.widthPixels.toFloat())
     //child.setStyleHeight(modalSize.y.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
 
-  override fun calculateLayoutOnChildren(): MutableIterable<ReactShadowNode<ReactShadowNode<*>>> {
-    return super.calculateLayoutOnChildren()
-    println("🥲calculateLayoutOnChildren ${getChildAt(0).layoutHeight}")
+  private fun savePendingHeight() {
+    val newHeight = getChildAt(0).layoutHeight
+    println("😀 dispatchUpdates id: $reactTag savePendingHeight: ${newHeight.toInt().toDP()}")
+    pendingUpdateHeight[reactTag] = newHeight
+  }
+
+  override fun dispatchUpdates(absoluteX: Float, absoluteY: Float, uiViewOperationQueue: UIViewOperationQueue?, nativeViewHierarchyOptimizer: NativeViewHierarchyOptimizer?): Boolean {
+    val didChange = super.dispatchUpdates(absoluteX, absoluteY, uiViewOperationQueue, nativeViewHierarchyOptimizer)
+    val newHeight = getChildAt(0).layoutHeight
+    attachedViews[reactTag]?.mHostView?.let {
+      if (it.reactView == null) {
+        savePendingHeight()
+      } else {
+        println("😀 dispatchUpdates id: $reactTag newHeight: ${newHeight.toInt().toDP()}")
+        it.setVirtualHeight(newHeight)
+        pendingUpdateHeight.remove(reactTag)
+      }
+    }
+    if (attachedViews[reactTag] == null) savePendingHeight()
+    return didChange
   }
 }
 
@@ -32,6 +54,13 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
 
   override fun createViewInstance(reactContext: ThemedReactContext): AppFittedSheet {
     return AppFittedSheet(reactContext)
+  }
+
+  override fun createViewInstance(reactTag: Int, reactContext: ThemedReactContext, initialProps: ReactStylesDiffMap?, stateWrapper: StateWrapper?): AppFittedSheet {
+    val view = super.createViewInstance(reactTag, reactContext, initialProps, stateWrapper)
+    println("🥲 createViewInstance id: $reactTag")
+    ModalHostShadowNode.attachedViews[view.id] = view
+    return view
   }
 
   @ReactProp(name = "fittedSheetParams")
@@ -45,7 +74,14 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     if (by == 0.0) return
     val newHeight = view.mHostView.reactHeight + PixelUtil.toPixelFromDIP(by)
     view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
-    view.mHostView.setVirtualHeight(newHeight.toInt())
+    view.mHostView.setVirtualHeight(newHeight)
+  }
+
+  @ReactProp(name = "sheetHeight")
+  fun setHeight(view: AppFittedSheet, by: Double) {
+    if (by == 0.0) return
+    //view.mHostView.sheetMaxHeightSize = view.mHostView.reactHeight.toDouble()
+    view.mHostView.setVirtualHeight(PixelUtil.toPixelFromDIP(by))
   }
 
   @ReactProp(name = "decreaseHeight")
@@ -54,7 +90,7 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     val newHeight = view.mHostView.reactHeight - PixelUtil.toPixelFromDIP(by)
     println("🥲decreaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
     view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
-    view.mHostView.setVirtualHeight(newHeight.toInt())
+    view.mHostView.setVirtualHeight(newHeight)
   }
 
   override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
@@ -68,11 +104,12 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
   }
 
   override fun createShadowNodeInstance(): LayoutShadowNode {
+    println("🥲 createShadowNodeInstance")
     return ModalHostShadowNode()
   }
 
   override fun createShadowNodeInstance(context: ReactApplicationContext): LayoutShadowNode {
-    println("🥲createShadowNodeInstance")
+    println("🥲 createShadowNodeInstance")
     return ModalHostShadowNode()
   }
 

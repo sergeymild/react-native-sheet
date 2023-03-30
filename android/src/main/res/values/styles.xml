@@ -16,4 +16,21 @@
     <item name="behavior_skipCollapsed">true</item>
   </style>
 
+
+
+
+
+  <style name="Theme.FullScreenDialog" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <item name="android:windowFrame">@null</item>
+    <item name="android:windowIsFloating">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+  </style>
+
+
+  <style name="Theme.FullScreenDialog.Slide">
+    <item name="android:windowEnterAnimation">@anim/slide_up</item>
+    <item name="android:windowExitAnimation">@anim/slide_down</item>
+  </style>
 </resources>

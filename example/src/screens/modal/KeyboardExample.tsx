@@ -22,18 +22,23 @@ const KeyboardExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
+
       <FittedSheet
-        params={{ maxHeight: 600 }}
+        params={{ maxHeight: 500 }}
         ref={bottomSheetRef}
         onSheetDismiss={() => setKH(0)}
       >
         {() => (
-          <View style={styles.contentContainerStyle}>
+          <View style={[styles.contentContainerStyle]}>
             <TextInput
               style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
             />
-            <ContactList count={100} />
-            <View style={{ height: keyboardHeight }} />
+            <ContactList
+              count={10}
+              contentContainerStyle={{
+                paddingBottom: keyboardHeight > 0 ? keyboardHeight : 34,
+              }}
+            />
             <KeyboardSpacer
               handleAndroid
               onToggle={(e) => {
@@ -54,7 +59,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   contentContainerStyle: {
-    flex: 1,
     paddingTop: 12,
     paddingHorizontal: 24,
     backgroundColor: 'white',

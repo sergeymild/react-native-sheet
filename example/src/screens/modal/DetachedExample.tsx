@@ -7,6 +7,7 @@ import { FittedSheet } from 'react-native-sheet';
 
 const DetachedExample = () => {
   // refs
+
   const bottomSheetRef = useRef<FittedSheet>(null);
 
   // variables
@@ -39,7 +40,7 @@ const DetachedExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
       <Button label="Close" onPress={handleClosePress} />
-      <FittedSheet ref={bottomSheetRef} params={{}}>
+      <FittedSheet ref={bottomSheetRef}>
         {() => (
           <View style={styles.sheetContainer}>{data.map(renderItem)}</View>
         )}
