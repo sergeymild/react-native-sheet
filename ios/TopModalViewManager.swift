@@ -35,7 +35,7 @@ class TopModalViewManager: RCTViewManager {
         let v = TopModalView(bridge: bridge)
         return v
     }
-    
+
     private func getSheetView(withTag tag: NSNumber) -> TopModalView {
         // swiftlint:disable force_cast
         return bridge.uiManager.view(forReactTag: tag) as! TopModalView
@@ -68,13 +68,13 @@ class TopModalView: RCTView {
     weak var manager: SheetViewManager?
     var _isPresented = false
     var _scrollViewTag: NSNumber?
-    
+
     private var _alertWindow: UIWindow?
     private lazy var presentViewController: UIViewController = {
         _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
         let controller = UIViewController()
         _alertWindow?.rootViewController = controller
-        _alertWindow?.windowLevel = UIWindow.Level.alert + 10
+        _alertWindow?.windowLevel = UIWindow.Level.alert
         _alertWindow?.isHidden = false
         viewController.modalPresentationStyle = .fullScreen
         viewController.view.backgroundColor = .clear
@@ -85,18 +85,17 @@ class TopModalView: RCTView {
     private var onModalDismiss: RCTDirectEventBlock?
     @objc
     private var animated: Bool = true
-    
-    
+
     init(bridge: RCTBridge) {
         self._bridge = bridge
         super.init(frame: .zero)
         _touchHandler = RCTTouchHandler(bridge: bridge)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
         debugPrint("😀insertReactSubview")
         super.insertReactSubview(subview, at: atIndex)
@@ -115,7 +114,7 @@ class TopModalView: RCTView {
 
     // need to leave it empty
     override func didUpdateReactSubviews() {}
-    
+
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if (!self.isUserInteractionEnabled && self.superview?.reactSubviews().contains(self) != nil) {
@@ -145,7 +144,7 @@ class TopModalView: RCTView {
             destroy()
         }
     }
-    
+
     func dismissVC() {
         self.viewController.dismiss(animated: true) {
             debugPrint("😀 dismissVC \(self.onModalDismiss)")
@@ -156,7 +155,7 @@ class TopModalView: RCTView {
     func destroy() {
         debugPrint("😀destroy")
         _isPresented = false
-        
+
         let cleanup = { [weak self] in
             guard let self = self else { return }
             debugPrint("😀 cleanup")
@@ -168,15 +167,15 @@ class TopModalView: RCTView {
             self._reactSubview = nil
             self._alertWindow = nil
         }
-        
-        
+
+
         if self.viewController.isBeingDismissed != true {
             debugPrint("😀dismissViewController")
             self.viewController.dismiss(animated: true, completion: cleanup)
         } else {
             cleanup()
         }
-        
+
     }
 
     deinit {

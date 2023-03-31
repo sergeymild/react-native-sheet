@@ -21,14 +21,14 @@ class ModalHostShadowView: RCTShadowView {
             subview.position = .absolute
         }
     }
-    
+
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
         let tag = self.reactTag.intValue
         var size = reactSubviews()[0].contentFrame.size
         let view = ModalHostShadowView.attachedViews[tag]
         let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? Double.infinity
-        
+
         DispatchQueue.main.async {
             if size.height > maxheight {
                 debugPrint("😀 constraint \(tag) \(size) \(maxheight)")
@@ -53,7 +53,7 @@ class SheetViewManager: RCTViewManager {
         let v = HostFittedSheet(bridge: bridge)
         return v
     }
-    
+
     private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet {
         // swiftlint:disable force_cast
         return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet
@@ -87,13 +87,13 @@ class HostFittedSheet: UIView {
     var _isPresented = false
     var _sheetSize: NSNumber?
     var _scrollViewTag: NSNumber?
-    
+
     private var _alertWindow: UIWindow?
     private lazy var presentViewController: UIViewController = {
         _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
         let controller = UIViewController()
         _alertWindow?.rootViewController = controller
-        _alertWindow?.windowLevel = UIWindow.Level.alert + 1
+        _alertWindow?.windowLevel = UIWindow.Level.alert
         _alertWindow?.isHidden = false
         return controller
     }()
@@ -114,7 +114,7 @@ class HostFittedSheet: UIView {
         debugPrint("setDecreaseHeight", -by.floatValue)
         changeHeight(-by.floatValue)
     }
-    
+
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
         debugPrint("😀 setPassScrollViewReactTag", tag)
@@ -287,7 +287,7 @@ class HostFittedSheet: UIView {
     func destroy() {
         debugPrint("😀destroy")
         _isPresented = false
-        
+
         let cleanup = { [weak self] in
             guard let self = self else { return }
             debugPrint("😀 cleanup")
@@ -303,14 +303,14 @@ class HostFittedSheet: UIView {
             self._reactSubview = nil
             self._alertWindow = nil
         }
-        
+
         if self._modalViewController?.isBeingDismissed != true {
             debugPrint("😀dismissViewController")
             self._modalViewController?.dismiss(animated: true, completion: cleanup)
         } else {
             cleanup()
         }
-        
+
     }
 
     deinit {
