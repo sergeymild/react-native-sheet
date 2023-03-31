@@ -8,6 +8,7 @@ import com.facebook.react.uimanager.LayoutShadowNode
 import com.facebook.react.uimanager.ReactShadowNodeImpl
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
+import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.yoga.YogaPositionType
 
 private class ModalHostShadowNode : LayoutShadowNode() {
@@ -33,6 +34,11 @@ class TopModalViewManager : ViewGroupManager<TopModalView>() {
       .build()
   }
 
+  @ReactProp(name="animated")
+  fun setAnimated(view: TopModalView, animated: Boolean) {
+    view.animated = animated
+  }
+
   override fun getShadowNodeClass(): Class<LayoutShadowNode> {
     return ModalHostShadowNode::class.java as Class<LayoutShadowNode>
   }
@@ -56,8 +62,8 @@ class TopModalViewManager : ViewGroupManager<TopModalView>() {
     println("⚽️ removeViewAt")
   }
 
-  override fun onAfterUpdateTransaction(view: TopModalView) {
-    super.onAfterUpdateTransaction(view)
-    view.showOrUpdate()
+  override fun onDropViewInstance(view: TopModalView) {
+    super.onDropViewInstance(view)
+    view.dismiss()
   }
 }

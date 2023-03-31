@@ -15,7 +15,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.sheet.R
 
-fun androidx.fragment.app.Fragment.safeShow(manager: FragmentManager, tag: String?) {
+fun androidx.fragment.app.Fragment.safeShow(
+  manager: FragmentManager,
+  tag: String?
+) {
   val ft = manager.beginTransaction()
   ft.add(this, tag)
   ft.commitAllowingStateLoss()
@@ -23,6 +26,7 @@ fun androidx.fragment.app.Fragment.safeShow(manager: FragmentManager, tag: Strin
 
 class FullScreenDialog(
   private val presentView: View,
+  private val animated: Boolean,
   private val onDismiss: () -> Unit
 ) : DialogFragment() {
 
@@ -37,7 +41,9 @@ class FullScreenDialog(
       val width = ViewGroup.LayoutParams.MATCH_PARENT
       val height = ViewGroup.LayoutParams.MATCH_PARENT
       it.setLayout(width, height)
-      it.setWindowAnimations(R.style.Theme_FullScreenDialog_Slide)
+      if (animated) {
+        it.setWindowAnimations(R.style.Theme_FullScreenDialog_Slide)
+      }
       it.setFormat(PixelFormat.TRANSLUCENT)
       it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
       it.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
