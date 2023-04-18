@@ -51,7 +51,7 @@ interface State {
 export const FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView";
 
 interface Context {
-  hide: () => void;
+  hide: (passThroughtParam?: any) => void;
   replace: (height: number) => void;
   setHeight: (size: number) => void;
   onLayout: (event: LayoutChangeEvent) => void;
@@ -127,7 +127,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
   };
 
-  hide = (passThroughtParam: any) => {
+  hide = (passThroughtParam?: any) => {
     if (!this.state.show) return;
     this.onHidePassThroughtParam = passThroughtParam;
     const tag = findNodeHandle(this.sheetRef.current);
