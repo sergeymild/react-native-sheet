@@ -7,7 +7,7 @@ Native implementation of Bottom sheet
 ## Installation
 
 ```sh
-"react-native-sheet": "sergeymild/react-native-sheet#0.8.5"
+"react-native-sheet": "sergeymild/react-native-sheet#0.8.6"
 ```
 
 ## Usage
