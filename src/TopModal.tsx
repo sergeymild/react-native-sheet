@@ -12,6 +12,7 @@ const TopModalView = requireNativeComponent<any>('TopModalView');
 interface Props {
   onModalDismiss?: () => void;
   children: React.ReactNode;
+  animated?: boolean
 }
 
 interface State {
@@ -59,7 +60,7 @@ export class TopModal extends React.PureComponent<Props, State> {
       return null;
     }
     return (
-      <TopModalView onModalDismiss={this.onDismiss} ref={this.sheetRef}>
+      <TopModalView onModalDismiss={this.onDismiss} ref={this.sheetRef} animated={this.props.animated ?? true}>
         <View
           accessibilityLabel={'top-modal-root-view'}
           nativeID={'top-modal-root-view'}

@@ -17,18 +17,13 @@ fun TopModalView.onModalDismiss() {
     .receiveEvent(id, "onModalDismiss", Arguments.createMap())
 }
 
-class TopModalView(context: Context?) : ReactViewGroup(context), LifecycleEventListener {
+class TopModalView(context: Context?) : ReactViewGroup(context) {
   private var dialog: FullScreenDialog? = null
   private var rnView = BaseRNView(context)
+  var animated = true
 
   init {
     println("⚽️ init")
-  }
-
-  fun showOrUpdate() {
-    println("⚽️ showOrUpdate")
-    (context as ReactContext).removeLifecycleEventListener(this)
-    (context as ReactContext).addLifecycleEventListener(this)
   }
 
   private fun getCurrentActivity(): AppCompatActivity {
@@ -37,7 +32,7 @@ class TopModalView(context: Context?) : ReactViewGroup(context), LifecycleEventL
 
   override fun addView(child: View, index: Int) {
     rnView.addView(child)
-    dialog = FullScreenDialog(rnView, ::onModalDismiss)
+    dialog = FullScreenDialog(rnView, animated, ::onModalDismiss)
     dialog?.safeShow(getCurrentActivity().supportFragmentManager, "TopModalView")
     dialog?.isCancelable = true
 
@@ -45,23 +40,6 @@ class TopModalView(context: Context?) : ReactViewGroup(context), LifecycleEventL
 
   override fun addChildrenForAccessibility(outChildren: ArrayList<View?>?) {}
   override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?) = false
-
-
-  override fun onHostResume() {
-    showOrUpdate()
-  }
-
-  override fun onHostPause() {}
-
-  override fun onHostDestroy() {
-    onDropInstance()
-  }
-
-  fun onDropInstance() {
-    println("⚽️ onDropInstance")
-    (context as ReactContext).removeLifecycleEventListener(this)
-    dismiss()
-  }
 
 
   override fun removeView(child: View?) {
@@ -77,8 +55,10 @@ class TopModalView(context: Context?) : ReactViewGroup(context), LifecycleEventL
   }
 
   fun dismiss() {
-    println("⚽️ dismiss")
-    dialog?.dismissAllowingStateLoss()
-    dialog = null
+    dialog?.let {
+      println("⚽️ dismiss")
+      dialog?.dismissAllowingStateLoss()
+      dialog = null
+    }
   }
 }
