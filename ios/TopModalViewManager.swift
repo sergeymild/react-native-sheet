@@ -125,7 +125,8 @@ class TopModalView: RCTView {
             _isPresented = true
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {return}
-                self.viewController.view.addSubview(self._reactSubview!)
+                guard let rv = self._reactSubview else {return}
+                self.viewController.view.addSubview(rv)
                 self.presentViewController.present(self.viewController, animated: self.animated)
             }
         }
