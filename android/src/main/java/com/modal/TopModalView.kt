@@ -26,14 +26,15 @@ class TopModalView(context: Context?) : ReactViewGroup(context) {
     println("⚽️ init")
   }
 
-  private fun getCurrentActivity(): AppCompatActivity {
-    return (context as ReactContext).currentActivity as AppCompatActivity
+  private fun getCurrentActivity(): AppCompatActivity? {
+    return (context as? ReactContext)?.currentActivity as? AppCompatActivity
   }
 
   override fun addView(child: View, index: Int) {
+    val activity = getCurrentActivity() ?: return
     rnView.addView(child)
     dialog = FullScreenDialog(rnView, animated, ::onModalDismiss)
-    dialog?.safeShow(getCurrentActivity().supportFragmentManager, "TopModalView")
+    dialog?.safeShow(activity.supportFragmentManager, "TopModalView")
     dialog?.isCancelable = true
 
   }
