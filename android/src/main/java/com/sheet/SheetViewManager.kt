@@ -19,10 +19,8 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
    */
   override fun addChildAt(child: ReactShadowNodeImpl, i: Int) {
     super.addChildAt(child, i)
-    println("🥲shadowNode.addChildAt")
     val display = Resources.getSystem().displayMetrics
     child.setStyleWidth(display.widthPixels.toFloat())
-    //child.setStyleHeight(modalSize.y.toFloat())
     child.setPositionType(YogaPositionType.ABSOLUTE)
   }
 

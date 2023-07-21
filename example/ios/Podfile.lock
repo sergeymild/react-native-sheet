@@ -336,7 +336,7 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-sheet (0.7.3):
+  - react-native-sheet (0.8.10):
     - FittedSheets
     - React-Core
   - React-perflogger (0.71.3)
@@ -631,7 +631,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 9f7c9137605e72ca0343db4cea88006cb94856dd
   React-logger: 957e5dc96d9dbffc6e0f15e0ee4d2b42829ff207
   react-native-safe-area-context: 39c2d8be3328df5d437ac1700f4f3a4f75716acc
-  react-native-sheet: beeded59b5c0318a91dd899fb6148844892adf98
+  react-native-sheet: 4bd2683a4fb21ec44baba0b8a6a18bc907b5e2e7
   React-perflogger: af8a3d31546077f42d729b949925cc4549f14def
   React-RCTActionSheet: 57cc5adfefbaaf0aae2cf7e10bccd746f2903673
   React-RCTAnimation: 11c61e94da700c4dc915cf134513764d87fc5e2b
@@ -651,6 +651,6 @@ SPEC CHECKSUMS:
   Yoga: 5ed1699acbba8863755998a4245daa200ff3817b
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 10868557094355155ff797491a92f5afa20aba8e
+PODFILE CHECKSUM: a2cf76092cdeebba79f1d1b17258d5ef9baec7dd
 
 COCOAPODS: 1.11.3

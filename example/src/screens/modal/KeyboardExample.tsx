@@ -9,6 +9,7 @@ import { FittedSheet } from 'react-native-sheet';
 const KeyboardExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
+  const [count, setCount] = useState(2)
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
@@ -24,9 +25,12 @@ const KeyboardExample = () => {
       <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
-        params={{ maxHeight: 500 }}
+        //params={{ maxHeight: 500 }}
         ref={bottomSheetRef}
-        onSheetDismiss={() => setKH(0)}
+        onSheetDismiss={() => {
+          setKH(0)
+          setCount(2)
+        }}
       >
         {() => (
           <View style={[styles.contentContainerStyle]}>
@@ -34,7 +38,7 @@ const KeyboardExample = () => {
               style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
             />
             <ContactList
-              count={10}
+              count={count}
               contentContainerStyle={{
                 paddingBottom: keyboardHeight > 0 ? keyboardHeight : 34,
               }}
@@ -43,6 +47,12 @@ const KeyboardExample = () => {
               handleAndroid
               onToggle={(e) => {
                 setKH(e);
+                setTimeout(() => {
+                  setCount(20)
+                  // setTimeout(() => {
+                  //   setCount(4)
+                  // }, 1000)
+                }, 1000)
                 console.log('[KeyboardExample.]', e);
               }}
             />

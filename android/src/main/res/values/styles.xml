@@ -7,6 +7,8 @@
     <item name="android:windowBackground">@android:color/transparent</item>
     <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
     <item name="bottomSheetStyle">@style/AppBottomSheetModalBehavior</item>
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:windowSoftInputMode">adjustNothing</item>
   </style>
 
   <style name="AppBottomSheetModalBehavior" parent="android:Widget">
