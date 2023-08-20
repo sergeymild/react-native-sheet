@@ -8,6 +8,8 @@
     <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
     <item name="bottomSheetStyle">@style/AppBottomSheetModalBehavior</item>
     <item name="android:windowIsFloating">false</item>
+    <item name="statusBarBackground">@android:color/transparent</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
     <item name="android:windowSoftInputMode">adjustNothing</item>
   </style>
 
