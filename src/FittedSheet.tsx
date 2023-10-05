@@ -29,7 +29,7 @@ interface FittedSheetParams {
   readonly backgroundColor?: string;
 }
 
-type Children = ((data: any) => React.ReactNode) | React.ReactNode;
+type Children = ((data: any) => React.ReactElement) | React.ReactElement;
 
 interface Props {
   readonly params?: FittedSheetParams;
