@@ -10,21 +10,20 @@
   },
   "dependencies": {
     "react": "18.2.0",
-    "react-native": "0.71.3",
-    "faker": "^4.1.0",
+    "react-native": "0.72.7",
     "@gorhom/showcase-template": "^2.1.0",
-    "@react-navigation/native": "^6.0.6",
-    "@react-navigation/native-stack": "^6.2.5",
-    "@react-navigation/stack": "^6.0.11",
-    "react-native-safe-area-context": "4.5.0",
-    "react-native-screens": "^3.20.0",
-    "react-native-gesture-handler": "^2.9.0"
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/native-stack": "^6.9.17",
+    "@react-navigation/stack": "^6.3.20",
+    "react-native-safe-area-context": "4.7.4",
+    "react-native-screens": "^3.27.0",
+    "react-native-gesture-handler": "^2.13.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@babel/preset-env": "^7.20.0",
-    "@babel/runtime": "^7.20.0",
-    "metro-react-native-babel-preset": "0.73.7",
-    "babel-plugin-module-resolver": "^4.1.0"
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@babel/runtime": "^7.23.4",
+    "metro-react-native-babel-preset": "0.77.0",
+    "babel-plugin-module-resolver": "^5.0.0"
   }
 }
