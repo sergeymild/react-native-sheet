@@ -37,6 +37,7 @@ class FullScreenDialog(
 
   override fun onStart() {
     super.onStart()
+    isCancelable = false
     dialog?.window?.let {
       val width = ViewGroup.LayoutParams.MATCH_PARENT
       val height = ViewGroup.LayoutParams.MATCH_PARENT
