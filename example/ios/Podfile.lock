@@ -318,7 +318,7 @@ PODS:
     - glog
   - react-native-safe-area-context (4.7.4):
     - React-Core
-  - react-native-sheet (0.8.13):
+  - react-native-sheet (0.9.1):
     - FittedSheets (~> 2.6.1)
     - React-Core
   - React-NativeModulesApple (0.72.7):
@@ -609,7 +609,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 8baadae51f01d867c3921213a25ab78ab4fbcd91
   React-logger: 8edc785c47c8686c7962199a307015e2ce9a0e4f
   react-native-safe-area-context: 2cd91d532de12acdb0a9cbc8d43ac72a8e4c897c
-  react-native-sheet: a33231849468d2c7a105cb1cd9bd4e968a18380e
+  react-native-sheet: 584f84f0f557e79801e7f2cbffb8b6897afade65
   React-NativeModulesApple: b6868ee904013a7923128892ee4a032498a1024a
   React-perflogger: 31ea61077185eb1428baf60c0db6e2886f141a5a
   React-RCTActionSheet: 392090a3abc8992eb269ef0eaa561750588fc39d

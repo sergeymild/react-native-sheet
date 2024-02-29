@@ -13,6 +13,10 @@
     <item name="android:windowSoftInputMode">adjustNothing</item>
   </style>
 
+  <style name="AppBottomSheetDialog.Dark">
+    <item name="android:navigationBarColor">@android:color/black</item>
+  </style>
+
   <style name="AppBottomSheetModalBehavior" parent="android:Widget">
     <item name="android:background">@android:color/transparent</item>
     <item name="android:elevation" tools:ignore="NewApi">16dp</item>

@@ -15,6 +15,7 @@ class FragmentModalBottomSheet(
   private val dismissable: Boolean,
   private val handleRadius: Float,
   private val sheetBackgroundColor: Int,
+  private val isDark: Boolean,
   private val onDismiss: () -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -26,7 +27,7 @@ class FragmentModalBottomSheet(
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     this.isCancelable = dismissable
-    val dialog = CustomBottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog)
+    val dialog = CustomBottomSheetDialog(requireContext(), if (isDark) R.style.AppBottomSheetDialog_Dark else R.style.AppBottomSheetDialog)
     dialog.setCornerRadius(handleRadius)
     dialog.setSheetBackgroundColor(sheetBackgroundColor)
     return dialog

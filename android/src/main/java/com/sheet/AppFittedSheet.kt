@@ -42,6 +42,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params?.float("topLeftRightCornerRadius")
   private val backgroundColor: Int
     get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
+  private val isDark: Boolean
+    get() = params?.bool("isDark") ?: false
 
   private fun getCurrentActivity(): AppCompatActivity {
     return (context as ReactContext).currentActivity as AppCompatActivity
@@ -60,6 +62,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         modalView = mHostView,
         dismissable = dismissable,
         sheetBackgroundColor = backgroundColor,
+        isDark = isDark,
         handleRadius = topLeftRightCornerRadius ?: 0F
       ) {
         println("😀 onDismiss")

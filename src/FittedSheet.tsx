@@ -25,6 +25,7 @@ interface FittedSheetParams {
   readonly maxWidth?: number;
   readonly maxHeight?: number;
   readonly minHeight?: number;
+  readonly isDark?: boolean;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
 }
@@ -160,6 +161,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
           this.props.params
             ? {
                 ...this.props.params,
+                isDark: this.props.params.isDark ?? false,
                 sheetHeight: height,
                 backgroundColor: this.props.params.backgroundColor
                   ? processColor(this.props.params.backgroundColor)
