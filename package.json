@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Native implementation of Bottom sheet",
   "main": "src/index",
   "module": "src/index",

@@ -657,11 +657,6 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
       && (!parent.isPointInChildBounds(scroll, (int) event.getX(), (int) event.getY()) || (initialY - event.getY() < 10 && scroll.getScrollY() == 0))
       && viewDragHelper != null
       && Math.abs(initialY - event.getY()) > viewDragHelper.getTouchSlop();
-    if (scroll != null) {
-      ReactScrollView s = ((ReactScrollView) scroll);
-      boolean inScroll = (!parent.isPointInChildBounds(scroll, (int) event.getX(), (int) event.getY()));
-//    System.out.println("=== " + inScroll + " " + s.getScrollY() + " " + (initialY - event.getY()));
-    }
     return iss;
   }
 
