@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Native implementation of Bottom sheet",
   "main": "src/index",
   "module": "src/index",
@@ -32,7 +32,6 @@
     "prepack": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
-    "bootstrap": "yarn example && yarn install && yarn example pods",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build"
   },
   "keywords": [
