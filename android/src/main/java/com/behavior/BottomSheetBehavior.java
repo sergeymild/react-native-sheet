@@ -299,6 +299,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   @Nullable ViewDragHelper viewDragHelper;
 
   private boolean ignoreEvents;
+  private boolean isHorizontalPanning = false;
 
   private int lastNestedScrollDy;
 
@@ -322,6 +323,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   int activePointerId;
 
   private int initialY;
+  private int initialX;
 
   boolean touchingScrollingChild;
 
@@ -614,6 +616,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     switch (action) {
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
+        isHorizontalPanning = false;
         touchingScrollingChild = false;
         activePointerId = MotionEvent.INVALID_POINTER_ID;
         // Reset the ignore flag
@@ -622,8 +625,20 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
           return false;
         }
         break;
+      case MotionEvent.ACTION_MOVE:
+        int newX = (int) event.getX();
+        int newY = (int) event.getY();
+        // panned horizontal
+        if (newY - initialY >= 20 && !isHorizontalPanning) {
+          ignoreEvents = false;
+        } else if (Math.abs(newX - initialX) >= 20) {
+          isHorizontalPanning = true;
+          ignoreEvents = true;
+        }
+        break;
       case MotionEvent.ACTION_DOWN:
-        int initialX = (int) event.getX();
+        isHorizontalPanning = false;
+        initialX = (int) event.getX();
         initialY = (int) event.getY();
         // Only intercept nested scrolling events here if the view not being moved by the
         // ViewDragHelper.
@@ -637,7 +652,6 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         ignoreEvents =
           activePointerId == MotionEvent.INVALID_POINTER_ID
             && !parent.isPointInChildBounds(child, initialX, initialY);
-        System.out.println("===| ");
         break;
       default: // fall out
     }
