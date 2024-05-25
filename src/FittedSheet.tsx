@@ -3,7 +3,7 @@ import React, {
   createContext,
   FunctionComponent,
   useContext,
-} from "react";
+} from 'react';
 import {
   Dimensions,
   findNodeHandle,
@@ -15,11 +15,11 @@ import {
   requireNativeComponent,
   ScrollView,
   View,
-} from "react-native";
+} from 'react-native';
 
-export const _FittedSheet = requireNativeComponent<any>("SheetView");
+export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
-interface FittedSheetParams {
+export interface FittedSheetParams {
   readonly dismissable?: boolean;
   readonly sheetHeight?: number;
   readonly maxWidth?: number;
@@ -49,7 +49,7 @@ interface State {
   };
 }
 
-export const FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView";
+export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 
 interface Context {
   hide: (passThroughtParam?: any) => void;
@@ -85,7 +85,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   onLayout = (event: LayoutChangeEvent) => {
-    if (Platform.OS === "ios") return;
+    if (Platform.OS === 'ios') return;
     this.setHeight(event.nativeEvent.layout.height);
   };
 
@@ -111,8 +111,8 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     let tag = findNodeHandle(ref.current);
     if (!tag) {
       console.warn(
-        "[FittedSheet.passScrollViewReactTag]",
-        "ScrollView did find with ref:",
+        '[FittedSheet.passScrollViewReactTag]',
+        'ScrollView did find with ref:',
         ref.current
       );
       return;
@@ -152,7 +152,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       return null;
     }
     let height = this.props.params?.sheetHeight ?? -1;
-    if (height === undefined && Platform.OS === "android") height = -1;
+    if (height === undefined && Platform.OS === 'android') height = -1;
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
@@ -172,11 +172,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       >
         <FittedSheetContext.Provider value={this}>
           <View
-            nativeID={"fitted-sheet-root-view"}
+            nativeID={'fitted-sheet-root-view'}
             style={{
               maxHeight:
                 this.props.params?.maxHeight ??
-                Dimensions.get("window").height * 0.95,
+                Dimensions.get('window').height * 0.95,
               minHeight: this.props.params?.minHeight,
             }}
           >
@@ -187,11 +187,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
               )}
             {!this.state.view &&
               this.props.children &&
-              typeof this.props.children === "function" &&
+              typeof this.props.children === 'function' &&
               this.props.children(this.state.data)}
             {!this.state.view &&
               this.props.children &&
-              typeof this.props.children !== "function" &&
+              typeof this.props.children !== 'function' &&
               this.props.children}
           </View>
         </FittedSheetContext.Provider>

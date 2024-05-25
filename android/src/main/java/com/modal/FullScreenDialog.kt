@@ -32,7 +32,7 @@ class FullScreenDialog(
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setStyle(STYLE_NORMAL, R.style.Theme_FullScreenDialog)
+    setStyle(STYLE_NORMAL, R.style.Custom_Theme_FullScreenDialog)
   }
 
   override fun onStart() {
@@ -43,7 +43,7 @@ class FullScreenDialog(
       val height = ViewGroup.LayoutParams.MATCH_PARENT
       it.setLayout(width, height)
       if (animated) {
-        it.setWindowAnimations(R.style.Theme_FullScreenDialog_Slide)
+        it.setWindowAnimations(R.style.Custom_Theme_FullScreenDialog_Slide)
       }
       it.setFormat(PixelFormat.TRANSLUCENT)
       it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

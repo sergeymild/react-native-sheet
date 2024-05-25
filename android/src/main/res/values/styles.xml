@@ -28,7 +28,7 @@
 
 
 
-  <style name="Theme.FullScreenDialog" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+  <style name="Custom.Theme.FullScreenDialog" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
     <item name="android:windowFrame">@null</item>
     <item name="android:windowIsFloating">true</item>
     <item name="android:windowContentOverlay">@null</item>
@@ -37,7 +37,7 @@
   </style>
 
 
-  <style name="Theme.FullScreenDialog.Slide">
+  <style name="Custom.Theme.FullScreenDialog.Slide">
     <item name="android:windowEnterAnimation">@anim/slide_up</item>
     <item name="android:windowExitAnimation">@anim/slide_down</item>
   </style>
