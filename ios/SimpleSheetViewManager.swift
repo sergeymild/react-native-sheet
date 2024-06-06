@@ -10,60 +10,65 @@ import Foundation
 import UIKit
 import React
 
-
 private class ModalHostShadowView: RCTShadowView {
-    static var attachedViews: [Int: HostFittedSheet] = [:]
-    override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
-        super.insertReactSubview(subview, at: atIndex)
-        if subview != nil {
-            (subview as RCTShadowView).width = YGValue.init(value: Float(RCTScreenSize().width), unit: .point)
-            subview.position = .absolute
-        }
-    }
+    static var attachedViews: [Int: HostFittedSheet2] = [:]
 
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
         let tag = self.reactTag.intValue
         var size = reactSubviews()[0].contentFrame.size
         let view = ModalHostShadowView.attachedViews[tag]
-        let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? Double.infinity
+        let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? RCTScreenSize().height
 
         DispatchQueue.main.async {
             if size.height > maxheight {
                 debugPrint("😀 ModalHostShadowView.constraint \(tag) \(size) \(maxheight)")
                 size.height = maxheight
-                view!.notifyForBoundsChange(newBounds: size)
+                view?.notifyForBoundsChange(newBounds: size)
             }
-            view?._modalViewController?.setSizes([.fixed(size.height)])
+            
+            if let view {
+                var sizes: [SheetSize] = []
+                
+                if let sheetMinHeightSize = view.sheetMinHeightSize {
+                    sizes.append(.fixed(sheetMinHeightSize.doubleValue))
+                }
+                sizes.append(.fixed(size.height))
+                
+                view.frame.size.height = size.height
+                view._modalViewController?.setSizes(sizes, skipHeightConstraint: true)
+                debugPrint("😀 ModalHostShadowView.layout(with \(tag) height: \(size.height) maxheight: \(maxheight)", sizes)
+            }
         }
-        debugPrint("😀 ModalHostShadowView.layout(with \(tag) \(size) \(maxheight)")
+    }
+    
+    deinit {
+        debugPrint("ModalHostShadowView.deinit")
     }
 }
 
-let FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView"
-
-@objc(SheetViewManager)
-class SheetViewManager: RCTViewManager {
+@objc(SimpleSheetViewManager)
+class SimpleSheetViewManager: RCTViewManager {
     override static func requiresMainQueueSetup() -> Bool {
         return true
     }
 
     override func view() -> UIView! {
-        let v = HostFittedSheet(bridge: bridge)
+        let v = HostFittedSheet2(bridge: bridge)
         return v
     }
 
-    private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet? {
+    private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet2 {
         // swiftlint:disable force_cast
-        return bridge.uiManager.view(forReactTag: tag) as? HostFittedSheet
+        return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet2
     }
 
     @objc
     final func dismiss(_ node: NSNumber) {
         DispatchQueue.main.async {
             let component = self.getSheetView(withTag: node)
-            component?._modalViewController?.dismiss(animated: true)
-            debugPrint("😀 SheetViewManager.dismiss")
+            component._modalViewController?.dismiss(animated: true)
+            debugPrint("😀 SimpleSheetViewManager.dismiss")
         }
     }
 
@@ -72,12 +77,12 @@ class SheetViewManager: RCTViewManager {
     }
 
     deinit {
-        debugPrint("😀 SheetViewManager.deinit")
+        debugPrint("😀 SimpleSheetViewManager.deinit")
     }
 }
 
 
-private class HostFittedSheet: UIView {
+private class HostFittedSheet2: UIView {
     var _modalViewController: SheetViewController?
     let viewController = UIViewController()
     var _touchHandler: RCTTouchHandler?
@@ -87,43 +92,33 @@ private class HostFittedSheet: UIView {
     var _sheetSize: NSNumber?
     var _scrollViewTag: NSNumber?
 
-    private var _alertWindow: UIWindow?
-    private lazy var presentViewController: UIViewController = {
-        _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
-        let controller = UIViewController()
-        _alertWindow?.rootViewController = controller
-        _alertWindow?.windowLevel = UIWindow.Level.alert
-        _alertWindow?.isHidden = false
-        return controller
-    }()
-
     @objc
     private var onSheetDismiss: RCTDirectEventBlock?
 
     @objc
     func setIncreaseHeight(_ by: NSNumber) {
         if by.floatValue == 0 { return }
-        debugPrint("😀 HostFittedSheet.setIncreaseHeight", by.floatValue)
+        debugPrint("😀 HostFittedSheet2.setIncreaseHeight", by.floatValue)
         changeHeight(by.floatValue)
     }
 
     @objc
     func setDecreaseHeight(_ by: NSNumber) {
         if by.floatValue == 0 { return }
-        debugPrint("😀 HostFittedSheet.setDecreaseHeight", -by.floatValue)
+        debugPrint("😀 HostFittedSheet2.setDecreaseHeight", -by.floatValue)
         changeHeight(-by.floatValue)
     }
 
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
-        debugPrint("😀 HostFittedSheet.setPassScrollViewReactTag", tag)
+        debugPrint("😀 HostFittedSheet2.setPassScrollViewReactTag", tag)
         guard let scrollView = self._bridge?.uiManager.view(forReactTag: tag) as? RCTScrollView else {
             return
         }
         if self._modalViewController == nil {
             self._scrollViewTag = tag
         }
-        debugPrint("😀 HostFittedSheet.setPassScrollViewReactTag found", scrollView, self._modalViewController)
+        debugPrint("😀 HostFittedSheet2.setPassScrollViewReactTag found", scrollView, self._modalViewController)
         self._modalViewController?.handleScrollView(scrollView.scrollView)
     }
 
@@ -133,17 +128,25 @@ private class HostFittedSheet: UIView {
 
         let newHeight = CGFloat(by)
         if reactSubView.frame.height == newHeight { return }
-        let increasedHeight = reactSubView.frame.height + newHeight
-        debugPrint("HostFittedSheet.changeHeight from", reactSubView.frame.height, "to", increasedHeight)
+        var increasedHeight = reactSubView.frame.height + newHeight
+        let _min = sheetMinHeightSize?.doubleValue ?? 0
+        let _max = sheetMaxHeightSize?.doubleValue ?? RCTScreenSize().height
+        increasedHeight = max(_min, increasedHeight)
+        increasedHeight = min(_max, increasedHeight)
+        
+        debugPrint("😀 HostFittedSheet2.changeHeight from", reactSubView.frame.height, "to", increasedHeight, "self", self.frame.size.height)
         let sizes: [SheetSize] = [.fixed(increasedHeight)]
-        self._modalViewController?.sizes = sizes
-        self._modalViewController?.resize(to: sizes[0], animated: true)
+        self._modalViewController?.setSizes(sizes)
         self.notifyForBoundsChange(newBounds: .init(width: reactSubView.frame.width, height: increasedHeight))
+        self.frame.size.height = increasedHeight
+        setNeedsLayout()
+        layoutSubviews()
     }
 
     private var sheetMaxWidthSize: NSNumber?
     private var dismissable = true
     var sheetMaxHeightSize: NSNumber?
+    var sheetMinHeightSize: NSNumber?
     private var topLeftRightCornerRadius: NSNumber?
     private var sheetBackgroundColor: UIColor?
 
@@ -152,6 +155,7 @@ private class HostFittedSheet: UIView {
         didSet {
             sheetMaxWidthSize = (fittedSheetParams?["maxWidth"] as? NSNumber)
             sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
+            sheetMinHeightSize = (fittedSheetParams?["minHeight"] as? NSNumber)
             dismissable = (fittedSheetParams?["dismissable"] as? Bool) ?? true
             topLeftRightCornerRadius = (fittedSheetParams?["topLeftRightCornerRadius"] as? NSNumber)
             sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
@@ -174,13 +178,12 @@ private class HostFittedSheet: UIView {
 
     func notifyForBoundsChange(newBounds: CGSize) {
       if (_reactSubview != nil && _isPresented) {
-          debugPrint("😀 HostFittedSheet.notifyForBoundsChange \(newBounds)")
+          debugPrint("😀 HostFittedSheet2.notifyForBoundsChange \(newBounds)")
           _bridge?.uiManager.setSize(newBounds, for: _reactSubview!)
       }
     }
 
     override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-        debugPrint("😀 HostFittedSheet.insertReactSubview")
         super.insertReactSubview(subview, at: atIndex)
         _touchHandler?.attach(to: subview)
         viewController.view.insertSubview(subview, at: 0)
@@ -188,7 +191,7 @@ private class HostFittedSheet: UIView {
     }
 
     override func removeReactSubview(_ subview: UIView!) {
-        debugPrint("😀 HostFittedSheet.removeReactSubview")
+        debugPrint("😀 HostFittedSheet2.removeReactSubview")
         super.removeReactSubview(subview)
         _touchHandler?.detach(from: subview)
         _reactSubview = nil
@@ -229,13 +232,24 @@ private class HostFittedSheet: UIView {
                     size.height = self.sheetMaxHeightSize!.doubleValue
                     self.notifyForBoundsChange(newBounds: size)
                 }
+                backgroundColor = .green
+                var sizes: [SheetSize] = []
+                if let sheetMinHeightSize {
+                    sizes.append(.fixed(sheetMinHeightSize.doubleValue))
+                }
+                sizes.append(.fixed(size.height))
+//                if let sheetMaxHeightSize {
+//                    sizes.append(.fixed(sheetMaxHeightSize.doubleValue))
+//                }
+                debugPrint("😀 HostFittedSheet2.sizes", sizes)
                 self._modalViewController = SheetViewController(
                     controller: self.viewController,
-                    sizes: [.fixed(size.height)],
+                    sizes: sizes,
                     options: .init(
                         pullBarHeight: 0,
                         shouldExtendBackground: false,
                         shrinkPresentingViewController: false,
+                        useInlineMode: true,
                         maxWidth: self.sheetWidth
                     )
                 )
@@ -243,9 +257,12 @@ private class HostFittedSheet: UIView {
                 self._modalViewController?.dismissOnOverlayTap = self.dismissable
                 self._modalViewController?.autoAdjustToKeyboard = false
                 self._modalViewController?.dismissOnPull = self.dismissable
+                self._modalViewController?.overlayColor = .clear
                 self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius?.doubleValue ?? 12
                 self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
-                debugPrint("😀 HostFittedSheet.attachedViews \(self.reactTag.intValue)")
+                _modalViewController?.allowGestureThroughOverlay = true
+                _modalViewController?.animateIn(to: self)
+                debugPrint("😀 HostFittedSheet2.attachedViews \(self.reactTag.intValue)")
                 ModalHostShadowView.attachedViews[self.reactTag.intValue] = self
 
                 if let tag = self._scrollViewTag {
@@ -257,11 +274,10 @@ private class HostFittedSheet: UIView {
                     }
                 }
 
-                self.presentViewController.present(self._modalViewController!, animated: true)
-                //self.reactViewController().present(self._modalViewController!, animated: true)
-
+                self.backgroundColor = .clear
+                self.accessibilityLabel = "sheetViewController"
                 self._modalViewController?.didDismiss = { [weak self] _ in
-                    debugPrint("😀 HostFittedSheet.didDismiss \(self?.onSheetDismiss)")
+                    debugPrint("😀 HostFittedSheet2.didDismiss \(self?.onSheetDismiss)")
                     self?.onSheetDismiss?([:])
                 }
             }
@@ -270,25 +286,25 @@ private class HostFittedSheet: UIView {
 
     override func removeFromSuperview() {
         super.removeFromSuperview()
-        debugPrint("😀 HostFittedSheet.removeFromSuperview")
+        debugPrint("😀 HostFittedSheet2.removeFromSuperview")
         //destroy()
     }
 
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if _isPresented && superview == nil {
-            debugPrint("😀 HostFittedSheet.didMoveToSuperview")
+            debugPrint("😀 HostFittedSheet2.didMoveToSuperview")
             destroy()
         }
     }
 
     func destroy() {
-        debugPrint("😀 HostFittedSheet.destroy")
+        debugPrint("😀 HostFittedSheet2.destroy")
         _isPresented = false
 
         let cleanup = { [weak self] in
             guard let self = self else { return }
-            debugPrint("😀 HostFittedSheet.cleanup")
+            debugPrint("😀 HostFittedSheet2.cleanup")
             ModalHostShadowView.attachedViews.removeValue(forKey: self.reactTag.intValue)
             self._modalViewController = nil
             self._reactSubview?.removeFromSuperview()
@@ -299,11 +315,10 @@ private class HostFittedSheet: UIView {
             self._sheetSize = nil
             self.sheetMaxWidthSize = nil
             self._reactSubview = nil
-            self._alertWindow = nil
         }
 
         if self._modalViewController?.isBeingDismissed != true {
-            debugPrint("😀 HostFittedSheet.dismissViewController")
+            debugPrint("😀 HostFittedSheet2.dismissViewController")
             self._modalViewController?.dismiss(animated: true, completion: cleanup)
         } else {
             cleanup()
@@ -312,7 +327,47 @@ private class HostFittedSheet: UIView {
     }
 
     deinit {
-        debugPrint("😀 HostFittedSheet.deinit")
+        debugPrint("😀 HostFittedSheet2.deinit")
     }
+    
+    
+    // Override the hitTest method
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // First, check if the point is within the bounds of this view
+        if self.point(inside: point, with: event) {
+            // Loop through the subviews in reverse order (front-to-back)
+            for subview in self.subviews.reversed() {
+                // Convert the point to the subview's coordinate system
+                let convertedPoint = subview.convert(point, from: self)
+                // Perform a hit test on the subview
+                if let hitView = subview.hitTest(convertedPoint, with: event) {
+                    return hitView
+                }
+            }
+            // If no subview contains the point, return self
+            return nil
+        }
+        // If the point is outside the bounds of this view, return nil
+        return nil
+    }
+    
+}
 
+
+extension UIView {
+    func find(_ nId: String, deepIndex: Int) -> UIView? {
+        if deepIndex >= 10 { return nil }
+        if self.nativeID == nId || self.accessibilityIdentifier == nId {
+            return self
+        }
+
+        let index = deepIndex + 1
+        for subview in subviews {
+            if let v = subview.find(nId, deepIndex: index) {
+                return v
+            }
+        }
+
+        return nil
+    }
 }

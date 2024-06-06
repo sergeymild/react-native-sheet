@@ -9,11 +9,9 @@
 import Foundation
 import UIKit
 import React
-import FittedSheets
 
 
 class TopModalShadowView: RCTShadowView {
-    static var attachedViews: [Int: HostFittedSheet] = [:]
     override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
         super.insertReactSubview(subview, at: atIndex)
         if subview != nil {

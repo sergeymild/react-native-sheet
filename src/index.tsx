@@ -5,8 +5,11 @@ import {
   FittedSheetParams,
 } from './FittedSheet';
 
+import { FittedSheetView } from './FittedSheetView';
+
 export {
   FittedSheet,
+  FittedSheetView,
   FITTED_SHEET_SCROLL_VIEW,
   useFittedSheetContext,
   FittedSheetParams,

@@ -75,6 +75,18 @@ export const screens = [
         getScreen: () =>
           require('./modal/DismissPreventExample').DismissPreventExample,
       },
+      {
+        name: 'SimpleViewExample',
+        slug: 'Modal/SimpleViewExample',
+        getScreen: () => require('./modal/SimpleViewExample').SimpleViewExample,
+      },
+      {
+        name: 'SimpleMultipleViewExample',
+        slug: 'Modal/SimpleMultipleViewExample',
+        getScreen: () =>
+          require('./modal/SimpleMultipleViewExample')
+            .SimpleMultipleViewExample,
+      },
     ],
   },
 ];

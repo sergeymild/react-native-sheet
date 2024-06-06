@@ -18,5 +18,4 @@ Pod::Spec.new do |s|
   s.resources = "ios/**/*.{storyboard}"
 
   s.dependency "React-Core"
-  s.dependency "FittedSheets", "~>2.6.1"
 end
