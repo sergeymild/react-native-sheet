@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
@@ -7,7 +7,7 @@ import { createContactListMockData } from '../../utilities/createMockData';
 import { FITTED_SHEET_SCROLL_VIEW, FittedSheetView } from 'react-native-sheet';
 
 const Sim: React.FC = () => {
-  const [data] = useState(() => createContactListMockData(6));
+  const [data] = useState(() => createContactListMockData(30));
 
   const renderItem = useCallback(
     (item: any, index: any) => (
@@ -59,7 +59,7 @@ export const SimpleMultipleViewExample = () => {
       </View>
 
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-        <Text>Bottom</Text>
+        <Text>Botto</Text>
       </View>
 
       <FittedSheetView
@@ -67,16 +67,18 @@ export const SimpleMultipleViewExample = () => {
         params={{
           backgroundColor: 'yellow',
           topLeftRightCornerRadius: 20,
-          maxHeight: 700,
-          minHeight: 250,
+          minHeight: 200,
+          maxHeight: 400,
         }}
       >
-        <View
+        <ScrollView
+          nestedScrollEnabled
+          accessibilityLabel={FITTED_SHEET_SCROLL_VIEW}
           nativeID={FITTED_SHEET_SCROLL_VIEW}
           style={styles.contentContainerStyle}
         >
           <Sim />
-        </View>
+        </ScrollView>
       </FittedSheetView>
       <FittedSheetView
         ref={bottomSheetRef2}
@@ -84,9 +86,11 @@ export const SimpleMultipleViewExample = () => {
           backgroundColor: 'yellow',
           topLeftRightCornerRadius: 20,
           minHeight: 200,
+          maxHeight: 400,
         }}
       >
         <View
+          accessibilityLabel={FITTED_SHEET_SCROLL_VIEW}
           nativeID={FITTED_SHEET_SCROLL_VIEW}
           style={styles.contentContainerStyle}
         >

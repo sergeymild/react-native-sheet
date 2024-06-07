@@ -2,6 +2,7 @@ package com.sheet
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -59,8 +60,10 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
     var oldH = layoutParams?.height ?: -1
     if (oldH <= 0) oldH = measuredHeight
     val newHeight = allowedHeight()
-    println("😀 DialogRootViewGroup.setVirtualHeight ${oldH.toDP()} -> ${newHeight.toDP()}")
     layoutParams?.height = newHeight
+    (parent as? ViewGroup)?.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, newHeight)
+    println("😀 DialogRootViewGroup.setVirtualHeight ${oldH.toDP()} -> ${newHeight.toDP()} parent: ${((parent as? ViewGroup)?.layoutParams?.height?.toDP())}")
+    setBackgroundColor(Color.BLUE)
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
