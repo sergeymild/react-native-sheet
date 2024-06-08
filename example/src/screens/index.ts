@@ -33,10 +33,10 @@ export const screens = [
         getScreen: () => require('./modal/List2Example').List2Example,
       },
       {
-        name: 'ListDynamicExample',
-        slug: 'Modal/ListDynamicExample',
+        name: 'IncreaseDecreaseHeight',
+        slug: 'Modal/IncreaseDecreaseHeight',
         getScreen: () =>
-          require('./modal/ListDynamicExample').ListDynamicExample,
+          require('./modal/IncreaseDecreaseHeight').IncreaseDecreaseHeight,
       },
       {
         name: 'KeyboardExample',

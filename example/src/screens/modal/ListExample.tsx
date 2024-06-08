@@ -20,26 +20,30 @@ const ListExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
 
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
-        <View
-          style={styles.contentContainerStyle}
-          onLayout={(e) =>
-            console.log('[ListExample.-----]', e.nativeEvent.layout.height)
-          }
-        >
-          <Text style={{ color: 'black' }}>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
-            eligendi nesciunt nulla ullam voluptatem voluptates. Aliquam aut
-            eveniet excepturi laboriosam minus optio pariatur quis. Ea hic
-            obcaecati provident quisquam voluptate. Lorem ipsum dolor sit amet,
-            consectetur adipisicing elit. Dolorem eligendi nesciunt nulla ullam
-            voluptatem voluptates. Aliquam aut eveniet excepturi laboriosam
-            minus optio pariatur quis. Ea hic obcaecati provident quisquam
-            voluptate.
-          </Text>
+      <FittedSheet
+        ref={bottomSheetRef}
+        params={{
+          backgroundColor: 'white',
+          maxLandscapeWidth: 560,
+          maxPortraitWidth: 300,
+          maxHeight: 500,
+          topLeftRightCornerRadius: 8,
+        }}
+      >
+        <Text style={{ color: 'black', paddingHorizontal: 12 }}>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
+          eligendi nesciunt nulla ullam voluptatem voluptates. Aliquam aut
+          eveniet excepturi laboriosam minus optio pariatur quis. Ea hic
+          obcaecati provident quisquam voluptate. Lorem ipsum dolor sit amet,
+          consectetur adipisicing elit. Dolorem eligendi nesciunt nulla ullam
+          voluptatem voluptates. Aliquam aut eveniet excepturi laboriosam minus
+          optio pariatur quis. Ea hic obcaecati provident quisquam voluptate.
+        </Text>
 
-          <ContactList count={50} />
-        </View>
+        <ContactList
+          count={50}
+          contentContainerStyle={{ paddingHorizontal: 12 }}
+        />
       </FittedSheet>
     </View>
   );
@@ -49,12 +53,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-  },
-  contentContainerStyle: {
-    paddingTop: 12,
-    paddingHorizontal: 24,
-    backgroundColor: 'white',
-    maxHeight: 600,
   },
   message: {
     fontSize: 24,

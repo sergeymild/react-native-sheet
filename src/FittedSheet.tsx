@@ -1,28 +1,22 @@
-import React, {
-  ComponentClass,
-  createContext,
-  FunctionComponent,
-  useContext,
-} from 'react';
+import React, { createContext, useContext } from 'react';
 import {
   Dimensions,
   findNodeHandle,
   FlatList,
-  LayoutChangeEvent,
   NativeModules,
-  Platform,
   processColor,
   requireNativeComponent,
   ScrollView,
+  StatusBar,
   View,
 } from 'react-native';
 
 export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
 export interface FittedSheetParams {
-  readonly dismissable?: boolean;
-  readonly sheetHeight?: number;
-  readonly maxWidth?: number;
+  readonly dismissible?: boolean;
+  readonly maxPortraitWidth?: number;
+  readonly maxLandscapeWidth?: number;
   readonly maxHeight?: number;
   readonly minHeight?: number;
   readonly isDark?: boolean;
@@ -30,32 +24,28 @@ export interface FittedSheetParams {
   readonly backgroundColor?: string;
 }
 
-type Children = ((data: any) => React.ReactElement) | React.ReactElement;
+type Children =
+  | ((data: any) => React.ReactElement)
+  | React.ReactElement
+  | React.ReactElement[];
 
 interface Props {
   readonly params?: FittedSheetParams;
-  readonly onSheetDismiss?: (passThroughtParam?: any) => void;
+  readonly onSheetDismiss?: (passThroughParam?: any) => void;
   readonly children?: Children;
 }
-
-type LazyView = () => FunctionComponent<any> | ComponentClass<any, any>;
 
 interface State {
   show: boolean;
   data: any | null;
-  view?: {
-    view: LazyView;
-    props?: any;
-  };
 }
 
 export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 
 interface Context {
-  hide: (passThroughtParam?: any) => void;
-  replace: (height: number) => void;
-  setHeight: (size: number) => void;
-  onLayout: (event: LayoutChangeEvent) => void;
+  hide: (passThroughParam?: any) => void;
+  increaseHeight: (by: number) => void;
+  decreaseHeight: (by: number) => void;
   passScrollViewReactTag: (tag: React.RefObject<ScrollView | FlatList>) => void;
 }
 
@@ -66,45 +56,23 @@ export const useFittedSheetContext = () => {
 };
 
 export class FittedSheet extends React.PureComponent<Props, State> {
-  private onHidePassThroughtParam?: any;
+  private cleanup?: () => void;
+  private shouldShowBack = false;
+  private onHidePassThroughParam?: any;
   private sheetRef = React.createRef<any>();
   constructor(props: Props) {
     super(props);
-    this.state = {
-      show: false,
-      data: null,
-    };
+    this.state = { show: false, data: null };
   }
 
   show = (data?: any) => {
     this.setState({ show: true, data });
   };
 
-  replace = (height: number) => {
-    this.sheetRef.current?.setNativeProps({ availableSize: height });
-  };
-
-  onLayout = (event: LayoutChangeEvent) => {
-    if (Platform.OS === 'ios') return;
-    this.setHeight(event.nativeEvent.layout.height);
-  };
-
-  setElement = (view: LazyView, props?: any) => {
-    this.setState({ view: { view, props } });
-  };
-
-  showElement = (view: LazyView, props?: any) => {
-    this.setState({ show: true, view: { view, props } });
-  };
-
   data = () => this.state.data;
 
   toggle = () => {
     this.setState({ show: !this.state.show });
-  };
-
-  setHeight = (size: number) => {
-    this.sheetRef.current?.setNativeProps({ sheetHeight: size });
   };
 
   passScrollViewReactTag = (ref: React.RefObject<ScrollView | FlatList>) => {
@@ -128,41 +96,66 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
   };
 
-  hide = (passThroughtParam?: any) => {
+  hide = (passThroughParam?: any) => {
     if (!this.state.show) return;
-    this.onHidePassThroughtParam = passThroughtParam;
+    this.onHidePassThroughParam = passThroughParam;
     const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
     NativeModules.SheetView.dismiss(tag);
   };
 
   private onDismiss = () => {
-    this.setState({ show: false, view: undefined });
-    const passValue = this.onHidePassThroughtParam;
-    this.onHidePassThroughtParam = undefined;
+    if (this.shouldShowBack) {
+      this.setState({ show: false }, () => this.show(this.state.data));
+      this.shouldShowBack = false;
+      return;
+    }
+    this.setState({ show: false });
+    const passValue = this.onHidePassThroughParam;
+    this.onHidePassThroughParam = undefined;
     this.props.onSheetDismiss?.(passValue);
   };
 
+  componentDidMount() {
+    this.cleanup = Dimensions.addEventListener('change', () => {
+      if (!this.state.show) return;
+      if (this.shouldShowBack) return;
+      this.shouldShowBack = true;
+      this.hide();
+    }).remove;
+  }
+
   componentWillUnmount() {
     this.hide();
+    this.cleanup?.();
+    this.cleanup = undefined;
   }
 
   render() {
-    if (!this.state.show) {
-      return null;
-    }
-    let height = this.props.params?.sheetHeight ?? -1;
-    if (height === undefined && Platform.OS === 'android') height = -1;
+    if (!this.state.show) return null;
+    const dim = Dimensions.get('screen');
+    const isLandscape = dim.width > dim.height;
+    const maxHeight = Math.min(
+      this.props.params?.maxHeight ?? Number.MAX_VALUE,
+      dim.height - (StatusBar.currentHeight ?? 0)
+    );
+    const paramsMaxWidth = isLandscape
+      ? this.props.params?.maxLandscapeWidth
+      : this.props.params?.maxPortraitWidth;
+    let maxWidth = Math.min(paramsMaxWidth ?? Number.MAX_VALUE, dim.width);
+    const minHeight = this.props.params?.minHeight;
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
+        style={{ width: maxWidth, maxHeight, minHeight }}
         fittedSheetParams={
           this.props.params
             ? {
                 ...this.props.params,
                 isDark: this.props.params.isDark ?? false,
-                sheetHeight: height,
+                maxHeight,
+                maxWidth,
                 backgroundColor: this.props.params.backgroundColor
                   ? processColor(this.props.params.backgroundColor)
                   : undefined,
@@ -171,26 +164,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         }
       >
         <FittedSheetContext.Provider value={this}>
-          <View
-            nativeID={'fitted-sheet-root-view'}
-            style={{
-              maxHeight:
-                this.props.params?.maxHeight ??
-                Dimensions.get('window').height * 0.95,
-              minHeight: this.props.params?.minHeight,
-            }}
-          >
-            {!!this.state.view &&
-              React.createElement(
-                this.state.view.view(),
-                this.state.view.props ?? this.state.data
-              )}
-            {!this.state.view &&
-              this.props.children &&
+          <View nativeID={'fitted-sheet-root-view'} style={{}}>
+            {this.props.children &&
               typeof this.props.children === 'function' &&
               this.props.children(this.state.data)}
-            {!this.state.view &&
-              this.props.children &&
+            {this.props.children &&
               typeof this.props.children !== 'function' &&
               this.props.children}
           </View>

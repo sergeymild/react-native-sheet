@@ -9,14 +9,20 @@ import { FittedSheet } from 'react-native-sheet';
 const KeyboardExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
-  const [count, setCount] = useState(2)
+  const [count, setCount] = useState(2);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
   }, []);
+
   const handleDismissPress = useCallback(() => {
     bottomSheetRef.current?.hide();
   }, []);
+
+  console.log(
+    '🍓[KeyboardExample.KeyboardExample]',
+    keyboardHeight > 0 ? keyboardHeight : 34
+  );
 
   // renders
   return (
@@ -28,36 +34,34 @@ const KeyboardExample = () => {
         //params={{ maxHeight: 500 }}
         ref={bottomSheetRef}
         onSheetDismiss={() => {
-          setKH(0)
-          setCount(2)
+          setKH(0);
+          setCount(2);
         }}
       >
-        {() => (
-          <View style={[styles.contentContainerStyle]}>
-            <TextInput
-              style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
-            />
-            <ContactList
-              count={count}
-              contentContainerStyle={{
-                paddingBottom: keyboardHeight > 0 ? keyboardHeight : 34,
-              }}
-            />
-            <KeyboardSpacer
-              handleAndroid
-              onToggle={(e) => {
-                setKH(e);
-                setTimeout(() => {
-                  setCount(20)
-                  // setTimeout(() => {
-                  //   setCount(4)
-                  // }, 1000)
-                }, 1000)
-                console.log('[KeyboardExample.]', e);
-              }}
-            />
-          </View>
-        )}
+        <View
+          style={[
+            styles.contentContainerStyle,
+            { paddingBottom: keyboardHeight > 0 ? keyboardHeight : 34 },
+          ]}
+        >
+          <TextInput
+            style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
+          />
+          <ContactList count={count} />
+          <KeyboardSpacer
+            handleAndroid
+            onToggle={(e) => {
+              setKH(e);
+              setTimeout(() => {
+                setCount(20);
+                // setTimeout(() => {
+                //   setCount(4)
+                // }, 1000)
+              }, 1000);
+              console.log('[KeyboardExample.]', e);
+            }}
+          />
+        </View>
       </FittedSheet>
     </View>
   );
@@ -69,7 +73,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   contentContainerStyle: {
-    paddingTop: 12,
     paddingHorizontal: 24,
     backgroundColor: 'white',
   },

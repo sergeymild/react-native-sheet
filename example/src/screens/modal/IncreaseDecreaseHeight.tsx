@@ -4,31 +4,35 @@ import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { FittedSheet } from 'react-native-sheet';
 
-export const ListDynamicExample = () => {
+export const IncreaseDecreaseHeight = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
   }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
+
+  const increase = useCallback(() => {
+    bottomSheetRef.current?.increaseHeight(30);
+  }, []);
+
+  const decrease = useCallback(() => {
+    bottomSheetRef.current?.decreaseHeight(30);
   }, []);
 
   // renders
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
 
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
-        <View
-          style={styles.contentContainerStyle}
-          onLayout={(e) =>
-            console.log('[ListDynamicExample.]', e.nativeEvent.layout.height)
-          }
-        >
-          <ContactList count={40} />
+      <FittedSheet
+        ref={bottomSheetRef}
+        params={{ maxHeight: 400, minHeight: 200, backgroundColor: 'white' }}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <Button label="increase" onPress={increase} />
+          <Button label="decrease" onPress={decrease} />
         </View>
+        <ContactList count={10} />
       </FittedSheet>
     </View>
   );
@@ -40,7 +44,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   contentContainerStyle: {
-    paddingTop: 56,
     paddingHorizontal: 24,
     //backgroundColor: 'white',
   },

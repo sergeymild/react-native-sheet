@@ -16,6 +16,7 @@
 
 package com.behavior;
 
+import com.facebook.react.uimanager.util.ReactFindViewUtil;
 import com.facebook.react.views.scroll.ReactScrollView;
 import com.google.android.material.R;
 
@@ -1523,22 +1524,26 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   @Nullable
   @VisibleForTesting
   View findScrollingChild(View view) {
-    if (view.getVisibility() != View.VISIBLE) {
-      return null;
-    }
-    if (ViewCompat.isNestedScrollingEnabled(view)) {
-      return view;
-    }
-    if (view instanceof ViewGroup) {
-      ViewGroup group = (ViewGroup) view;
-      for (int i = 0, count = group.getChildCount(); i < count; i++) {
-        View scrollingChild = findScrollingChild(group.getChildAt(i));
-        if (scrollingChild != null) {
-          return scrollingChild;
-        }
-      }
-    }
-    return null;
+    View fittedSheetScrollView = ReactFindViewUtil.findView(view, "fittedSheetScrollView");
+    if (fittedSheetScrollView == null) return null;
+    fittedSheetScrollView.setNestedScrollingEnabled(true);
+    return fittedSheetScrollView;
+//    if (view.getVisibility() != View.VISIBLE) {
+//      return null;
+//    }
+//    if (ViewCompat.isNestedScrollingEnabled(view)) {
+//      return view;
+//    }
+//    if (view instanceof ViewGroup) {
+//      ViewGroup group = (ViewGroup) view;
+//      for (int i = 0, count = group.getChildCount(); i < count; i++) {
+//        View scrollingChild = findScrollingChild(group.getChildAt(i));
+//        if (scrollingChild != null) {
+//          return scrollingChild;
+//        }
+//      }
+//    }
+//    return null;
   }
 
   private boolean shouldHandleDraggingWithHelper() {
