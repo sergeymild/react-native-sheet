@@ -2,11 +2,9 @@ import React, { createContext, useContext } from 'react';
 import {
   Dimensions,
   findNodeHandle,
-  FlatList,
   NativeModules,
   processColor,
   requireNativeComponent,
-  ScrollView,
   StatusBar,
   View,
 } from 'react-native';
@@ -14,6 +12,7 @@ import {
 export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
 export interface FittedSheetParams {
+  readonly applyMaxHeightToMinHeight?: boolean;
   readonly dismissible?: boolean;
   readonly maxPortraitWidth?: number;
   readonly maxLandscapeWidth?: number;
@@ -46,7 +45,7 @@ interface Context {
   hide: (passThroughParam?: any) => void;
   increaseHeight: (by: number) => void;
   decreaseHeight: (by: number) => void;
-  passScrollViewReactTag: (tag: React.RefObject<ScrollView | FlatList>) => void;
+  passScrollViewReactTag: (nativeId: string) => void;
 }
 
 const FittedSheetContext = createContext<Context | null>(null);
@@ -75,17 +74,9 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.setState({ show: !this.state.show });
   };
 
-  passScrollViewReactTag = (ref: React.RefObject<ScrollView | FlatList>) => {
-    let tag = findNodeHandle(ref.current);
-    if (!tag) {
-      console.warn(
-        '[FittedSheet.passScrollViewReactTag]',
-        'ScrollView did find with ref:',
-        ref.current
-      );
-      return;
-    }
-    this.sheetRef.current?.setNativeProps({ passScrollViewReactTag: tag });
+  passScrollViewReactTag = (nativeId: string) => {
+    console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
+    this.sheetRef.current?.setNativeProps({ setNewNestedScrollView: nativeId });
   };
 
   increaseHeight = (by: number) => {
@@ -143,7 +134,10 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       ? this.props.params?.maxLandscapeWidth
       : this.props.params?.maxPortraitWidth;
     let maxWidth = Math.min(paramsMaxWidth ?? Number.MAX_VALUE, dim.width);
-    const minHeight = this.props.params?.minHeight;
+    let minHeight = this.props.params?.minHeight;
+    if (this.props.params?.applyMaxHeightToMinHeight) {
+      minHeight = maxHeight;
+    }
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}

@@ -1,11 +1,9 @@
 package com.sheet;
 
 import android.annotation.SuppressLint;
-import android.graphics.Outline;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
@@ -25,22 +23,8 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
 
   protected int startState = BottomSheetBehavior.STATE_EXPANDED;
 
-  public void setCornerRadius(final float r) {
-    ViewGroup contentContainer = getContentContainer();
-    if (contentContainer == null) return;
-    contentContainer.setOutlineProvider(new ViewOutlineProvider() {
-      @Override
-      public void getOutline(View view, Outline outline) {
-        int left = 0;
-        int top = 0;
-        int right = view.getWidth();
-        int bottom = view.getHeight();
-        int cornerRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, r, view.getResources().getDisplayMetrics());
-
-        outline.setRoundRect(left, top, right, bottom + cornerRadius, cornerRadius);
-      }
-    });
-    contentContainer.setClipToOutline(true);
+  public void setNewNestedScrollView(View view) {
+    behavior.setNewNestedScrollView(view);
   }
 
   public void setSheetBackgroundColor(int sheetBackgroundColor) {

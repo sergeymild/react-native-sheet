@@ -77,6 +77,10 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     }
   }
 
+  fun setNewNestedScrollView(view: View) {
+    sheet?.setNewNestedScrollView(view)
+  }
+
   @RequiresApi(Build.VERSION_CODES.M)
   override fun dispatchProvideStructure(structure: ViewStructure?) {
     mHostView.dispatchProvideStructure(structure)

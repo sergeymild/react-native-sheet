@@ -16,8 +16,6 @@
 
 package com.behavior;
 
-import com.facebook.react.uimanager.util.ReactFindViewUtil;
-import com.facebook.react.views.scroll.ReactScrollView;
 import com.google.android.material.R;
 
 import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
@@ -316,6 +314,11 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   @Nullable WeakReference<View> accessibilityDelegateViewRef;
 
   @Nullable WeakReference<View> nestedScrollingChildRef;
+
+  public void setNewNestedScrollView(View view) {
+    view.setNestedScrollingEnabled(true);
+    nestedScrollingChildRef = new WeakReference<>(view);
+  }
 
   @NonNull private final ArrayList<BottomSheetCallback> callbacks = new ArrayList<>();
 
@@ -1524,7 +1527,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   @Nullable
   @VisibleForTesting
   View findScrollingChild(View view) {
-    View fittedSheetScrollView = ReactFindViewUtil.findView(view, "fittedSheetScrollView");
+    View fittedSheetScrollView = findView(view, "fittedSheetScrollView");
     if (fittedSheetScrollView == null) return null;
     fittedSheetScrollView.setNestedScrollingEnabled(true);
     return fittedSheetScrollView;
@@ -2294,5 +2297,33 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         return true;
       }
     };
+  }
+
+
+  @Nullable
+  private static String getNativeId(View view) {
+    Object tag = view.getTag(com.facebook.react.R.id.view_tag_native_id);
+    return tag instanceof String ? (String)tag : null;
+  }
+
+  @Nullable
+  public static View findView(View root, String nativeId) {
+    String tag = getNativeId(root);
+    if (tag != null && tag.contains(nativeId)) {
+      return root;
+    } else {
+      if (root instanceof ViewGroup) {
+        ViewGroup viewGroup = (ViewGroup)root;
+
+        for(int i = 0; i < viewGroup.getChildCount(); ++i) {
+          View view = findView(viewGroup.getChildAt(i), nativeId);
+          if (view != null) {
+            return view;
+          }
+        }
+      }
+
+      return null;
+    }
   }
 }

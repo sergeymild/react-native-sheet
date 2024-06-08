@@ -1,6 +1,8 @@
 package com.sheet
 
+import android.view.View
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.LayoutShadowNode
@@ -10,9 +12,11 @@ import com.facebook.react.uimanager.ReactShadowNodeImpl
 import com.facebook.react.uimanager.ReactStylesDiffMap
 import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.UIViewOperationQueue
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.util.ReactFindViewUtil
 import com.facebook.yoga.YogaPositionType
 
 internal class ModalHostShadowNode : LayoutShadowNode() {
@@ -89,6 +93,12 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
   fun fittedSheetParams(view: AppFittedSheet, params: ReadableMap) {
     println("🥲 fittedSheetParams $params")
     view.params = params
+  }
+
+  @ReactProp(name = "setNewNestedScrollView")
+  fun setNewNestedScrollView(view: AppFittedSheet, nativeId: String) {
+    val v = ReactFindViewUtil.findView(view, nativeId) ?: return
+    view.setNewNestedScrollView(v)
   }
 
   @ReactProp(name = "increaseHeight")
