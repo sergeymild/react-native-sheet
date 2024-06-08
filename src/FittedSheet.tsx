@@ -148,7 +148,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
-        style={{ width: maxWidth, maxHeight, minHeight }}
+        style={{ width: maxWidth, maxHeight, minHeight, position: 'absolute' }}
         fittedSheetParams={
           this.props.params
             ? {
@@ -164,7 +164,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         }
       >
         <FittedSheetContext.Provider value={this}>
-          <View nativeID={'fitted-sheet-root-view'} style={{}}>
+          <View nativeID={'fitted-sheet-root-view'}>
             {this.props.children &&
               typeof this.props.children === 'function' &&
               this.props.children(this.state.data)}
