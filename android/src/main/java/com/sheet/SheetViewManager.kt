@@ -95,8 +95,8 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
     view.params = params
   }
 
-  @ReactProp(name = "setNewNestedScrollView")
-  fun setNewNestedScrollView(view: AppFittedSheet, nativeId: String) {
+  @ReactProp(name = "passScrollViewReactTag")
+  fun passScrollViewReactTag(view: AppFittedSheet, nativeId: String) {
     val v = ReactFindViewUtil.findView(view, nativeId) ?: return
     view.setNewNestedScrollView(v)
   }
