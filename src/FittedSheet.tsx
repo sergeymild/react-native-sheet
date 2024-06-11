@@ -76,7 +76,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   passScrollViewReactTag = (nativeId: string) => {
     console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
-    this.sheetRef.current?.setNativeProps({ setNewNestedScrollView: nativeId });
+    this.sheetRef.current?.setNativeProps({ passScrollViewReactTag: nativeId });
   };
 
   increaseHeight = (by: number) => {
