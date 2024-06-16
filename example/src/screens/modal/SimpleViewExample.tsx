@@ -7,15 +7,15 @@ import { createContactListMockData } from '../../utilities/createMockData';
 import { FITTED_SHEET_SCROLL_VIEW, FittedSheetView } from 'react-native-sheet';
 
 const Sim: React.FC = () => {
-  const [data, setData] = useState(() => createContactListMockData(6));
+  const [data, setData] = useState(() => createContactListMockData(20));
 
   useEffect(() => {
-    setTimeout(() => {
-      setData(createContactListMockData(2));
-      setTimeout(() => {
-        setData(createContactListMockData(20));
-      }, 2000);
-    }, 2000);
+    // setTimeout(() => {
+    //   setData(createContactListMockData(2));
+    //   setTimeout(() => {
+    //     setData(createContactListMockData(20));
+    //   }, 2000);
+    // }, 2000);
   }, []);
 
   const renderItem = useCallback(
