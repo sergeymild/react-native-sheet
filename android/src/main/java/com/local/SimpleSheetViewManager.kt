@@ -76,7 +76,7 @@ class SimpleSheetViewManager : ViewGroupManager<AppFittedSheet2>() {
   @ReactProp(name = "increaseHeight")
   fun setIncreaseHeight(view: AppFittedSheet2, by: Double) {
     if (by == 0.0) return
-    val newHeight = view.mHostView.reactHeight + PixelUtil.toPixelFromDIP(by)
+    val newHeight = view.mHostView.currentHeight + PixelUtil.toPixelFromDIP(by)
     view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
     view.mHostView.setVirtualHeight(newHeight)
   }
@@ -91,8 +91,8 @@ class SimpleSheetViewManager : ViewGroupManager<AppFittedSheet2>() {
   @ReactProp(name = "decreaseHeight")
   fun setDecreaseHeight(view: AppFittedSheet2, by: Double) {
     if (by == 0.0) return
-    val newHeight = view.mHostView.reactHeight - PixelUtil.toPixelFromDIP(by)
-    println("🥲 SimpleSheetViewManager.decreaseHeight from: ${view.mHostView.reactHeight} to: $newHeight")
+    val newHeight = view.mHostView.currentHeight - PixelUtil.toPixelFromDIP(by)
+    println("🥲 SimpleSheetViewManager.decreaseHeight from: ${view.mHostView.currentHeight} to: $newHeight")
     view.mHostView.sheetMaxHeightSize = newHeight.toDouble()
     view.mHostView.setVirtualHeight(newHeight)
   }

@@ -31,15 +31,15 @@ class AppFittedSheet2(context: Context) : ViewGroup(context), LifecycleEventList
       field = value
     }
 
-  private val dismissable: Boolean
-  get() = params?.bool("dismissable") ?: true
+  private val dismissible: Boolean
+  get() = params?.bool("dismissible", true) ?: true
 
   private val topLeftRightCornerRadius: Float?
-    get() = params?.float("topLeftRightCornerRadius")
+    get() = params?.float("topLeftRightCornerRadius", 0f)
 //  private val backgroundColor: Int
 //    get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
   private val isDark: Boolean
-    get() = params?.bool("isDark") ?: false
+    get() = params?.bool("isDark", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity {
     return (context as ReactContext).currentActivity as AppCompatActivity
@@ -135,7 +135,7 @@ class AppFittedSheet2(context: Context) : ViewGroup(context), LifecycleEventList
     for (i in 0 until count) {
       val child = getChildAt(i)
       if (child!!.visibility != GONE) {
-        child!!.layout(0, 0, 0 + width, 0 + height)
+        child.layout(0, 0, 0 + width, 0 + height)
       }
     }
   }

@@ -8,6 +8,9 @@ import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.PixelUtil
+import com.facebook.react.uimanager.UIManagerHelper
+import com.facebook.react.uimanager.UIManagerModule
+import com.facebook.react.uimanager.common.UIManagerType
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 
@@ -19,18 +22,30 @@ fun Double.toDP(): Int {
   return PixelUtil.toDIPFromPixel(this.toFloat()).toInt()
 }
 
+fun Float.toDP(): Float {
+  return PixelUtil.toDIPFromPixel(this)
+}
+
 fun Double.toPxD(): Double {
   return PixelUtil.toPixelFromDIP(this.toFloat()).toDouble()
 }
 
-fun ReadableMap.bool(value: String): Boolean? {
-  if (!hasKey(value)) return null
+fun ReadableMap?.bool(value: String, default: Boolean): Boolean {
+  if (this == null) return default
+  if (!hasKey(value)) return default
   return getBoolean(value)
 }
 
-fun ReadableMap.float(value: String): Float? {
-  if (!hasKey(value)) return null
+fun ReadableMap?.float(value: String, default: Float): Float {
+  if (this == null) return default
+  if (!hasKey(value)) return default
   return getDouble(value).toFloat()
+}
+
+fun ReadableMap?.double(value: String, default: Double): Double {
+  if (this == null) return default
+  if (!hasKey(value)) return default
+  return getDouble(value)
 }
 
 fun ReadableMap.color(value: String, context: Context): Int {
@@ -42,4 +57,12 @@ fun ReadableMap.color(value: String, context: Context): Int {
 fun onSheetDismiss(view: View) {
   (view.context as ReactContext).getJSModule(RCTEventEmitter::class.java)
     .receiveEvent(view.id, "onSheetDismiss", Arguments.createMap())
+}
+
+fun View.setNewShadowSize(width: Int, height: Int) {
+  val module = UIManagerHelper.getUIManager(context as ReactContext?, UIManagerType.DEFAULT) as UIManagerModule
+  UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
+    val id = module.uiImplementation.resolveShadowNode(this.id).getChildAt(0).reactTag
+    module.updateNodeSize(id, width, height)
+  }
 }

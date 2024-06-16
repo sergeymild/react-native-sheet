@@ -3,17 +3,21 @@ package com.sheet
 import android.content.Context
 import android.graphics.Color
 import android.os.Build
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
-import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.facebook.react.bridge.*
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.LifecycleEventListener
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.UiThreadUtil
+import com.facebook.react.uimanager.UIManagerHelper
+import com.facebook.react.uimanager.UIManagerModule
+import com.facebook.react.uimanager.common.UIManagerType
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import com.google.android.material.snackbar.Snackbar
 import com.modal.safeShow
 
 
@@ -23,22 +27,21 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
   var params: ReadableMap? = null
     set(value) {
-      if (value?.hasKey("maxHeight") == true) {
-        mHostView.sheetMaxHeightSize = value.getDouble("maxHeight").toPxD()
-      }
+      mHostView.sheetMaxHeightSize = value.double("maxHeight", -1.0).toPxD()
+      mHostView.sheetMaxWidthSize = value.double("maxWidth", -1.0).toPxD()
+      mHostView.sheetMinHeightSize = value.double("minHeight", -1.0).toPxD()
 
       field = value
     }
 
-  private val dismissable: Boolean
-  get() = params?.bool("dismissable") ?: true
-
-  private val topLeftRightCornerRadius: Float?
-    get() = params?.float("topLeftRightCornerRadius")
+  private val dismissible: Boolean
+    get() = params.bool("dismissible", true)
+  private val topLeftRightCornerRadius: Float
+    get() = params.float("topLeftRightCornerRadius", 0f)
   private val backgroundColor: Int
     get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
   private val isDark: Boolean
-    get() = params?.bool("isDark") ?: false
+    get() = params.bool("isDark", false)
 
   private fun getCurrentActivity(): AppCompatActivity {
     return (context as ReactContext).currentActivity as AppCompatActivity
@@ -52,13 +55,13 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     UiThreadUtil.assertOnUiThread()
 
     val sheet = this.sheet
+    mHostView.setCornerRadius(topLeftRightCornerRadius)
+    mHostView.setBackgroundColor(backgroundColor)
     if (sheet == null) {
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
-        dismissable = dismissable,
-        sheetBackgroundColor = backgroundColor,
-        isDark = isDark,
-        handleRadius = topLeftRightCornerRadius ?: 0F
+        dismissible = dismissible,
+        isDark = isDark
       ) {
         println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup
@@ -67,6 +70,10 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       }
       fragment.safeShow(getCurrentActivity().supportFragmentManager, fragmentTag)
     }
+  }
+
+  fun setNewNestedScrollView(view: View) {
+    sheet?.setNewNestedScrollView(view)
   }
 
   @RequiresApi(Build.VERSION_CODES.M)
@@ -78,10 +85,11 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
-    ModalHostShadowNode.pendingUpdateHeight[id]?.let {
-      println("🥲 addView pending: $it")
-      mHostView.setVirtualHeight(it)
-      ModalHostShadowNode.pendingUpdateHeight.remove(id)
+    val module = UIManagerHelper.getUIManager(context as ReactContext?, UIManagerType.DEFAULT) as UIManagerModule
+    UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
+      val resolveShadowNode = module.uiImplementation.resolveShadowNode(child.id)
+      val height = resolveShadowNode.layoutHeight
+      if (height > 0) mHostView.setVirtualHeight(height)
     }
   }
 
@@ -99,7 +107,6 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     super.onDetachedFromWindow()
     println("🥲 onDetachedFromWindow: $id")
     ModalHostShadowNode.attachedViews.remove(id)
-    ModalHostShadowNode.pendingUpdateHeight.remove(id)
   }
 
   override fun removeViewAt(index: Int) {

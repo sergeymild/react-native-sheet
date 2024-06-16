@@ -72,10 +72,7 @@ const ContactListComponent = ({
     <FlatList
       {...rest}
       data={data}
-      style={{ backgroundColor: 'white' }}
-      nestedScrollEnabled
       nativeID={FITTED_SHEET_SCROLL_VIEW}
-      accessibilityLabel={FITTED_SHEET_SCROLL_VIEW}
       refreshing={false}
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}
@@ -85,10 +82,7 @@ const ContactListComponent = ({
       renderItem={renderFlatListItem}
       keyboardDismissMode="interactive"
       indicatorStyle="black"
-      contentContainerStyle={[
-        { paddingBottom: 34 },
-        rest.contentContainerStyle,
-      ]}
+      contentContainerStyle={[rest.contentContainerStyle]}
     />
   );
 };

@@ -39,7 +39,11 @@ const DynamicSnapPointExample = () => {
       <Button label="Dismiss" onPress={handleDismissPress} />
       <FittedSheet
         ref={bottomSheetRef}
-        params={{}}
+        params={{
+          maxLandscapeWidth: 400,
+          topLeftRightCornerRadius: 20,
+          maxPortraitWidth: 300,
+        }}
         onSheetDismiss={() => setCount(0)}
       >
         {() => (
@@ -50,7 +54,6 @@ const DynamicSnapPointExample = () => {
               paddingTop: 16,
               paddingHorizontal: 16,
             }}
-            onLayout={bottomSheetRef.current?.onLayout}
           >
             <Text style={styles.message}>
               Could this sheet modal resize to its content height ?

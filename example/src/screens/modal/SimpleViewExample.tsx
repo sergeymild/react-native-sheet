@@ -7,7 +7,7 @@ import { createContactListMockData } from '../../utilities/createMockData';
 import { FITTED_SHEET_SCROLL_VIEW, FittedSheetView } from 'react-native-sheet';
 
 const Sim: React.FC = () => {
-  const [data, setData] = useState(() => createContactListMockData(20));
+  const [data, setData] = useState(() => createContactListMockData(6));
 
   useEffect(() => {
     // setTimeout(() => {

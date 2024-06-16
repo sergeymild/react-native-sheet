@@ -2,10 +2,12 @@ package com.sheet
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
+import android.graphics.Outline
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.uimanager.JSPointerDispatcher
@@ -13,6 +15,7 @@ import com.facebook.react.uimanager.JSTouchDispatcher
 import com.facebook.react.uimanager.RootView
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
+import kotlin.math.max
 import kotlin.math.min
 
 fun DialogRootViewGroup.eventDispatcher(): EventDispatcher {
@@ -26,11 +29,36 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   var reactView: View? = null
 
   var sheetMaxHeightSize: Double = -1.0
-  private val screenHeight: Int by lazy {
-    return@lazy Resources.getSystem().displayMetrics.heightPixels
+  var sheetMaxWidthSize: Double = -1.0
+  var sheetMinHeightSize: Double = -1.0
+
+  private val metrics: Resources by lazy { Resources.getSystem() }
+
+  fun setCornerRadius(r: Float) {
+    setOutlineProvider(object : ViewOutlineProvider() {
+      override fun getOutline(view: View, outline: Outline) {
+        val left = 0
+        val top = 0
+        val right = view.width
+        val bottom = view.height
+        val cornerRadius =
+          TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, r, view.resources.displayMetrics)
+            .toInt()
+        outline.setRoundRect(left, top, right, bottom + cornerRadius, cornerRadius.toFloat())
+      }
+    })
+    setClipToOutline(true)
   }
 
-  var reactHeight: Int = -1
+  private val screenHeight: Int
+    get() = metrics.displayMetrics.heightPixels
+
+  private val screenWidth: Int
+    get() = metrics.displayMetrics.widthPixels
+  val currentHeight: Int
+    get() = layoutParams?.height ?: 0
+  val currentWidth: Int
+    get() = layoutParams?.width ?: 0
 
   init {
     if (ReactFeatureFlags.dispatchPointerEvents) {
@@ -39,13 +67,18 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   }
 
   private fun allowedHeight(): Int {
-    val returnValue = if (sheetMaxHeightSize <= 0.0) {
-      min(reactHeight, screenHeight)
+    var returnValue = if (sheetMaxHeightSize >= 0) {
+      min(sheetMaxHeightSize.toInt(), screenHeight)
     } else {
-      min(min(sheetMaxHeightSize.toInt(), screenHeight), reactHeight)
+      screenHeight
     }
-    println("🥲 DialogRootViewGroup.allowedHeight reactHeight: ${reactHeight.toDP()}, sheetMaxHeightSize: ${sheetMaxHeightSize.toDP()}, screenHeight: ${screenHeight.toDP()} returnValue: ${returnValue.toDP()}")
+    returnValue = max(returnValue, sheetMinHeightSize.toInt())
     return returnValue
+  }
+
+  private fun allowedWidth(): Int {
+    if (sheetMaxWidthSize >= 0) return min(sheetMaxWidthSize.toInt(), screenWidth)
+    return screenWidth
   }
 
   private fun ensureLayoutParams() {
@@ -56,14 +89,13 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   fun setVirtualHeight(h: Float) {
     if (reactView == null) return
     ensureLayoutParams()
-    this@DialogRootViewGroup.reactHeight = h.toInt()
-    var oldH = layoutParams?.height ?: -1
-    if (oldH <= 0) oldH = measuredHeight
+    this.sheetMaxHeightSize = h.toDouble()
     val newHeight = allowedHeight()
+    val newWidth = allowedWidth()
+    println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.toDP()} :${newWidth.toDP()}")
+    translationX = ((screenWidth - newWidth) / 2).toFloat()
     layoutParams?.height = newHeight
-    (parent as? ViewGroup)?.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, newHeight)
-    println("😀 DialogRootViewGroup.setVirtualHeight ${oldH.toDP()} -> ${newHeight.toDP()} parent: ${((parent as? ViewGroup)?.layoutParams?.height?.toDP())}")
-    setBackgroundColor(Color.BLUE)
+    layoutParams?.width = newWidth
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
@@ -71,6 +103,7 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
     if (reactView != null) removeView(reactView)
     super.addView(child, -1, params)
     reactView = child
+    setVirtualHeight(sheetMaxHeightSize.toFloat())
   }
 
   override fun removeView(view: View?) {
@@ -121,7 +154,6 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
 
   private fun releaseReactView() {
     sheetMaxHeightSize = -1.0
-    reactHeight = -1
     reactView = null
   }
 }
