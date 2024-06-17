@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import React
-import FittedSheets
 
 func refBounds() -> CGSize {
     UIScreen.main.bounds.size
@@ -168,7 +167,7 @@ class HostFittedSheet: UIView {
     var _sheetMaxWidth: CGFloat?
     var _sheetMaxHeight: CGFloat?
     var _sheetMinHeight: CGFloat?
-    private var dismissable = true
+    private var dismissible = true
     private var topLeftRightCornerRadius: CGFloat?
     private var sheetBackgroundColor: UIColor?
 
@@ -178,7 +177,7 @@ class HostFittedSheet: UIView {
             _sheetMaxWidth = RCTConvert.cgFloat(fittedSheetParams?["maxWidth"])
             _sheetMaxHeight = RCTConvert.cgFloat(fittedSheetParams?["maxHeight"])
             _sheetMinHeight = RCTConvert.cgFloat(fittedSheetParams?["minHeight"])
-            dismissable = (fittedSheetParams?["dismissable"] as? Bool) ?? true
+            dismissible = (fittedSheetParams?["dismissible"] as? Bool) ?? true
             topLeftRightCornerRadius = RCTConvert.cgFloat(fittedSheetParams?["topLeftRightCornerRadius"])
             sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
         }
@@ -273,9 +272,9 @@ class HostFittedSheet: UIView {
                     )
                 )
                 self._modalViewController?.allowPullingPastMaxHeight = false
-                self._modalViewController?.dismissOnOverlayTap = self.dismissable
+                self._modalViewController?.dismissOnOverlayTap = self.dismissible
                 self._modalViewController?.autoAdjustToKeyboard = false
-                self._modalViewController?.dismissOnPull = self.dismissable
+                self._modalViewController?.dismissOnPull = self.dismissible
                 self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 0
                 self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
                 debugPrint("😀 attachedViews \(self.reactTag.intValue)")
@@ -290,7 +289,6 @@ class HostFittedSheet: UIView {
                 //self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
-                    debugPrint("😀didDismiss \(self?.onSheetDismiss)")
                     self?.onSheetDismiss?([:])
                 }
             }

@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import React
-import FittedSheets
 
 
 class TopModalShadowView: RCTShadowView {

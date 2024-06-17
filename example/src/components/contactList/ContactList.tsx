@@ -9,6 +9,7 @@ export interface ContactListProps {
   count?: number;
   onItemPress?: () => void;
   onRefresh?: () => void;
+  nativeId?: string;
   readonly contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -28,7 +29,7 @@ const ContactListComponent = ({
 
   // renders
   const renderFlatListItem = useCallback(
-    ({ item, index }) => {
+    ({ item, index }: any) => {
       if (index === 10) {
         return (
           <View style={{ height: 72 }}>
@@ -72,7 +73,7 @@ const ContactListComponent = ({
     <FlatList
       {...rest}
       data={data}
-      nativeID={FITTED_SHEET_SCROLL_VIEW}
+      nativeID={rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW}
       refreshing={false}
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}
