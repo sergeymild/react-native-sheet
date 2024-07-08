@@ -1,3 +1,5 @@
+import { TransparentActivityExample } from 'example/src/screens/modal/TransparentActivityExample';
+
 export const screens = [
   {
     title: 'Modal',
@@ -68,6 +70,12 @@ export const screens = [
         name: 'TopModalExample',
         slug: 'Modal/TopModalExample',
         getScreen: () => require('./modal/TopModalExample').TopModalExample,
+      },
+      {
+        name: 'TransparentActivityExample',
+        slug: 'Modal/TransparentActivityExample',
+        getScreen: () =>
+          require('./modal/TransparentActivityExample').TabsScreen,
       },
       {
         name: 'DismissPreventExample',

@@ -140,7 +140,6 @@ public class SheetViewController: UIViewController {
 
     public var didDismiss: ((SheetViewController) -> Void)?
     public var sizeChanged: ((SheetViewController, SheetSize, CGFloat) -> Void)?
-    public var panGestureShouldBegin: ((UIPanGestureRecognizer) -> Bool?)?
 
     public private(set) var contentViewController: SheetContentViewController
     var overlayView = UIView()
@@ -688,11 +687,9 @@ extension SheetViewController: UIGestureRecognizerDelegate {
     }
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let panGestureRecognizer = gestureRecognizer as? InitialTouchPanGestureRecognizer, let childScrollView = self.childScrollView, let point = panGestureRecognizer.initialTouchLocation else { return true }
-
-        if let pan = gestureRecognizer as? UIPanGestureRecognizer, let closure = panGestureShouldBegin, let should = closure(pan) {
-            return should
-        }
+        guard let panGestureRecognizer = gestureRecognizer as? InitialTouchPanGestureRecognizer else { return true }
+        guard let childScrollView = self.childScrollView else { return true }
+        guard let point = panGestureRecognizer.initialTouchLocation else { return true }
 
         let pointInChildScrollView = self.view.convert(point, to: childScrollView).y - childScrollView.contentOffset.y
 
@@ -705,7 +702,9 @@ extension SheetViewController: UIGestureRecognizerDelegate {
         }
         let topInset = childScrollView.contentInset.top
 
-        guard abs(velocity.y) > abs(velocity.x), childScrollView.contentOffset.y <= -topInset else { return false }
+        if !(abs(velocity.y) > abs(velocity.x) && childScrollView.contentOffset.y <= -topInset) {
+            return false
+        }
 
         if velocity.y < 0 {
             let containerHeight = height(for: self.currentSize)

@@ -1,7 +1,5 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
-  AppState,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -9,21 +7,31 @@ import {
   View,
 } from 'react-native';
 import { Button } from '../../components/button';
-import { TopModal } from 'react-native-sheet';
-import { useNavigation } from '@react-navigation/native';
+import { TransparentActivityView } from 'react-native-sheet';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-export const TopModalExample = () => {
-  const navigation = useNavigation();
+const Stack = createBottomTabNavigator<any>();
+
+export const TabsScreen = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
+    >
+      <Stack.Screen
+        name={'TransparentActivityExample'}
+        component={TransparentActivityExample}
+      />
+      <Stack.Screen
+        name={'TransparentActivityExample2'}
+        component={TransparentActivityExample}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export const TransparentActivityExample = () => {
   // refs
-  const modalRef = useRef<TopModal>(null);
-
-  useEffect(() => {
-    AppState.addEventListener('change', (state) => {
-      if (state === 'background') {
-        modalRef.current?.show();
-      }
-    });
-  }, []);
+  const modalRef = useRef<TransparentActivityView>(null);
 
   const handlePresentPress = useCallback(() => {
     //bottomSheetRef.current?.show();
@@ -47,9 +55,11 @@ export const TopModalExample = () => {
         }}
       />
 
-      <TopModal
+      <TransparentActivityView
         ref={modalRef}
-        onModalDismiss={() => console.log('[TopModalExample.---ibd]')}
+        onActivityDismiss={() =>
+          console.log('[TransparentActivityView.dismiss]')
+        }
       >
         <View
           accessibilityLabel={'inModal'}
@@ -67,18 +77,23 @@ export const TopModalExample = () => {
               children={'Close'}
               style={{
                 color: 'red',
-                backgroundColor: 'green',
+                backgroundColor: 'orange',
                 height: 100,
                 width: 100,
               }}
             />
           </TouchableOpacity>
           <TextInput
-            multiline
-            style={{ minHeight: 56, width: '100%', backgroundColor: 'yellow' }}
+            multiline={false}
+            style={{
+              minHeight: 56,
+              width: '100%',
+              backgroundColor: 'yellow',
+              marginBottom: 50,
+            }}
           />
         </View>
-      </TopModal>
+      </TransparentActivityView>
     </View>
   );
 };

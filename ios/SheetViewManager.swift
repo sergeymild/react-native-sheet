@@ -347,7 +347,7 @@ class HostFittedSheet: UIView {
 
 extension UIView {
     func find(_ nId: String, deepIndex: Int) -> UIView? {
-        if deepIndex >= 10 { return nil }
+        //if deepIndex >= 10 { return nil }
         if self.nativeID?.hasPrefix(nId) == true || self.accessibilityIdentifier?.hasPrefix(nId) == true {
             return self
         }

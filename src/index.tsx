@@ -13,3 +13,4 @@ export {
 };
 
 export { TopModal } from './TopModal';
+export { TransparentActivityView } from './TransparentActivity';
