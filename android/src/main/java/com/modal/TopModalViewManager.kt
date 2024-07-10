@@ -34,9 +34,23 @@ class TopModalViewManager : ViewGroupManager<TopModalView>() {
       .build()
   }
 
+  @ReactProp(name = "isEdgeToEdge")
+  fun setIsEdgeToEdge(view: TopModalView, isEdgeToEdge: Boolean) {
+    view.isEdgeToEdge = isEdgeToEdge
+  }
+  @ReactProp(name = "isStatusBarBgLight")
+  fun setIsStatusBarBgLight(view: TopModalView, isStatusBarBgLight: Boolean) {
+    view.isStatusBarBgLight = isStatusBarBgLight
+  }
+
   @ReactProp(name="animated")
   fun setAnimated(view: TopModalView, animated: Boolean) {
     view.animated = animated
+  }
+  // "slide" | "fade"
+  @ReactProp(name = "animationType")
+  fun setAnimationType(view: TopModalView, animationType: String) {
+    view.animationType = animationType
   }
 
   override fun getShadowNodeClass(): Class<LayoutShadowNode> {

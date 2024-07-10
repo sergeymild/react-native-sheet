@@ -20,7 +20,12 @@ fun TopModalView.onModalDismiss() {
 class TopModalView(context: Context?) : ReactViewGroup(context) {
   private var dialog: FullScreenDialog? = null
   private var rnView = BaseRNView(context)
+
+  var isEdgeToEdge = false
+  var isStatusBarBgLight = false
   var animated = true
+  // "slide" || "fade"
+  var animationType = "slide"
 
   init {
     println("⚽️ init")
@@ -33,7 +38,14 @@ class TopModalView(context: Context?) : ReactViewGroup(context) {
   override fun addView(child: View, index: Int) {
     val activity = getCurrentActivity() ?: return
     rnView.addView(child)
-    dialog = FullScreenDialog(rnView, animated, ::onModalDismiss)
+    dialog = FullScreenDialog(
+      presentView = rnView,
+      animated = animated,
+      animationType = animationType,
+      isEdgeToEdge = isEdgeToEdge,
+      isStatusBarBgLight = isStatusBarBgLight,
+      ::onModalDismiss,
+    )
     dialog?.safeShow(activity.supportFragmentManager, "TopModalView")
     dialog?.isCancelable = true
 

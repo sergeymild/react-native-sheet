@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  courtesy of http://adilatwork.blogspot.com/2012/11/android-dialogfragment-enter-and-exit.html
+  file location: src/main/res/anim
+-->
+<alpha
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:interpolator="@android:anim/accelerate_interpolator"
+  android:fromAlpha="0.0"
+  android:toAlpha="1.0"
+  android:duration="400" />
