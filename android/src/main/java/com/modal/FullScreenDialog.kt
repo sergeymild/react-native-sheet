@@ -3,11 +3,14 @@ package com.modal
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -28,57 +31,27 @@ fun androidx.fragment.app.Fragment.safeShow(
 class FullScreenDialog(
   private val presentView: View,
   private val animated: Boolean,
-  // "slide" || "fade"
-  private val animationType: String,
-  private val isEdgeToEdge: Boolean,
-  private val isStatusBarBgLight: Boolean,
   private val onDismiss: () -> Unit
 ) : DialogFragment() {
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    if (isEdgeToEdge) {
-      setStyle(STYLE_NORMAL, R.style.Theme_EdgeToEdgeDialog)
-    } else {
-      setStyle(STYLE_NORMAL, R.style.Theme_FullScreenDialog)
-    }
+    setStyle(STYLE_NORMAL, R.style.Custom_Theme_FullScreenDialog)
   }
 
   override fun onStart() {
     super.onStart()
     isCancelable = false
-
     dialog?.window?.let {
+      val width = ViewGroup.LayoutParams.MATCH_PARENT
+      val height = ViewGroup.LayoutParams.MATCH_PARENT
+      it.setLayout(width, height)
       if (animated) {
-        if (animationType == "slide") {
-          it.setWindowAnimations(R.style.Theme_FullScreenDialog_Slide)
-        }
-        // Fade is applied by Default
-      } else {
-        it.setWindowAnimations(R.style.Theme_FullScreenDialog_NoAnimation)
+        it.setWindowAnimations(R.style.Custom_Theme_FullScreenDialog_Slide)
       }
-
-      if (isEdgeToEdge) {
-        it.navigationBarColor = Color.TRANSPARENT
-        it.statusBarColor = Color.TRANSPARENT
-        it.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-          View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-
-        if (isStatusBarBgLight) {
-          it.decorView.systemUiVisibility =
-            it.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        } else {
-          it.decorView.systemUiVisibility =
-            it.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-        }
-      } else {
-        val width = ViewGroup.LayoutParams.MATCH_PARENT
-        val height = ViewGroup.LayoutParams.MATCH_PARENT
-        it.setLayout(width, height)
-        it.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-      }
-
       it.setFormat(PixelFormat.TRANSLUCENT)
       it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+      it.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
   }
 
