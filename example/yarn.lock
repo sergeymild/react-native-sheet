@@ -4306,6 +4306,10 @@ react-native-safe-area-context@4.7.4:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.7.4.tgz#3dd8438971e70043d76f2428ede75b8a9639265e"
   integrity sha512-3LR3DCq9pdzlbq6vsHGWBFehXAKDh2Ljug6jWhLWs1QFuJHM6AS2+mH2JfKlB2LqiSFZOBcZfHQFz0sGaA3uqg==
 
+react-native-safe-area@sergeymild/react-native-safe-area#0.3.2:
+  version "0.3.2"
+  resolved "https://codeload.github.com/sergeymild/react-native-safe-area/tar.gz/0bc617a8efd0813aefe7bd365eca2684f6b2deeb"
+
 react-native-screens@^3.27.0:
   version "3.27.0"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.27.0.tgz#2ac39f78dee27df97d3b6fb11ebf8e5751aa986a"

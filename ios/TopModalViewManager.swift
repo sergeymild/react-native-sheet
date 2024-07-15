@@ -76,6 +76,15 @@ class TopModalView: RCTView {
         _alertWindow?.windowLevel = UIWindow.Level.alert
         _alertWindow?.isHidden = false
         viewController.modalPresentationStyle = .fullScreen
+
+        if (animationType == "fade") {
+          viewController.modalTransitionStyle = .crossDissolve
+        } else if (animationType == "slide") {
+          viewController.modalTransitionStyle = .coverVertical
+        } else if animationType == "none" {
+
+        }
+
         viewController.view.backgroundColor = .clear
         return controller
     }()
@@ -84,6 +93,9 @@ class TopModalView: RCTView {
     private var onModalDismiss: RCTDirectEventBlock?
     @objc
     private var animated: Bool = true
+    /// objc doesn't support String Enums
+    @objc
+    private var animationType = "slide"
 
     init(bridge: RCTBridge) {
         self._bridge = bridge
@@ -146,7 +158,7 @@ class TopModalView: RCTView {
     }
 
     func dismissVC() {
-        self.viewController.dismiss(animated: true) {
+      self.viewController.dismiss(animated: self.animated) {
             debugPrint("😀 dismissVC \(self.onModalDismiss)")
             self.onModalDismiss?([:])
         }
@@ -171,7 +183,7 @@ class TopModalView: RCTView {
 
         if self.viewController.isBeingDismissed != true {
             debugPrint("😀dismissViewController")
-            self.viewController.dismiss(animated: true, completion: cleanup)
+            self.viewController.dismiss(animated: self.animated, completion: cleanup)
         } else {
             cleanup()
         }

@@ -1,6 +1,7 @@
 import {
   findNodeHandle,
   NativeModules,
+  Platform,
   requireNativeComponent,
   StyleSheet,
   View,
@@ -8,6 +9,7 @@ import {
 import React from 'react';
 
 const TransparentActivity = requireNativeComponent<any>('TransparentActivity');
+const TopModalView = requireNativeComponent<any>('TopModalView');
 
 interface Props {
   onActivityDismiss?: () => void;
@@ -37,7 +39,9 @@ export class TransparentActivityView extends React.PureComponent<Props, State> {
     const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
     console.log('[TopModal.hide]', tag);
-    NativeModules.TransparentActivity.dismiss(tag);
+    if (Platform.OS === 'android')
+      NativeModules.TransparentActivity.dismiss(tag);
+    else NativeModules.TopModalView.dismiss(tag);
   };
 
   private onDismiss = () => {
@@ -57,11 +61,30 @@ export class TransparentActivityView extends React.PureComponent<Props, State> {
       console.log('[TopModal.render.remove]');
       return null;
     }
+
+    if (Platform.OS === 'android') {
+      return (
+        <TransparentActivity
+          onActivityDismiss={this.onDismiss}
+          ref={this.sheetRef}
+          animated={this.props.animated ?? true}
+        >
+          <View
+            accessibilityLabel={'transparent-activity-root-view'}
+            nativeID={'transparent-activity-root-view'}
+            style={StyleSheet.absoluteFill}
+            children={this.props.children}
+          />
+        </TransparentActivity>
+      );
+    }
+
     return (
-      <TransparentActivity
-        onActivityDismiss={this.onDismiss}
+      <TopModalView
+        animationType={'none'}
+        animated={false}
+        onModalDismiss={this.onDismiss}
         ref={this.sheetRef}
-        animated={this.props.animated ?? true}
       >
         <View
           accessibilityLabel={'transparent-activity-root-view'}
@@ -69,7 +92,7 @@ export class TransparentActivityView extends React.PureComponent<Props, State> {
           style={StyleSheet.absoluteFill}
           children={this.props.children}
         />
-      </TransparentActivity>
+      </TopModalView>
     );
   }
 }

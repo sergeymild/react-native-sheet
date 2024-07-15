@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import {
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -9,13 +10,18 @@ import {
 import { Button } from '../../components/button';
 import { TransparentActivityView } from 'react-native-sheet';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { KeyboardSpacer } from '../../components/KeyboardSpacer';
+import { safeArea } from 'react-native-safe-area';
 
 const Stack = createBottomTabNavigator<any>();
 
 export const TabsScreen = () => {
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
+      screenOptions={{
+        headerShown: false,
+        tabBarHideOnKeyboard: Platform.OS === 'android',
+      }}
     >
       <Stack.Screen
         name={'TransparentActivityExample'}
@@ -33,8 +39,12 @@ export const TransparentActivityExample = () => {
   // refs
   const modalRef = useRef<TransparentActivityView>(null);
 
-  const handlePresentPress = useCallback(() => {
-    //bottomSheetRef.current?.show();
+  const handlePresentPress = useCallback(async () => {
+    // bottomSheetRef.current?.show();
+    console.log(
+      '🍓[TransparentActivityExample.]',
+      await safeArea.actualSafeArea()
+    );
     modalRef.current!.show();
   }, []);
 
@@ -89,9 +99,12 @@ export const TransparentActivityExample = () => {
               minHeight: 56,
               width: '100%',
               backgroundColor: 'yellow',
-              marginBottom: 50,
+              borderBottomWidth: 1,
+              borderBottomColor: 'purple',
+              marginBottom: safeArea.androidBottomInset,
             }}
           />
+          <KeyboardSpacer />
         </View>
       </TransparentActivityView>
     </View>

@@ -19,6 +19,8 @@ RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 
 RCT_EXPORT_VIEW_PROPERTY(onModalDismiss, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(animated, BOOL)
+/// "fade" | "slide" | "none"
+RCT_EXPORT_VIEW_PROPERTY(animationType, NSString)
 RCT_EXTERN_METHOD(present:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 

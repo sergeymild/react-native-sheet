@@ -21,7 +21,6 @@ const defaultAnimation: LayoutAnimationConfig = {
   create: {
     duration: 300,
     type: LayoutAnimation.Types.easeInEaseOut,
-
     property: LayoutAnimation.Properties.opacity,
   },
   update: {
@@ -31,7 +30,6 @@ const defaultAnimation: LayoutAnimationConfig = {
 };
 
 interface Props {
-  readonly topSpacing?: number;
   readonly onToggle?: (height: number) => void;
   readonly handleAndroid?: boolean;
   readonly style?: StyleProp<ViewStyle>;
@@ -46,12 +44,25 @@ interface State {
 
 export class KeyboardSpacer extends PureComponent<Props, State> {
   private _listeners: Array<EmitterSubscription> = [];
+
   constructor(props: Props) {
     super(props);
     this.state = {
       keyboardSpace: 0,
       isKeyboardOpened: false,
     };
+  }
+
+  get style(): StyleProp<ViewStyle> {
+    let spacing = this.props.defaultBottomSpacing ?? 0;
+    if (this.state.keyboardSpace > 0) {
+      spacing = this.props.openedSpacing ?? 0;
+    }
+    let height = this.state.keyboardSpace + spacing;
+    if (Platform.OS === 'android' && this.props.handleAndroid !== true) {
+      height = spacing;
+    }
+    return [styles.container, { height }, this.props.style];
   }
 
   componentDidMount() {
@@ -66,7 +77,7 @@ export class KeyboardSpacer extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    this._listeners.forEach(listener => listener.remove());
+    this._listeners.forEach((listener) => listener.remove());
   }
 
   updateKeyboardSpace = (event: KeyboardEvent) => {
@@ -84,22 +95,13 @@ export class KeyboardSpacer extends PureComponent<Props, State> {
     }
     LayoutAnimation.configureNext(animationConfig);
 
-    // get updated on rotation
-    // when external physical keyboard is connected
-    // event.endCoordinates.height still equals virtual keyboard height
-    // however only the keyboard toolbar is showing if there should be one
-    let screenY = Platform.OS === 'ios' ? event.endCoordinates.height : 0;
-    if (this.props.handleAndroid && Platform.OS === 'android') {
-      screenY = event.endCoordinates.height;
-    }
-    const keyboardSpace = screenY + (this.props.topSpacing ?? 0);
     this.setState(
       {
-        keyboardSpace,
+        keyboardSpace: event.endCoordinates.height,
         isKeyboardOpened: true,
       },
       () => {
-        this.props.onToggle?.(keyboardSpace);
+        this.props.onToggle?.(event.endCoordinates.height);
       }
     );
   };
@@ -125,23 +127,7 @@ export class KeyboardSpacer extends PureComponent<Props, State> {
     );
   };
 
-  get style(): StyleProp<ViewStyle> {
-    let spacing = this.props.defaultBottomSpacing ?? 0;
-    if (this.state.keyboardSpace > 0) {
-      spacing = this.props.openedSpacing ?? 0;
-    }
-    return [
-      styles.container,
-      {
-        height: this.state.keyboardSpace + spacing,
-        backgroundColor: __DEV__ ? 'red' : 'transparent',
-      },
-      this.props.style,
-    ];
-  }
-
   render() {
-    return null;
     return <View style={this.style} />;
   }
 }
