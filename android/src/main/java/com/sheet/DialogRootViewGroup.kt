@@ -12,6 +12,7 @@ import com.facebook.react.uimanager.JSTouchDispatcher
 import com.facebook.react.uimanager.RootView
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
+import kotlin.math.max
 import kotlin.math.min
 
 fun DialogRootViewGroup.eventDispatcher(): EventDispatcher {
@@ -25,6 +26,7 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   var reactView: View? = null
 
   var sheetMaxHeightSize: Double = -1.0
+  var sheetMinHeightSize: Double = -1.0
   private val screenHeight: Int by lazy {
     return@lazy Resources.getSystem().displayMetrics.heightPixels
   }
@@ -38,10 +40,11 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
   }
 
   private fun allowedHeight(): Int {
+    val rHeight = max(sheetMinHeightSize.toInt(), reactHeight)
     val returnValue = if (sheetMaxHeightSize <= 0.0) {
-      min(reactHeight, screenHeight)
+      min(rHeight, screenHeight)
     } else {
-      min(min(sheetMaxHeightSize.toInt(), screenHeight), reactHeight)
+      min(min(sheetMaxHeightSize.toInt(), screenHeight), rHeight)
     }
     println("🥲 DialogRootViewGroup.allowedHeight reactHeight: ${reactHeight.toDP()}, sheetMaxHeightSize: ${sheetMaxHeightSize.toDP()}, screenHeight: ${screenHeight.toDP()} returnValue: ${returnValue.toDP()}")
     return returnValue

@@ -32,6 +32,10 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         mHostView.sheetMaxHeightSize = value.getDouble("maxHeight").toPxD()
       }
 
+      if (value?.hasKey("minHeight") == true) {
+        mHostView.sheetMinHeightSize = value.getDouble("minHeight").toPxD()
+      }
+
       field = value
     }
 
