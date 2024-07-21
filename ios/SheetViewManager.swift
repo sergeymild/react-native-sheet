@@ -95,6 +95,7 @@ class HostFittedSheet: UIView {
         _alertWindow?.rootViewController = controller
         _alertWindow?.windowLevel = UIWindow.Level.alert
         _alertWindow?.isHidden = false
+        _alertWindow?.makeKeyAndVisible()
         return controller
     }()
 

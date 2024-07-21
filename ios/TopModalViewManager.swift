@@ -76,6 +76,7 @@ class TopModalView: RCTView {
         _alertWindow?.rootViewController = controller
         _alertWindow?.windowLevel = UIWindow.Level.alert
         _alertWindow?.isHidden = false
+        _alertWindow?.makeKeyAndVisible()
         viewController.modalPresentationStyle = .fullScreen
         viewController.view.backgroundColor = .clear
         return controller
