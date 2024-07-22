@@ -47,6 +47,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
   private val isDark: Boolean
     get() = params.bool("isDark", false)
+  private val isStatusBarBgLight: Boolean
+    get() = params?.bool("isStatusBarBgLight", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity {
     return (context as ReactContext).currentActivity as AppCompatActivity
@@ -66,7 +68,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
         dismissible = dismissible,
-        isDark = isDark
+        isDark = isDark,
+        isStatusBarBgLight = isStatusBarBgLight
       ) {
         println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup

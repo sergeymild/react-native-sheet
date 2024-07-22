@@ -21,6 +21,10 @@ export interface FittedSheetParams {
   readonly isDark?: boolean;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
+  /**
+   * Android only
+   */
+  readonly isStatusBarBgLight?: boolean;
 }
 
 type Children =
