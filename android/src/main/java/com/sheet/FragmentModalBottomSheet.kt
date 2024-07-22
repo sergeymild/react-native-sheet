@@ -36,13 +36,7 @@ class FragmentModalBottomSheet(
     dialog.window?.let {
       presentedWindow = WeakReference(it)
 
-      if (isStatusBarBgLight) {
-        it.decorView.systemUiVisibility =
-          it.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-      } else {
-        it.decorView.systemUiVisibility =
-          it.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-      }
+      it.updateStatusBar(isStatusBarBgLight)
     }
     return dialog
   }

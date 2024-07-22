@@ -14,6 +14,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.sheet.R
+import com.sheet.updateStatusBar
 
 
 fun androidx.fragment.app.Fragment.safeShow(
@@ -63,13 +64,7 @@ class FullScreenDialog(
         it.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
           View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 
-        if (isStatusBarBgLight) {
-          it.decorView.systemUiVisibility =
-            it.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        } else {
-          it.decorView.systemUiVisibility =
-            it.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-        }
+        it.updateStatusBar(isStatusBarBgLight)
       } else {
         val width = ViewGroup.LayoutParams.MATCH_PARENT
         val height = ViewGroup.LayoutParams.MATCH_PARENT

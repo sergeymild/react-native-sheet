@@ -3,6 +3,7 @@ package com.sheet
 import android.content.Context
 import android.graphics.Color
 import android.view.View
+import android.view.Window
 import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReadableMap
@@ -56,5 +57,15 @@ fun View.setNewShadowSize(width: Int, height: Int) {
   UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
     val id = module.uiImplementation.resolveShadowNode(this.id).getChildAt(0).reactTag
     module.updateNodeSize(id, width, height)
+  }
+}
+
+fun Window.updateStatusBar(isLight: Boolean) {
+  if (isLight) {
+    decorView.systemUiVisibility =
+      decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+  } else {
+    decorView.systemUiVisibility =
+      decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
   }
 }
