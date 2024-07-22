@@ -40,7 +40,7 @@ class FullScreenDialog(
     if (isEdgeToEdge) {
       setStyle(STYLE_NORMAL, R.style.Custom_Theme_EdgeToEdgeDialog)
     } else {
-      setStyle(STYLE_NORMAL, R.style.Theme_FullScreenDialog)
+      setStyle(STYLE_NORMAL, R.style.Custom_Theme_FullScreenDialog)
     }
   }
 
