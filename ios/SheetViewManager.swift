@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 import React
-import FittedSheets
-
 
 class ModalHostShadowView: RCTShadowView {
     static var attachedViews: [Int: HostFittedSheet] = [:]
