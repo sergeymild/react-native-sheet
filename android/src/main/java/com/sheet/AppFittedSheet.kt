@@ -96,6 +96,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     val module = UIManagerHelper.getUIManager(context as ReactContext?, UIManagerType.DEFAULT) as UIManagerModule
     UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
       val resolveShadowNode = module.uiImplementation.resolveShadowNode(child.id)
+      if (resolveShadowNode == null) return@runOnNativeModulesQueueThread
       val height = resolveShadowNode.layoutHeight
       if (height > 0) mHostView.setVirtualHeight(height)
     }
