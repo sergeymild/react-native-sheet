@@ -59,8 +59,8 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
     println("😀 setStyleMinHeight id: ${styledMinHeight.toInt().toDP()}")
   }
 
-  override fun dispatchUpdates(absoluteX: Float, absoluteY: Float, uiViewOperationQueue: UIViewOperationQueue?, nativeViewHierarchyOptimizer: NativeViewHierarchyOptimizer?): Boolean {
-    val didChange = super.dispatchUpdates(absoluteX, absoluteY, uiViewOperationQueue, nativeViewHierarchyOptimizer)
+  override fun dispatchUpdates(absoluteX: Float, absoluteY: Float, uiViewOperationQueue: UIViewOperationQueue?, nativeViewHierarchyOptimizer: NativeViewHierarchyOptimizer?) {
+    super.dispatchUpdates(absoluteX, absoluteY, uiViewOperationQueue, nativeViewHierarchyOptimizer)
     val newHeight = getChildAt(0).layoutHeight
     attachedViews[reactTag]?.mHostView?.let {
       if (it.reactView == null) {
@@ -71,7 +71,6 @@ internal class ModalHostShadowNode : LayoutShadowNode() {
         println("😀 dispatchUpdates ${it.currentWidth.toDP()} pa: ${it.currentHeight.toDP()}")
       }
     }
-    return didChange
   }
 }
 
