@@ -20,7 +20,6 @@ export const TabsScreen = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarHideOnKeyboard: Platform.OS === 'android',
       }}
     >
       <Stack.Screen
@@ -50,63 +49,14 @@ export const TransparentActivityExample = () => {
 
   return (
     <View style={styles.container}>
-      <Button label="Present" onPress={handlePresentPress} />
       <TextInput
-        style={{ height: 40, width: '100%', backgroundColor: 'gray' }}
-      />
-      <View
         style={{
-          position: 'absolute',
-          height: 200,
-          bottom: 10,
-          left: 0,
-          right: 0,
-          backgroundColor: 'green',
+          height: 40,
+          width: '100%',
+          backgroundColor: 'gray',
         }}
       />
-
-      <TransparentActivityView
-        ref={modalRef}
-        onActivityDismiss={() =>
-          console.log('[TransparentActivityView.dismiss]')
-        }
-      >
-        <View
-          accessibilityLabel={'inModal'}
-          style={{
-            flex: 1,
-            justifyContent: 'flex-end',
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              modalRef.current?.hide();
-            }}
-          >
-            <Text
-              children={'Close'}
-              style={{
-                color: 'red',
-                backgroundColor: 'orange',
-                height: 100,
-                width: 100,
-              }}
-            />
-          </TouchableOpacity>
-          <TextInput
-            multiline={false}
-            style={{
-              minHeight: 56,
-              width: '100%',
-              backgroundColor: 'yellow',
-              borderBottomWidth: 1,
-              borderBottomColor: 'purple',
-              marginBottom: safeArea.androidBottomInset,
-            }}
-          />
-          <KeyboardSpacer />
-        </View>
-      </TransparentActivityView>
+      <KeyboardSpacer handleAndroid />
     </View>
   );
 };
@@ -115,6 +65,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   },
   sheetContainer: {
     marginHorizontal: 16,
