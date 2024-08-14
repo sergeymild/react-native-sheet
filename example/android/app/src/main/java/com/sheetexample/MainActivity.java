@@ -1,5 +1,9 @@
 package com.sheetexample;
 
+import android.os.Bundle;
+
+import androidx.core.view.WindowCompat;
+
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
@@ -14,6 +18,12 @@ public class MainActivity extends ReactActivity {
   @Override
   protected String getMainComponentName() {
     return "SheetExample";
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+    super.onCreate(savedInstanceState);
   }
 
   /**
