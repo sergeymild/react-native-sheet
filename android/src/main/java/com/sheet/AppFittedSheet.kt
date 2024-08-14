@@ -50,12 +50,12 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   private val isStatusBarBgLight: Boolean
     get() = params?.bool("isStatusBarBgLight", false) ?: false
 
-  private fun getCurrentActivity(): AppCompatActivity {
-    return (context as ReactContext).currentActivity as AppCompatActivity
+  private fun getCurrentActivity(): AppCompatActivity? {
+    return (context as ReactContext)?.currentActivity as? AppCompatActivity
   }
 
   private val sheet: FragmentModalBottomSheet?
-    get() = getCurrentActivity().supportFragmentManager.findFragmentByTag(fragmentTag) as FragmentModalBottomSheet?
+    get() = getCurrentActivity()?.supportFragmentManager?.findFragmentByTag(fragmentTag) as FragmentModalBottomSheet?
 
   fun showOrUpdate() {
     println("🥲 showOrUpdate")
@@ -76,7 +76,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         parent?.removeViewAt(0)
         onSheetDismiss()
       }
-      fragment.safeShow(getCurrentActivity().supportFragmentManager, fragmentTag)
+      getCurrentActivity()?.supportFragmentManager?.let {
+        fragment.safeShow(it, fragmentTag)
+      }
     }
   }
 
