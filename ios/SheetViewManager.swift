@@ -30,11 +30,13 @@ class ModalHostShadowView: RCTShadowView {
         super.layoutSubviews(with: layoutContext)
         let tag = self.reactTag.intValue
         var size = reactSubviews()[0].contentFrame.size
-        let view = ModalHostShadowView.attachedViews[tag]
-        let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? .infinity
-        let minHeight = view?.sheetMinHeightSize?.doubleValue ?? .zero
 
         DispatchQueue.main.async {
+            let view = ModalHostShadowView.attachedViews[tag]
+            let maxWidth = view?.sheetWidth ?? .infinity
+            let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? .infinity
+            let minHeight = view?.sheetMinHeightSize?.doubleValue ?? .zero
+
             if size.height > maxheight {
                 debugPrint("😀 constraint \(tag) \(size) \(maxheight)")
                 size.height = maxheight
@@ -45,9 +47,14 @@ class ModalHostShadowView: RCTShadowView {
                 size.height = minHeight
                 view!.notifyForBoundsChange(newBounds: size)
             }
+            if size.width > maxWidth {
+                debugPrint("😀 constraint \(tag) \(size) \(maxWidth)")
+                size.width = maxWidth
+                view!.notifyForBoundsChange(newBounds: size)
+            }
             view?._modalViewController?.setSizes([.fixed(size.height)])
+            debugPrint("😀 layout(with \(tag) \(size) \(maxheight)")
         }
-        debugPrint("😀 layout(with \(tag) \(size) \(maxheight)")
     }
 }
 
@@ -154,7 +161,7 @@ class HostFittedSheet: UIView {
         debugPrint("", increasedHeight)
     }
 
-    private var sheetMaxWidthSize: NSNumber?
+    var sheetMaxWidthSize: NSNumber?
     private var dismissable = true
     var sheetMaxHeightSize: NSNumber?
     var sheetMinHeightSize: NSNumber?
@@ -174,7 +181,7 @@ class HostFittedSheet: UIView {
         }
     }
 
-    private var sheetWidth: CGFloat {
+    var sheetWidth: CGFloat {
         return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(UIScreen.main.bounds.width))
     }
 
@@ -239,17 +246,22 @@ class HostFittedSheet: UIView {
                     size = .init(width: self.sheetWidth, height: CGFloat(self._sheetSize!.floatValue))
                     debugPrint("😀 else", size)
                 }
+                var shouldUpdate = false
                 if size.width > self.sheetWidth {
                     size.width = self.sheetWidth
+                    shouldUpdate = true
                 }
                 // if maxSize is present notify react native view
                 if self.sheetMaxHeightSize != nil && size.height > self.sheetMaxHeightSize!.doubleValue {
                     size.height = self.sheetMaxHeightSize!.doubleValue
-                    self.notifyForBoundsChange(newBounds: size)
+                    shouldUpdate = true
                 }
                 // if maxSize is present notify react native view
                 if self.sheetMinHeightSize != nil && size.height < self.sheetMinHeightSize!.doubleValue {
                     size.height = self.sheetMinHeightSize!.doubleValue
+                    shouldUpdate = true
+                }
+                if shouldUpdate {
                     self.notifyForBoundsChange(newBounds: size)
                 }
                 self._modalViewController = SheetViewController(
@@ -344,7 +356,7 @@ class HostFittedSheet: UIView {
 extension UIView {
     func find(_ nId: String, deepIndex: Int) -> UIView? {
         if deepIndex >= 10 { return nil }
-        if self.nativeID.contains(nId) || self.accessibilityIdentifier?.contains(nId) == true {
+        if self.nativeID?.contains(nId) == true || self.accessibilityIdentifier?.contains(nId) == true {
             return self
         }
 
