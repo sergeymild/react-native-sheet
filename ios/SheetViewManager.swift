@@ -15,7 +15,13 @@ class ModalHostShadowView: RCTShadowView {
     override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
         super.insertReactSubview(subview, at: atIndex)
         if subview != nil {
-            (subview as RCTShadowView).width = YGValue.init(value: Float(RCTScreenSize().width), unit: .point)
+            let s = RCTScreenSize()
+            let orientation = UIDevice.current.orientation
+            var width = s.width
+            if orientation == .landscapeLeft || orientation == .landscapeRight {
+                width = s.height
+            }
+            (subview as RCTShadowView).width = YGValue.init(value: Float(width), unit: .point)
             subview.position = .absolute
         }
     }
@@ -158,6 +164,7 @@ class HostFittedSheet: UIView {
     @objc
     var fittedSheetParams: NSDictionary? {
         didSet {
+            debugPrint("😀 ", fittedSheetParams ?? "nil")
             sheetMaxWidthSize = (fittedSheetParams?["maxWidth"] as? NSNumber)
             sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
             sheetMinHeightSize = (fittedSheetParams?["minHeight"] as? NSNumber)
@@ -227,8 +234,10 @@ class HostFittedSheet: UIView {
                     self._reactSubview?.layoutIfNeeded()
                     self._reactSubview?.sizeToFit()
                     size = self._reactSubview?.frame.size ?? .zero
+                    debugPrint("😀 self._sheetSize?.floatValue == nil", size)
                 } else {
                     size = .init(width: self.sheetWidth, height: CGFloat(self._sheetSize!.floatValue))
+                    debugPrint("😀 else", size)
                 }
                 if size.width > self.sheetWidth {
                     size.width = self.sheetWidth
@@ -335,7 +344,7 @@ class HostFittedSheet: UIView {
 extension UIView {
     func find(_ nId: String, deepIndex: Int) -> UIView? {
         if deepIndex >= 10 { return nil }
-        if self.nativeID == nId || self.accessibilityIdentifier == nId {
+        if self.nativeID.contains(nId) || self.accessibilityIdentifier?.contains(nId) == true {
             return self
         }
 
