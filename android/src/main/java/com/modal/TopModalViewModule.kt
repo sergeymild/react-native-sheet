@@ -19,18 +19,22 @@ class TopModalViewModule(reactContext: ReactApplicationContext) : ReactContextBa
     return TAG
   }
 
-  private fun findSheetView(viewId: Int): TopModalView {
+  private fun findSheetView(viewId: Int): TopModalView? {
     Log.d(TAG, "Finding view $viewId...")
     val view = if (reactApplicationContext != null) UIManagerHelper.getUIManager(reactApplicationContext, viewId)?.resolveView(viewId) as TopModalView? else null
     Log.d(TAG,  if (reactApplicationContext != null) "Found view $viewId!" else "Couldn't find view $viewId!")
-    return view ?: throw RuntimeException("ViewNotFound($viewId)")
+    return view
   }
 
   @ReactMethod
   fun dismiss(viewTag: Int) {
     Handler(Looper.getMainLooper()).post {
-      val view = findSheetView(viewTag)
-      view.dismiss()
+      try {
+        val view = findSheetView(viewTag)
+        view?.dismiss()
+      } catch (_: Throwable) {
+
+      }
     }
   }
 }
