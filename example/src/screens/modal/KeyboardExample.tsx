@@ -4,7 +4,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet2';
 
 const KeyboardExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
@@ -31,7 +31,7 @@ const KeyboardExample = () => {
       <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
-        //params={{ maxHeight: 500 }}
+        params={{ maxHeight: 800 }}
         ref={bottomSheetRef}
         onSheetDismiss={() => {
           setKH(0);

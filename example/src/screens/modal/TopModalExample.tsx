@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Button } from '../../components/button';
-import { TopModal } from 'react-native-sheet';
+import { TopModal } from 'react-native-sheet2';
 import { useNavigation } from '@react-navigation/native';
 
 export const TopModalExample = () => {

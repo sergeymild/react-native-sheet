@@ -25,35 +25,26 @@ class ModalHostShadowView: RCTShadowView {
             subview.position = .absolute
         }
     }
-
+    
+    func renderSizes(subviews: [RCTShadowView]?) {
+        guard let subviews else { return }
+        for v in subviews {
+            debugPrint(v)
+            renderSizes(subviews: v.reactSubviews())
+        }
+    }
+    
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
-        let tag = self.reactTag.intValue
-        var size = reactSubviews()[0].contentFrame.size
-
-        DispatchQueue.main.async {
-            let view = ModalHostShadowView.attachedViews[tag]
-            let maxWidth = view?.sheetWidth ?? .infinity
-            let maxheight = view?.sheetMaxHeightSize?.doubleValue ?? .infinity
-            let minHeight = view?.sheetMinHeightSize?.doubleValue ?? .zero
-
-            if size.height > maxheight {
-                debugPrint("😀 constraint \(tag) \(size) \(maxheight)")
-                size.height = maxheight
-                view!.notifyForBoundsChange(newBounds: size)
-            }
-            if size.height < minHeight {
-                debugPrint("😀 constraint \(tag) \(size) \(minHeight)")
-                size.height = minHeight
-                view!.notifyForBoundsChange(newBounds: size)
-            }
-            if size.width > maxWidth {
-                debugPrint("😀 constraint \(tag) \(size) \(maxWidth)")
-                size.width = maxWidth
-                view!.notifyForBoundsChange(newBounds: size)
-            }
+        
+        RCTExecuteOnMainQueue { [weak self] in
+            guard let self else { return }
+            let view = RCTBridge.current().uiManager.view(
+                forReactTag: self.reactTag) as? HostFittedSheet
+            let v = self.reactSubviews()[0]
+            let size = v.contentFrame.size
+            debugPrint("😀 ModalHostShadowView.layoutSubviews", size)
             view?._modalViewController?.setSizes([.fixed(size.height)])
-            debugPrint("😀 layout(with \(tag) \(size) \(maxheight)")
         }
     }
 }
@@ -119,20 +110,13 @@ class HostFittedSheet: UIView {
     @objc
     private var onSheetDismiss: RCTDirectEventBlock?
 
-    @objc
-    func setIncreaseHeight(_ by: NSNumber) {
-        if by.floatValue == 0 { return }
-        debugPrint("setIncreaseHeight", by.floatValue)
-        changeHeight(by.floatValue)
-    }
-
-    @objc
-    func setDecreaseHeight(_ by: NSNumber) {
-        if by.floatValue == 0 { return }
-        debugPrint("setDecreaseHeight", -by.floatValue)
-        changeHeight(-by.floatValue)
-    }
-
+    var sheetMaxWidthSize: NSNumber?
+    private var dismissable = true
+    var sheetMaxHeightSize: NSNumber?
+    var sheetMinHeightSize: NSNumber?
+    private var topLeftRightCornerRadius: NSNumber?
+    private var sheetBackgroundColor: UIColor?
+    
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
         debugPrint("😀 setPassScrollViewReactTag", tag)
@@ -145,28 +129,6 @@ class HostFittedSheet: UIView {
         debugPrint("😀 setPassScrollViewReactTag found", scrollView, self._modalViewController)
         self._modalViewController?.handleScrollView(scrollView.scrollView)
     }
-
-    private func changeHeight(_ by: Float) {
-        if !_isPresented { return }
-        guard let reactSubView = _reactSubview else { return }
-
-        let newHeight = CGFloat(by)
-        if reactSubView.frame.height == newHeight { return }
-        let increasedHeight = reactSubView.frame.height + newHeight
-        debugPrint("changeHeight from", reactSubView.frame.height, "to", increasedHeight)
-        let sizes: [SheetSize] = [.fixed(increasedHeight)]
-        self._modalViewController?.sizes = sizes
-        self._modalViewController?.resize(to: sizes[0], animated: true)
-        self.notifyForBoundsChange(newBounds: .init(width: reactSubView.frame.width, height: increasedHeight))
-        debugPrint("", increasedHeight)
-    }
-
-    var sheetMaxWidthSize: NSNumber?
-    private var dismissable = true
-    var sheetMaxHeightSize: NSNumber?
-    var sheetMinHeightSize: NSNumber?
-    private var topLeftRightCornerRadius: NSNumber?
-    private var sheetBackgroundColor: UIColor?
 
     @objc
     var fittedSheetParams: NSDictionary? {
@@ -193,13 +155,6 @@ class HostFittedSheet: UIView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    func notifyForBoundsChange(newBounds: CGSize) {
-      if (_reactSubview != nil && _isPresented) {
-          debugPrint("😀notifyForBoundsChange \(newBounds)")
-          _bridge?.uiManager.setSize(newBounds, for: _reactSubview!)
-      }
     }
 
     override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
@@ -246,24 +201,19 @@ class HostFittedSheet: UIView {
                     size = .init(width: self.sheetWidth, height: CGFloat(self._sheetSize!.floatValue))
                     debugPrint("😀 else", size)
                 }
-                var shouldUpdate = false
+
                 if size.width > self.sheetWidth {
                     size.width = self.sheetWidth
-                    shouldUpdate = true
                 }
                 // if maxSize is present notify react native view
                 if self.sheetMaxHeightSize != nil && size.height > self.sheetMaxHeightSize!.doubleValue {
                     size.height = self.sheetMaxHeightSize!.doubleValue
-                    shouldUpdate = true
                 }
                 // if maxSize is present notify react native view
                 if self.sheetMinHeightSize != nil && size.height < self.sheetMinHeightSize!.doubleValue {
                     size.height = self.sheetMinHeightSize!.doubleValue
-                    shouldUpdate = true
                 }
-                if shouldUpdate {
-                    self.notifyForBoundsChange(newBounds: size)
-                }
+
                 self._modalViewController = SheetViewController(
                     controller: self.viewController,
                     sizes: [.fixed(size.height)],

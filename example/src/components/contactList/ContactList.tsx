@@ -3,7 +3,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
-import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet';
+import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet2';
 
 export interface ContactListProps {
   count?: number;
@@ -83,6 +83,9 @@ const ContactListComponent = ({
       renderItem={renderFlatListItem}
       keyboardDismissMode="interactive"
       indicatorStyle="black"
+      onLayout={(e) =>
+        console.log('🍓[ContactList.layout]', e.nativeEvent.layout.height)
+      }
       contentContainerStyle={[rest.contentContainerStyle]}
     />
   );

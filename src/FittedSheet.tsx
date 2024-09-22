@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react';
 import {
   Dimensions,
   findNodeHandle,
+  type LayoutChangeEvent,
   NativeModules,
   processColor,
   requireNativeComponent,
@@ -41,6 +42,7 @@ interface Props {
 interface State {
   show: boolean;
   data: any | null;
+  maxHeight: number;
 }
 
 export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
@@ -65,7 +67,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   private sheetRef = React.createRef<any>();
   constructor(props: Props) {
     super(props);
-    this.state = { show: false, data: null };
+    this.state = { show: false, data: null, maxHeight: -1 };
   }
 
   show = (data?: any) => {
@@ -73,6 +75,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   data = () => this.state.data;
+
+  onLayout = (e: LayoutChangeEvent) => {
+    console.log('🍓[FittedSheet.onLayout]', e.nativeEvent.layout.height);
+    this.setState({ maxHeight: e.nativeEvent.layout.height });
+  };
 
   toggle = () => {
     this.setState({ show: !this.state.show });
@@ -84,11 +91,16 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   increaseHeight = (by: number) => {
-    this.sheetRef.current?.setNativeProps({ increaseHeight: by });
+    //this.sheetRef.current?.setNativeProps({ increaseHeight: by });
+    this.setState({ maxHeight: this.state.maxHeight + by });
   };
 
   decreaseHeight = (by: number) => {
-    this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
+    const minHeight = this.props.params?.minHeight;
+    this.setState({
+      maxHeight: Math.max(minHeight ?? 0, this.state.maxHeight - by),
+    });
+    //this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
   };
 
   hide = (passThroughParam?: any) => {
@@ -128,12 +140,15 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   render() {
     if (!this.state.show) return null;
+
     const dim = Dimensions.get('screen');
     const isLandscape = dim.width > dim.height;
-    const maxHeight = Math.min(
+
+    let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       dim.height - (StatusBar.currentHeight ?? 0)
     );
+
     const paramsMaxWidth = isLandscape
       ? this.props.params?.maxLandscapeWidth
       : this.props.params?.maxPortraitWidth;
@@ -162,7 +177,11 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         }
       >
         <FittedSheetContext.Provider value={this}>
-          <View nativeID={'fitted-sheet-root-view'}>
+          <View
+            nativeID={'fitted-sheet-root-view'}
+            style={{ maxHeight, minHeight, maxWidth }}
+            onLayout={this.onLayout}
+          >
             {this.props.children &&
               typeof this.props.children === 'function' &&
               this.props.children(this.state.data)}

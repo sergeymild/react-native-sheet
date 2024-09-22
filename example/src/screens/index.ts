@@ -1,5 +1,3 @@
-import { TransparentActivityExample } from 'example/src/screens/modal/TransparentActivityExample';
-
 export const screens = [
   {
     title: 'Modal',
@@ -46,12 +44,6 @@ export const screens = [
         getScreen: () => require('./modal/KeyboardExample').default,
       },
       {
-        name: 'RequireExample',
-        slug: 'Modal/RequireExample',
-
-        getScreen: () => require('./modal/RequireExample').RequireExample,
-      },
-      {
         name: 'PropsExample',
         slug: 'Modal/PropsExample',
         getScreen: () => require('./modal/PropsExample').PropsExample,
@@ -70,12 +62,6 @@ export const screens = [
         name: 'TopModalExample',
         slug: 'Modal/TopModalExample',
         getScreen: () => require('./modal/TopModalExample').TopModalExample,
-      },
-      {
-        name: 'TransparentActivityExample',
-        slug: 'Modal/TransparentActivityExample',
-        getScreen: () =>
-          require('./modal/TransparentActivityExample').TabsScreen,
       },
       {
         name: 'DismissPreventExample',
