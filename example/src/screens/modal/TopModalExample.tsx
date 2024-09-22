@@ -55,6 +55,7 @@ export const TopModalExample = () => {
           accessibilityLabel={'inModal'}
           style={{
             flex: 1,
+            backgroundColor: 'green',
             justifyContent: 'flex-end',
           }}
         >

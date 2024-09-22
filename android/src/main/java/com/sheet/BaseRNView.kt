@@ -3,6 +3,7 @@ package com.sheet
 import android.content.Context
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.uimanager.JSPointerDispatcher
@@ -10,9 +11,8 @@ import com.facebook.react.uimanager.JSTouchDispatcher
 import com.facebook.react.uimanager.RootView
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
-import com.facebook.react.views.view.ReactViewGroup
 
-open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
+open class BaseRNView(context: Context?) : ViewGroup(context), RootView {
   private val reactContext: ReactContext
     get() = context as ReactContext
   private val mJSTouchDispatcher = JSTouchDispatcher(this)
@@ -62,12 +62,12 @@ open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
       //e
     }
     super.onTouchEvent(event)
-    // In case when there is no children interested in handling touch event, we return true from
-    // the root view in order to receive subsequent events related to that gesture
     return true
   }
 
-  // No-op - override in order to still receive events to onInterceptTouchEvent
-  // even when some other view disallow that
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+
+  }
+
   override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) = Unit
 }

@@ -3,29 +3,13 @@ package com.sheet
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Outline
-import android.util.TypedValue
-import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewOutlineProvider
-import com.facebook.react.bridge.ReactContext
-import com.facebook.react.config.ReactFeatureFlags
-import com.facebook.react.uimanager.JSPointerDispatcher
-import com.facebook.react.uimanager.JSTouchDispatcher
-import com.facebook.react.uimanager.RootView
-import com.facebook.react.uimanager.UIManagerModule
-import com.facebook.react.uimanager.events.EventDispatcher
+import com.facebook.react.uimanager.PixelUtil
 import kotlin.math.max
 import kotlin.math.min
 
-fun DialogRootViewGroup.eventDispatcher(): EventDispatcher {
-  val reactContext = context as ReactContext
-  return reactContext.getNativeModule(UIManagerModule::class.java)!!.eventDispatcher
-}
-
-class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
-  private val mJSTouchDispatcher = JSTouchDispatcher(this)
-  private var mJSPointerDispatcher: JSPointerDispatcher? = null
+class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   var reactView: View? = null
 
   var sheetMaxHeightSize: Double = -1.0
@@ -41,9 +25,7 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
         val top = 0
         val right = view.width
         val bottom = view.height
-        val cornerRadius =
-          TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, r, view.resources.displayMetrics)
-            .toInt()
+        val cornerRadius = PixelUtil.toPixelFromDIP(r).toInt()
         outline.setRoundRect(left, top, right, bottom + cornerRadius, cornerRadius.toFloat())
       }
     })
@@ -52,19 +34,10 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
 
   private val screenHeight: Int
     get() = metrics.displayMetrics.heightPixels
-
   private val screenWidth: Int
     get() = metrics.displayMetrics.widthPixels
-  val currentHeight: Int
-    get() = layoutParams?.height ?: 0
   val currentWidth: Int
     get() = layoutParams?.width ?: 0
-
-  init {
-    if (ReactFeatureFlags.dispatchPointerEvents) {
-      mJSPointerDispatcher = JSPointerDispatcher(this)
-    }
-  }
 
   private fun allowedHeight(): Int {
     var returnValue = if (sheetMaxHeightSize >= 0) {
@@ -116,40 +89,6 @@ class DialogRootViewGroup(context: Context) : ViewGroup(context), RootView {
     super.removeViewAt(index)
   }
 
-  override fun onChildStartedNativeGesture(p0: View?, p1: MotionEvent?) {
-    mJSTouchDispatcher.onChildStartedNativeGesture(p1, eventDispatcher())
-    mJSPointerDispatcher?.onChildStartedNativeGesture(p0, p1, eventDispatcher())
-  }
-
-  override fun onChildStartedNativeGesture(p0: MotionEvent?) {
-    this.onChildStartedNativeGesture(null, p0)
-  }
-
-  override fun onChildEndedNativeGesture(p0: View?, p1: MotionEvent?) {
-    mJSTouchDispatcher.onChildEndedNativeGesture(p1, eventDispatcher())
-    mJSPointerDispatcher?.onChildEndedNativeGesture()
-  }
-
-  override fun handleException(t: Throwable?) {
-    (context as ReactContext).handleException(RuntimeException(t))
-  }
-
-  override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-    mJSTouchDispatcher.handleTouchEvent(event, eventDispatcher())
-    mJSPointerDispatcher?.handleMotionEvent(event, eventDispatcher(), true)
-    return super.onInterceptTouchEvent(event)
-  }
-
-  override fun onTouchEvent(event: MotionEvent): Boolean {
-    try {
-      mJSTouchDispatcher.handleTouchEvent(event, eventDispatcher())
-      mJSPointerDispatcher?.handleMotionEvent(event, eventDispatcher(), false)
-    } catch (_: Throwable) { }
-    super.onTouchEvent(event)
-    return true
-  }
-
-  override fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) = Unit
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
 
   private fun releaseReactView() {
