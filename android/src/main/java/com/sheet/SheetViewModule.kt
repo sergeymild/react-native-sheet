@@ -35,7 +35,7 @@ class SheetViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
   @ReactMethod
   fun dismiss(viewTag: Int) {
-    Handler(Looper.getMainLooper()).post {
+    reactApplicationContext.runOnUiQueueThread {
       val view = findSheetView(viewTag)
       view?.dismiss()
     }

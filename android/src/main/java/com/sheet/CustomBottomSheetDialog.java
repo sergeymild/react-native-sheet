@@ -146,24 +146,6 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
   }
 
   /**
-   * Set to perform the swipe down animation when dismissing instead of the window animation for the
-   * dialog.
-   *
-   * @param dismissWithAnimation True if swipe down animation should be used when dismissing.
-   */
-  public void setDismissWithAnimation(boolean dismissWithAnimation) {
-    this.dismissWithAnimation = dismissWithAnimation;
-  }
-
-  /**
-   * Returns if dismissing will perform the swipe down animation on the bottom sheet, rather than
-   * the window animation for the dialog.
-   */
-  public boolean getDismissWithAnimation() {
-    return dismissWithAnimation;
-  }
-
-  /**
    * Creates the container layout which must exist to find the behavior
    */
   private FrameLayout ensureContainerAndBehavior() {
@@ -171,7 +153,7 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
       container =
         (FrameLayout) View.inflate(getContext(), getDialogLayout(), null);
 
-      FrameLayout bottomSheet = (FrameLayout) container.findViewById(R.id.design_bottom_sheet);
+      FrameLayout bottomSheet = container.findViewById(R.id.design_bottom_sheet);
       behavior = BottomSheetBehavior.from(bottomSheet);
       behavior.addBottomSheetCallback(bottomSheetCallback);
       behavior.setHideable(cancelable);

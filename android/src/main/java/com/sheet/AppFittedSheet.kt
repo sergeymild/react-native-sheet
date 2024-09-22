@@ -95,10 +95,10 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
-    val module = UIManagerHelper.getUIManager(context as ReactContext?, UIManagerType.DEFAULT) as UIManagerModule
-    UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
-      val resolveShadowNode = module.uiImplementation.resolveShadowNode(child.id)
-      if (resolveShadowNode == null) return@runOnNativeModulesQueueThread
+    val ctx = context as ReactContext? ?: return
+    val module = UIManagerHelper.getUIManager(ctx, UIManagerType.DEFAULT) as? UIManagerModule ?: return
+    ctx.runOnNativeModulesQueueThread {
+      val resolveShadowNode = module?.uiImplementation?.resolveShadowNode(child.id) ?: return@runOnNativeModulesQueueThread
       val height = resolveShadowNode.layoutHeight
       if (height > 0) mHostView.setVirtualHeight(height)
     }
