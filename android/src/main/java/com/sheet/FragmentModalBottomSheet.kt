@@ -14,8 +14,7 @@ import java.lang.ref.WeakReference
 class FragmentModalBottomSheet(
   private val modalView: ViewGroup,
   private val dismissible: Boolean,
-  private val isDark: Boolean,
-  private val isStatusBarBgLight: Boolean,
+  private val isSystemUILight: Boolean,
   private val onDismiss: () -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -31,12 +30,16 @@ class FragmentModalBottomSheet(
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     this.isCancelable = dismissible
-    val dialog = CustomBottomSheetDialog(requireContext(), if (isDark) R.style.AppBottomSheetDialog_Dark else R.style.AppBottomSheetDialog)
+    val dialog = CustomBottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog)
     dialog.setSheetBackgroundColor(Color.TRANSPARENT)
     dialog.window?.let {
       presentedWindow = WeakReference(it)
-
-      it.updateStatusBar(isStatusBarBgLight)
+      it.setStatusBarStyle(isSystemUILight)
+      if (isSystemUILight) {
+        it.setSystemUIColor(Color.WHITE)
+      } else {
+        it.setSystemUIColor(Color.BLACK)
+      }
     }
     return dialog
   }

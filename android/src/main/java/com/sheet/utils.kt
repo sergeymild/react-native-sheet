@@ -2,8 +2,10 @@ package com.sheet
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.view.View
 import android.view.Window
+import android.view.WindowInsetsController
 import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.PixelUtil
@@ -40,12 +42,29 @@ fun ReadableMap.color(value: String, context: Context): Int {
   return ColorPropConverter.getColor(getDouble("backgroundColor"), context)
 }
 
-fun Window.updateStatusBar(isLight: Boolean) {
-  if (isLight) {
-    decorView.systemUiVisibility =
-      decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+fun Window.setStatusBarStyle(isLight: Boolean) {
+  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    decorView.windowInsetsController?.setSystemBarsAppearance(
+      if (!isLight) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
+      WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+    );
   } else {
-    decorView.systemUiVisibility =
-      decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+    if (isLight) {
+      // Draw light icons on a dark background color
+      decorView.systemUiVisibility =
+        decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+    } else {
+      // Draw dark icons on a light background color
+      decorView.systemUiVisibility =
+        decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+    }
+  }
+}
+
+fun Window.setSystemUIColor(color: Int) {
+  navigationBarColor = color
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    isNavigationBarContrastEnforced = false
   }
 }

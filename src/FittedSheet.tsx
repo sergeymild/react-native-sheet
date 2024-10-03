@@ -19,13 +19,12 @@ export interface FittedSheetParams {
   readonly maxLandscapeWidth?: number;
   readonly maxHeight?: number;
   readonly minHeight?: number;
-  readonly isDark?: boolean;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
   /**
    * Android only
    */
-  readonly isStatusBarBgLight?: boolean;
+  readonly isSystemUILight?: boolean;
 }
 
 type Children =
@@ -77,7 +76,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   data = () => this.state.data;
 
   onLayout = (e: LayoutChangeEvent) => {
-    console.log('🍓[FittedSheet.onLayout]', e.nativeEvent.layout.height);
     this.setState({ maxHeight: e.nativeEvent.layout.height });
   };
 
@@ -166,7 +164,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
           this.props.params
             ? {
                 ...this.props.params,
-                isDark: this.props.params.isDark ?? false,
                 maxHeight,
                 maxWidth,
                 backgroundColor: this.props.params.backgroundColor

@@ -22,7 +22,7 @@ class TopModalView(context: Context?) : ReactViewGroup(context) {
   private var rnView = BaseRNView(context)
 
   var isEdgeToEdge = false
-  var isStatusBarBgLight = false
+  var isSystemUILight = false
   var animated = true
   // "slide" || "fade"
   var animationType = "slide"
@@ -43,7 +43,7 @@ class TopModalView(context: Context?) : ReactViewGroup(context) {
       animated = animated,
       animationType = animationType,
       isEdgeToEdge = isEdgeToEdge,
-      isStatusBarBgLight = isStatusBarBgLight,
+      isSystemUILight = isSystemUILight,
       ::onModalDismiss,
     )
     dialog?.safeShow(activity.supportFragmentManager, "TopModalView")
