@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet2';
 import { ContactList } from '../../components/contactList';
 
 export const PropsExample = () => {
@@ -20,7 +20,10 @@ export const PropsExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <Button label="Dismiss" onPress={handleDismissPress} />
-      <FittedSheet params={{ maxHeight: 600 }} ref={bottomSheetRef}>
+      <FittedSheet
+        params={{ maxHeight: 600, backgroundColor: 'white' }}
+        ref={bottomSheetRef}
+      >
         {(data) => {
           return <ContactList count={data.count} />;
         }}

@@ -22,7 +22,7 @@ interface Props {
    * @default false
    * @platform Android
    */
-  isStatusBarBgLight?: boolean;
+  isSystemUILight?: boolean;
 
   animated?: boolean;
   /** @default "slide" */
@@ -80,7 +80,7 @@ export class TopModal extends React.PureComponent<Props, State> {
         animated={this.props.animated ?? true}
         animationType={this.props.animationType ?? 'slide'}
         isEdgeToEdge={this.props.isEdgeToEdge ?? false}
-        isStatusBarBgLight={this.props.isStatusBarBgLight ?? false}
+        isStatusBarBgLight={this.props.isSystemUILight ?? false}
       >
         <View
           accessibilityLabel={'top-modal-root-view'}

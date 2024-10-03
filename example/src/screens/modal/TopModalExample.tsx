@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Button } from '../../components/button';
-import { TopModal } from 'react-native-sheet';
+import { TopModal } from 'react-native-sheet2';
 import { useNavigation } from '@react-navigation/native';
 
 export const TopModalExample = () => {
@@ -55,6 +55,7 @@ export const TopModalExample = () => {
           accessibilityLabel={'inModal'}
           style={{
             flex: 1,
+            backgroundColor: 'green',
             justifyContent: 'flex-end',
           }}
         >

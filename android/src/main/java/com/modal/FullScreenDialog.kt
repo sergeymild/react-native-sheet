@@ -14,7 +14,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.sheet.R
-import com.sheet.updateStatusBar
+import com.sheet.setStatusBarStyle
 
 
 fun androidx.fragment.app.Fragment.safeShow(
@@ -32,7 +32,7 @@ class FullScreenDialog(
   // "slide" || "fade"
   private val animationType: String,
   private val isEdgeToEdge: Boolean,
-  private val isStatusBarBgLight: Boolean,
+  private val isSystemUILight: Boolean,
   private val onDismiss: () -> Unit
 ) : DialogFragment() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ class FullScreenDialog(
         it.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
           View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 
-        it.updateStatusBar(isStatusBarBgLight)
+        it.setStatusBarStyle(isSystemUILight)
       } else {
         val width = ViewGroup.LayoutParams.MATCH_PARENT
         val height = ViewGroup.LayoutParams.MATCH_PARENT

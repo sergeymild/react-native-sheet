@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet2';
 
 const DynamicSnapPointExample = () => {
   // state
@@ -42,29 +42,34 @@ const DynamicSnapPointExample = () => {
         params={{
           maxLandscapeWidth: 400,
           topLeftRightCornerRadius: 20,
-          maxPortraitWidth: 300,
+          maxPortraitWidth: 350,
+          isStatusBarBgLight: false,
         }}
         onSheetDismiss={() => setCount(0)}
       >
-        {() => (
-          <View
-            style={{
-              paddingBottom: 34,
-              backgroundColor: 'white',
-              paddingTop: 16,
-              paddingHorizontal: 16,
-            }}
-          >
-            <Text style={styles.message}>
-              Could this sheet modal resize to its content height ?
-            </Text>
-            <View style={emojiContainerStyle}>
-              <Text style={styles.emoji}>😍</Text>
-            </View>
-            <Button label="Yes" onPress={handleIncreaseContentPress} />
-            <Button label="Maybe" onPress={handleDecreaseContentPress} />
+        <View
+          onLayout={(e) =>
+            console.log(
+              '🍓[DynamicSnapPointExample.lay]',
+              e.nativeEvent.layout.height
+            )
+          }
+          style={{
+            paddingBottom: 34,
+            backgroundColor: 'white',
+            paddingTop: 16,
+            paddingHorizontal: 16,
+          }}
+        >
+          <Text style={styles.message}>
+            Could this sheet modal resize to its content height ?
+          </Text>
+          <View style={emojiContainerStyle}>
+            <Text style={styles.emoji}>😍</Text>
           </View>
-        )}
+          <Button label="Yes" onPress={handleIncreaseContentPress} />
+          <Button label="Maybe" onPress={handleDecreaseContentPress} />
+        </View>
       </FittedSheet>
     </View>
   );
@@ -72,8 +77,9 @@ const DynamicSnapPointExample = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 24,
+    flex: 1,
+    backgroundColor: 'purple',
   },
   contentContainerStyle: {
     paddingTop: 12,
@@ -94,6 +100,7 @@ const styles = StyleSheet.create({
   emojiContainer: {
     overflow: 'hidden',
     justifyContent: 'center',
+    backgroundColor: 'green',
   },
 });
 

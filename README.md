@@ -7,7 +7,7 @@ Native implementation of Bottom sheet
 ## Installation
 
 ```sh
-"react-native-sheet": "sergeymild/react-native-sheet#0.8.12"
+"react-native-sheet": "1.2.1"
 ```
 
 ## Usage
@@ -16,21 +16,39 @@ Native implementation of Bottom sheet
 import {
   FITTED_SHEET_SCROLL_VIEW,
   FittedSheet,
+  useFittedSheetContext,
 } from 'react-native-sheet';
 import { ScrollView, TouchableOpacity } from 'react-native';
 
+
+const RenderSheetComponent: React.FC = () => {
+  // context available in bottom sheet
+  // these are methods available: hide, passScrollViewReactTag
+  // method hide accepts parameters which will be passed to onDimiss callback from bottomSheet 
+  const sheetContext = useFittedSheetContext()
+  
+  return (
+    <ScrollView
+      // used for find scrollView in Native Code
+      nativeId={FITTED_SHEET_SCROLL_VIEW}
+    />
+  )
+}
+
 const App: React.FC = () => {
   const sheetRef = useRef<FittedSheet>(null);
+  
+  useEffect(() => {
+    // if scrollView creates dynamically  in bottom sheet (for example after loading)
+    // you have to pass nativeID of scroll view by calling passScrollViewReactTag
+    sheetRef.current?.passScrollViewReactTag('scrollView')
+  }, [])
 
   return (
     <>
       <TouchableOpacity onPress={() => {
-        // pass data object which will be available in child render function
-        sheetRef.current?.show({field: 'value'})
-
-        // also there is `showElement` method
-        // which accept function for lazy require component and render it
-        sheetRef.current?.showElement(() => require('./someLazyView').default, {field: 'value'})
+        // show also accept params which will be passed to render function
+        sheetRef.current?.show()
       }}>
         <Text>Show sheet</Text>
       </TouchableOpacity>
@@ -38,28 +56,35 @@ const App: React.FC = () => {
 
       <FittedSheet
         ref={sheetRef}
+        onSheetDismiss={(paramsPassedToHideMethod) => {
+            // called when sheet completely hided
+        }}
         params={{
           // top left right corner sheet view radius
           topLeftRightCornerRadius: 20,
           // background color of sheet view
           backgroundColor: 'purple',
           // max allowed height of sheet view
-          maxHeight: 600
+          maxHeight: 600,
+          // min height of sheet view
+          minHeight: 600,
+          // max allowed width in portrait view
+          maxPortraitWidth: 300
+          // max allowed width in landscape view
+          maxLandscapeWidth: 300,
+          // should status bar on android be either dark of light
+          isSystemUILight: false
         }}
-        ref={sheetRef}
         >
-          // this all doesn't need it `showElement`
-          // was call as FittedSheet will render require component
+          // data which was passed to .show() method 
           {(data) => {
             return (
-              <ScrollView
-                // used for find scrollView in Native Code
-                nativeId={FITTED_SHEET_SCROLL_VIEW}
-                // used in android which allows scrollView/FlatList scroll
-                nestedScrollEnabled
-              />
+              <RenderSheetComponent/>
             );
         }}
+        
+        // if you do not need data you can omit render function and pass just component
+        <RenderSheetComponent/>
       </FittedSheet>
     </>
   )

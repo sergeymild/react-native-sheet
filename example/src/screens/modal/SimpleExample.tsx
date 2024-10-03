@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
 import { createContactListMockData } from '../../utilities/createMockData';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet2';
 
 const Sim: React.FC = () => {
   const data = useMemo(() => createContactListMockData(5), []);

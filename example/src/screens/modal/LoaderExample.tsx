@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet2';
 import { ContactList } from '../../components/contactList';
 
 const Sim: React.FC = () => {

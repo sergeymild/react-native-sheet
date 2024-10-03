@@ -38,9 +38,9 @@ class TopModalViewManager : ViewGroupManager<TopModalView>() {
   fun setIsEdgeToEdge(view: TopModalView, isEdgeToEdge: Boolean) {
     view.isEdgeToEdge = isEdgeToEdge
   }
-  @ReactProp(name = "isStatusBarBgLight")
-  fun setIsStatusBarBgLight(view: TopModalView, isStatusBarBgLight: Boolean) {
-    view.isStatusBarBgLight = isStatusBarBgLight
+  @ReactProp(name = "isSystemUILight")
+  fun setIsSystemUILight(view: TopModalView, isSystemUILight: Boolean) {
+    view.isSystemUILight = isSystemUILight
   }
 
   @ReactProp(name="animated")

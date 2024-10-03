@@ -8,8 +8,6 @@ RCT_EXPORT_VIEW_PROPERTY(onSheetDismiss, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(fittedSheetParams, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(passScrollViewReactTag, NSString)
 
-RCT_EXPORT_VIEW_PROPERTY(increaseHeight, NSNumber)
-RCT_EXPORT_VIEW_PROPERTY(decreaseHeight, NSNumber)
 RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 
 @end

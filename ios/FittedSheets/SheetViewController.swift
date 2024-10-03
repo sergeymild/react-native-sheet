@@ -245,11 +245,8 @@ public class SheetViewController: UIViewController {
 
     /// Change the sizes the sheet should try to pin to
     public func setSizes(_ sizes: [SheetSize], animated: Bool = true) {
-        guard sizes.count > 0 else {
-            return
-        }
+        guard sizes.count > 0 else { return }
         self.sizes = sizes
-
         self.resize(to: sizes[0], animated: animated)
     }
 
@@ -540,7 +537,7 @@ public class SheetViewController: UIViewController {
                        options: UIView.AnimationOptions = [.curveEaseOut],
                        animated: Bool = true,
                        complete: (() -> Void)? = nil) {
-
+        debugPrint("ShetViewController.resizeTo", size)
         let previousSize = self.currentSize
         self.currentSize = size
 

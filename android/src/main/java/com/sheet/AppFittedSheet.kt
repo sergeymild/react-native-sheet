@@ -45,10 +45,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params.float("topLeftRightCornerRadius", 0f)
   private val backgroundColor: Int
     get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
-  private val isDark: Boolean
-    get() = params.bool("isDark", false)
-  private val isStatusBarBgLight: Boolean
-    get() = params?.bool("isStatusBarBgLight", false) ?: false
+  private val isSystemUILight: Boolean
+    get() = params?.bool("isSystemUILight", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity? {
     return (context as ReactContext)?.currentActivity as? AppCompatActivity
@@ -68,8 +66,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
         dismissible = dismissible,
-        isDark = isDark,
-        isStatusBarBgLight = isStatusBarBgLight
+        isSystemUILight = isSystemUILight
       ) {
         println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup
@@ -95,10 +92,10 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
-    val module = UIManagerHelper.getUIManager(context as ReactContext?, UIManagerType.DEFAULT) as UIManagerModule
-    UIManagerHelper.getReactContext(this).runOnNativeModulesQueueThread {
-      val resolveShadowNode = module.uiImplementation.resolveShadowNode(child.id)
-      if (resolveShadowNode == null) return@runOnNativeModulesQueueThread
+    val ctx = context as ReactContext? ?: return
+    val module = UIManagerHelper.getUIManager(ctx, UIManagerType.DEFAULT) as? UIManagerModule ?: return
+    ctx.runOnNativeModulesQueueThread {
+      val resolveShadowNode = module?.uiImplementation?.resolveShadowNode(child.id) ?: return@runOnNativeModulesQueueThread
       val height = resolveShadowNode.layoutHeight
       if (height > 0) mHostView.setVirtualHeight(height)
     }
