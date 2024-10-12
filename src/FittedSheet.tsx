@@ -14,7 +14,7 @@ export const _FittedSheet = requireNativeComponent<any>('SheetView');
 
 export interface FittedSheetParams {
   readonly applyMaxHeightToMinHeight?: boolean;
-  readonly dismissible?: boolean;
+  readonly dismissable?: boolean;
   readonly maxPortraitWidth?: number;
   readonly maxLandscapeWidth?: number;
   readonly maxHeight?: number;

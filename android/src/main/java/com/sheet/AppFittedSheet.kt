@@ -39,8 +39,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       field = value
     }
 
-  private val dismissible: Boolean
-    get() = params.bool("dismissible", true)
+  private val dismissable: Boolean
+    get() = params.bool("dismissable", true)
   private val topLeftRightCornerRadius: Float
     get() = params.float("topLeftRightCornerRadius", 0f)
   private val backgroundColor: Int
@@ -65,7 +65,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     if (sheet == null) {
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
-        dismissible = dismissible,
+        dismissable = dismissable,
         isSystemUILight = isSystemUILight
       ) {
         println("😀 onDismiss")

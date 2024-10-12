@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference
 
 class FragmentModalBottomSheet(
   private val modalView: ViewGroup,
-  private val dismissible: Boolean,
+  private val dismissable: Boolean,
   private val isSystemUILight: Boolean,
   private val onDismiss: () -> Unit
 ) : BottomSheetDialogFragment() {
@@ -29,7 +29,7 @@ class FragmentModalBottomSheet(
   ): View = modalView
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-    this.isCancelable = dismissible
+    this.isCancelable = dismissable
     val dialog = CustomBottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog)
     dialog.setSheetBackgroundColor(Color.TRANSPARENT)
     dialog.window?.let {
