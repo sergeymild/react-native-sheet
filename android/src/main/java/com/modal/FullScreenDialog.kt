@@ -23,7 +23,7 @@ fun androidx.fragment.app.Fragment.safeShow(
 ) {
   val ft = manager.beginTransaction()
   ft.add(this, tag)
-  ft.commitAllowingStateLoss()
+  ft.commitNowAllowingStateLoss()
 }
 
 class FullScreenDialog(
