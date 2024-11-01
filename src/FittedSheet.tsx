@@ -56,7 +56,11 @@ interface Context {
 const FittedSheetContext = createContext<Context | null>(null);
 
 export const useFittedSheetContext = () => {
-  return useContext(FittedSheetContext)!;
+  try {
+    return useContext(FittedSheetContext);
+  } catch {
+    return undefined;
+  }
 };
 
 export class FittedSheet extends React.PureComponent<Props, State> {
