@@ -4,7 +4,7 @@ apply plugin: "org.jetbrains.kotlin.android"
 import com.android.build.OutputFile
 
 react {
-
+autolinkLibrariesWithApp()
 }
 
 def enableSeparateBuildPerCPUArchitecture = false
@@ -66,5 +66,3 @@ dependencies {
 
   implementation("com.facebook.react:hermes-android")
 }
-
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

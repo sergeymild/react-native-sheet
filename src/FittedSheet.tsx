@@ -41,15 +41,14 @@ interface Props {
 interface State {
   show: boolean;
   data: any | null;
-  maxHeight: number;
+  currentHeight: number;
+  passScrollViewReactTag?: string;
 }
 
 export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 
 interface Context {
   hide: (passThroughParam?: any) => void;
-  increaseHeight: (by: number) => void;
-  decreaseHeight: (by: number) => void;
   passScrollViewReactTag: (nativeId: string) => void;
 }
 
@@ -70,7 +69,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   private sheetRef = React.createRef<any>();
   constructor(props: Props) {
     super(props);
-    this.state = { show: false, data: null, maxHeight: -1 };
+    this.state = { show: false, data: null, currentHeight: -1 };
   }
 
   show = (data?: any) => {
@@ -79,8 +78,20 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   data = () => this.state.data;
 
+  private newOrMaxHeight(height: number) {
+    const dim = Dimensions.get('screen');
+
+    const maxHeight = Math.min(
+      this.props.params?.maxHeight ?? Number.MAX_VALUE,
+      dim.height - (StatusBar.currentHeight ?? 0)
+    );
+    return Math.min(maxHeight, height);
+  }
+
   onLayout = (e: LayoutChangeEvent) => {
-    this.setState({ maxHeight: e.nativeEvent.layout.height });
+    this.setState({
+      currentHeight: this.newOrMaxHeight(e.nativeEvent.layout.height),
+    });
   };
 
   toggle = () => {
@@ -89,20 +100,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
   passScrollViewReactTag = (nativeId: string) => {
     console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
-    this.sheetRef.current?.setNativeProps({ passScrollViewReactTag: nativeId });
-  };
-
-  increaseHeight = (by: number) => {
-    //this.sheetRef.current?.setNativeProps({ increaseHeight: by });
-    this.setState({ maxHeight: this.state.maxHeight + by });
-  };
-
-  decreaseHeight = (by: number) => {
-    const minHeight = this.props.params?.minHeight;
-    this.setState({
-      maxHeight: Math.max(minHeight ?? 0, this.state.maxHeight - by),
-    });
-    //this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
+    this.setState({ passScrollViewReactTag: nativeId });
   };
 
   hide = (passThroughParam?: any) => {
@@ -159,23 +157,39 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     if (this.props.params?.applyMaxHeightToMinHeight) {
       minHeight = maxHeight;
     }
+    const fittedSheetParams = this.props.params
+      ? {
+          ...this.props.params,
+          maxHeight,
+          maxWidth,
+          currentHeight: this.state.currentHeight,
+          passScrollViewReactTag: this.state.passScrollViewReactTag,
+          backgroundColor: this.props.params.backgroundColor
+            ? processColor(this.props.params.backgroundColor)
+            : undefined,
+        }
+      : {
+          maxHeight,
+          maxWidth,
+          passScrollViewReactTag: this.state.passScrollViewReactTag,
+          currentHeight: this.state.currentHeight,
+        };
+    console.log(
+      '🍓[FittedSheet.render]',
+      this.state.currentHeight,
+      fittedSheetParams
+    );
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
-        style={{ width: maxWidth, maxHeight, minHeight, position: 'absolute' }}
-        fittedSheetParams={
-          this.props.params
-            ? {
-                ...this.props.params,
-                maxHeight,
-                maxWidth,
-                backgroundColor: this.props.params.backgroundColor
-                  ? processColor(this.props.params.backgroundColor)
-                  : undefined,
-              }
-            : {}
-        }
+        style={{
+          width: maxWidth,
+          maxHeight,
+          minHeight,
+          position: 'absolute',
+        }}
+        fittedSheetParams={fittedSheetParams}
       >
         <FittedSheetContext.Provider value={this}>
           <View

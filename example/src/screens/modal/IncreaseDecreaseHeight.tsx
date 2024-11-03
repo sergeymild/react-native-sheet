@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
@@ -6,17 +6,18 @@ import { FittedSheet } from 'react-native-sheet2';
 
 export const IncreaseDecreaseHeight = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
+  const [height, setHeight] = useState(400);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
   }, []);
 
   const increase = useCallback(() => {
-    bottomSheetRef.current?.increaseHeight(30);
+    setHeight((p) => Math.min(400, p + 30));
   }, []);
 
   const decrease = useCallback(() => {
-    bottomSheetRef.current?.decreaseHeight(30);
+    setHeight((p) => Math.max(200, p - 30));
   }, []);
 
   // renders
@@ -28,11 +29,13 @@ export const IncreaseDecreaseHeight = () => {
         ref={bottomSheetRef}
         params={{ maxHeight: 400, minHeight: 200, backgroundColor: 'white' }}
       >
-        <View style={{ flexDirection: 'row' }}>
-          <Button label="increase" onPress={increase} />
-          <Button label="decrease" onPress={decrease} />
+        <View style={{ height }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Button label="increase" onPress={increase} />
+            <Button label="decrease" onPress={decrease} />
+          </View>
+          <ContactList count={10} />
         </View>
-        <ContactList count={10} />
       </FittedSheet>
     </View>
   );

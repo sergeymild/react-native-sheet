@@ -35,6 +35,7 @@ interface Props {
   readonly style?: StyleProp<ViewStyle>;
   readonly defaultBottomSpacing?: number;
   readonly openedSpacing?: number;
+  readonly hideView?: boolean;
 }
 
 interface State {
@@ -128,6 +129,7 @@ export class KeyboardSpacer extends PureComponent<Props, State> {
   };
 
   render() {
+    if (this.props.hideView) return null;
     return <View style={this.style} />;
   }
 }

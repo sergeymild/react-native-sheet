@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet2",
-  "version": "1.2.6",
+  "version": "1.3.0",
   "description": "Native implementation of Bottom sheet",
   "main": "src/index",
   "module": "src/index",
@@ -49,19 +49,16 @@
   },
   "devDependencies": {
     "@react-native-community/eslint-config": "^3.2.0",
-    "@types/react": "~18.2.38",
-    "@types/react-native": "0.72.7",
-    "eslint": "^8.4.1",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "pod-install": "^0.1.39",
-    "prettier": "^3.1.0",
-    "react": "18.2.0",
-    "react-native": "0.72.7",
-    "typescript": "^5.3.2"
-  },
-  "resolutions": {
-    "@types/react": "18.2.0"
+    "@types/react": "~18.3.12",
+    "@types/react-native": "^0.73.0",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "pod-install": "^0.3.0",
+    "prettier": "^3.3.3",
+    "react": "18.3.1",
+    "react-native": "0.76.1",
+    "typescript": "^5.6.3"
   },
   "peerDependencies": {
     "react": "*",

@@ -17,5 +17,5 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm,swift}"
   s.resources = "ios/**/*.{storyboard}"
 
-  s.dependency "React-Core"
+  install_modules_dependencies(s)
 end

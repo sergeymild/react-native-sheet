@@ -16,7 +16,7 @@ export const List2Example = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
 
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
+      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 800 }}>
         <View
           style={styles.contentContainerStyle}
           onLayout={(e) =>
@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     paddingTop: 12,
+    maxHeight: 600,
     paddingHorizontal: 24,
     backgroundColor: 'white',
-    maxHeight: 600,
   },
   message: {
     fontSize: 24,

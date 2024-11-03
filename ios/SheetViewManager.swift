@@ -26,16 +26,9 @@ class ModalHostShadowView: RCTShadowView {
         }
     }
 
-    func renderSizes(subviews: [RCTShadowView]?) {
-        guard let subviews else { return }
-        for v in subviews {
-            debugPrint(v)
-            renderSizes(subviews: v.reactSubviews())
-        }
-    }
-
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
+        debugPrint("😀 ModalHostShadowView.layoutSubviews")
 
         RCTExecuteOnMainQueue { [weak self] in
             guard let self else { return }
@@ -89,12 +82,12 @@ class SheetViewManager: RCTViewManager {
 class HostFittedSheet: UIView {
     var _modalViewController: SheetViewController?
     let viewController = UIViewController()
-    var _touchHandler: RCTTouchHandler?
+    var _touchHandler: RCTSurfaceTouchHandler?
     var _reactSubview: UIView?
     var _bridge: RCTBridge?
     var _isPresented = false
     var _sheetSize: NSNumber?
-    var _scrollViewTag: NSNumber?
+    var _scrollViewTag: String?
 
     private var _alertWindow: UIWindow?
     private lazy var presentViewController: UIViewController = {
@@ -118,28 +111,44 @@ class HostFittedSheet: UIView {
     private var sheetBackgroundColor: UIColor?
 
     @objc
-    func setPassScrollViewReactTag(_ tag: NSNumber) {
+    func setPassScrollViewReactTag(_ tag: String) {
         debugPrint("😀 setPassScrollViewReactTag", tag)
-        guard let scrollView = self._bridge?.uiManager.view(forReactTag: tag) as? RCTScrollView else {
-            return
-        }
         if self._modalViewController == nil {
             self._scrollViewTag = tag
+        } else {
+            let scrollView = self._reactSubview?.find(
+                FITTED_SHEET_SCROLL_VIEW,
+                deepIndex: 0
+            ) as? RCTScrollView
+            if scrollView != nil {
+                self._modalViewController?.handleScrollView(scrollView!.scrollView)
+            }
+            debugPrint("😀 setPassScrollViewReactTag found", scrollView)
         }
-        debugPrint("😀 setPassScrollViewReactTag found", scrollView, self._modalViewController)
-        self._modalViewController?.handleScrollView(scrollView.scrollView)
     }
-
+    
     @objc
-    var fittedSheetParams: NSDictionary? {
-        didSet {
-            debugPrint("😀 ", fittedSheetParams ?? "nil")
-            sheetMaxWidthSize = (fittedSheetParams?["maxWidth"] as? NSNumber)
-            sheetMaxHeightSize = (fittedSheetParams?["maxHeight"] as? NSNumber)
-            sheetMinHeightSize = (fittedSheetParams?["minHeight"] as? NSNumber)
-            dismissable = (fittedSheetParams?["dismissable"] as? Bool) ?? true
-            topLeftRightCornerRadius = (fittedSheetParams?["topLeftRightCornerRadius"] as? NSNumber)
-            sheetBackgroundColor = RCTConvert.uiColor(fittedSheetParams?["backgroundColor"])
+    func setFittedSheetParams(_ params: NSDictionary) {
+        debugPrint("😀 fittedSheetParams", params)
+        sheetMaxWidthSize = (params["maxWidth"] as? NSNumber)
+        sheetMaxHeightSize = (params["maxHeight"] as? NSNumber)
+        sheetMinHeightSize = (params["minHeight"] as? NSNumber)
+        let currentHeight = RCTConvert.cgFloat(params["currentHeight"])
+        dismissable = (params["dismissable"] as? Bool) ?? true
+        topLeftRightCornerRadius = (params["topLeftRightCornerRadius"] as? NSNumber)
+        sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])
+        if let scrollId = RCTConvert.nsString(params["passScrollViewReactTag"]) {
+            self.setPassScrollViewReactTag(scrollId)
+        }
+        
+        if let s = _modalViewController?.currentSize {
+            switch s {
+            case .fixed(let ss):
+                if ss != currentHeight {
+                    _modalViewController?.setSizes([.fixed(currentHeight)], animated: true)
+                }
+            default: break
+            }
         }
     }
 
@@ -150,7 +159,7 @@ class HostFittedSheet: UIView {
     init(bridge: RCTBridge) {
         self._bridge = bridge
         super.init(frame: .zero)
-        _touchHandler = RCTTouchHandler(bridge: bridge)
+        _touchHandler = RCTSurfaceTouchHandler()
     }
 
     required init?(coder: NSCoder) {
@@ -234,16 +243,12 @@ class HostFittedSheet: UIView {
                 ModalHostShadowView.attachedViews[self.reactTag.intValue] = self
 
                 if let tag = self._scrollViewTag {
-                    self.setPassScrollViewReactTag(tag)
+                    setPassScrollViewReactTag(tag)
                 } else {
-                    let scrollView = self._reactSubview?.find(FITTED_SHEET_SCROLL_VIEW, deepIndex: 0) as? RCTScrollView
-                    if scrollView != nil {
-                        self._modalViewController?.handleScrollView(scrollView!.scrollView)
-                    }
+                    setPassScrollViewReactTag(FITTED_SHEET_SCROLL_VIEW)
                 }
 
                 self.presentViewController.present(self._modalViewController!, animated: true)
-                //self.reactViewController().present(self._modalViewController!, animated: true)
 
                 self._modalViewController?.didDismiss = { [weak self] _ in
                     debugPrint("😀didDismiss \(self?.onSheetDismiss)")
@@ -278,7 +283,7 @@ class HostFittedSheet: UIView {
             self._modalViewController = nil
             self._reactSubview?.removeFromSuperview()
             if let v = self._reactSubview {
-                self._touchHandler?.detach(from: self._reactSubview)
+                self._touchHandler?.detach(from: v)
             }
             self._touchHandler = nil
             self._bridge = nil
@@ -307,7 +312,7 @@ class HostFittedSheet: UIView {
 
 extension UIView {
     func find(_ nId: String, deepIndex: Int) -> UIView? {
-        if deepIndex >= 10 { return nil }
+        if deepIndex >= 100 { return nil }
         if self.nativeID?.contains(nId) == true || self.accessibilityIdentifier?.contains(nId) == true {
             return self
         }
