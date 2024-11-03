@@ -25,7 +25,7 @@ class ModalHostShadowView: RCTShadowView {
             subview.position = .absolute
         }
     }
-    
+
     func renderSizes(subviews: [RCTShadowView]?) {
         guard let subviews else { return }
         for v in subviews {
@@ -33,10 +33,10 @@ class ModalHostShadowView: RCTShadowView {
             renderSizes(subviews: v.reactSubviews())
         }
     }
-    
+
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
-        
+
         RCTExecuteOnMainQueue { [weak self] in
             guard let self else { return }
             let view = RCTBridge.current().uiManager.view(
@@ -116,7 +116,7 @@ class HostFittedSheet: UIView {
     var sheetMinHeightSize: NSNumber?
     private var topLeftRightCornerRadius: NSNumber?
     private var sheetBackgroundColor: UIColor?
-    
+
     @objc
     func setPassScrollViewReactTag(_ tag: NSNumber) {
         debugPrint("😀 setPassScrollViewReactTag", tag)
@@ -277,7 +277,9 @@ class HostFittedSheet: UIView {
             ModalHostShadowView.attachedViews.removeValue(forKey: self.reactTag.intValue)
             self._modalViewController = nil
             self._reactSubview?.removeFromSuperview()
-            self._touchHandler?.detach(from: self._reactSubview)
+            if let v = self._reactSubview {
+                self._touchHandler?.detach(from: self._reactSubview)
+            }
             self._touchHandler = nil
             self._bridge = nil
             self.onSheetDismiss = nil
