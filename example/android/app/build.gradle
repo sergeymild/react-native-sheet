@@ -1,10 +1,9 @@
 apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
 apply plugin: "org.jetbrains.kotlin.android"
-import com.android.build.OutputFile
+apply plugin: "com.facebook.react"
 
 react {
-autolinkLibrariesWithApp()
+  autolinkLibrariesWithApp()
 }
 
 def enableSeparateBuildPerCPUArchitecture = false
@@ -66,3 +65,10 @@ dependencies {
 
   implementation("com.facebook.react:hermes-android")
 }
+
+// Since our library doesn't invoke codegen automatically we need to do it here.
+tasks.register('invokeLibraryCodegen', Exec) {
+  workingDir "$rootDir/../../"
+  commandLine "npx", "bob", "build", "--target", "codegen"
+}
+preBuild.dependsOn invokeLibraryCodegen
