@@ -960,7 +960,7 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.11.0):
     - React-Core
-  - react-native-sheet (1.2.0):
+  - react-native-sheet (1.2.6):
     - React-Core
   - React-nativeconfig (0.74.5)
   - React-NativeModulesApple (0.74.5):
@@ -1462,7 +1462,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: bc6cf48ea4f08ea5c5a74e19c6579e9b86d8729c
   react-native-safe-area: a9434b34dc23385e1a6041507699644f1c763882
   react-native-safe-area-context: 851c62c48dce80ccaa5637b6aa5991a1bc36eca9
-  react-native-sheet: d641c4333b971d3cae44353f3ac5eeedc6baa26f
+  react-native-sheet: bef068d3f287dda32fd2e89f287a3df618639581
   React-nativeconfig: ba9a2e54e2f0882cf7882698825052793ed4c851
   React-NativeModulesApple: 8d11ff8955181540585c944cf48e9e7236952697
   React-perflogger: ed4e0c65781521e0424f2e5e40b40cc7879d737e
@@ -1489,7 +1489,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 67e78f16895947f7e57ab91e75e914d3e9ef7239
   RNScreens: aa943ad421c3ced3ef5a47ede02b0cbfc43a012e
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 950bbfd7e6f04790fdb51149ed51df41f329fcc8
+  Yoga: 2246eea72aaf1b816a68a35e6e4b74563653ae09
 
 PODFILE CHECKSUM: c6b36c773172b58da2e5ec9919589e6e9ce620c4
 
