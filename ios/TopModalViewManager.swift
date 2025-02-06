@@ -73,7 +73,7 @@ class TopModalView: RCTView {
         _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
         let controller = UIViewController()
         _alertWindow?.rootViewController = controller
-        _alertWindow?.windowLevel = UIWindow.Level.alert
+        _alertWindow?.windowLevel = UIWindow.Level.alert + 2
         _alertWindow?.isHidden = false
         viewController.modalPresentationStyle = .fullScreen
 
