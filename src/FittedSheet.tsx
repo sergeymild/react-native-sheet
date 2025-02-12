@@ -4,6 +4,7 @@ import {
   findNodeHandle,
   type LayoutChangeEvent,
   NativeModules,
+  Platform,
   processColor,
   requireNativeComponent,
   StatusBar,
@@ -140,11 +141,19 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.cleanup = undefined;
   }
 
+  private viewportSize(): { width: number; height: number } {
+    if (Platform.OS === 'ios') {
+      return NativeModules.SheetView.viewportSize();
+    }
+    return Dimensions.get('screen');
+  }
+
   render() {
     if (!this.state.show) return null;
 
-    const dim = Dimensions.get('screen');
+    const dim = this.viewportSize();
     const isLandscape = dim.width > dim.height;
+    console.log('🍓[FittedSheet.render]', dim);
 
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,

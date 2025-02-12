@@ -76,6 +76,12 @@ class SheetViewManager: RCTViewManager {
     }
   }
   
+  @objc
+  func viewportSize() -> [String: CGFloat] {
+    let size = RCTViewportSize()
+    return ["width": size.width, "height": size.height]
+  }
+  
   override func shadowView() -> RCTShadowView! {
     return ModalHostShadowView()
   }
