@@ -15,7 +15,7 @@ class ModalHostShadowView: RCTShadowView {
   override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
     super.insertReactSubview(subview, at: atIndex)
     if subview != nil {
-      let s = RCTScreenSize()
+        let s = RCTViewportSize()
       let orientation = UIDevice.current.orientation
       var width = s.width
       if orientation == .landscapeLeft || orientation == .landscapeRight {
@@ -104,7 +104,7 @@ class HostFittedSheet: UIView {
   
   private var _alertWindow: UIWindow?
   private lazy var presentViewController: UIViewController = {
-    _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
+    _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTViewportSize()))
     let controller = UIViewController()
     _alertWindow?.rootViewController = controller
     _alertWindow?.windowLevel = UIWindow.Level.alert
@@ -150,7 +150,7 @@ class HostFittedSheet: UIView {
   }
   
   var sheetWidth: CGFloat {
-    return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(UIScreen.main.bounds.width))
+      return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(RCTViewportSize().width))
   }
   
   init(bridge: RCTBridge) {
