@@ -15,7 +15,7 @@ class ModalHostShadowView: RCTShadowView {
     override func insertReactSubview(_ subview: RCTShadowView!, at atIndex: Int) {
         super.insertReactSubview(subview, at: atIndex)
         if subview != nil {
-            let s = RCTScreenSize()
+            let s = viewPort()
             let orientation = UIDevice.current.orientation
             var width = s.width
             if orientation == .landscapeLeft || orientation == .landscapeRight {
@@ -29,7 +29,6 @@ class ModalHostShadowView: RCTShadowView {
     override func layoutSubviews(with layoutContext: RCTLayoutContext) {
         super.layoutSubviews(with: layoutContext)
         debugPrint("😀 ModalHostShadowView.layoutSubviews")
-
     RCTExecuteOnMainQueue { [weak self] in
       guard let self else { return }
       let view = RCTBridge.current().uiManager.view(
@@ -68,6 +67,11 @@ class SheetViewManager: RCTViewManager {
       debugPrint("😀dismiss")
     }
   }
+@objc
+  func viewportSize() -> [String: CGFloat] {
+    let size = viewPort()
+    return ["width": size.width, "height": size.height]
+  }
 
   override func shadowView() -> RCTShadowView! {
     return ModalHostShadowView()
@@ -78,6 +82,13 @@ class SheetViewManager: RCTViewManager {
   }
 }
 
+func viewPort() -> CGSize {
+  var size: CGSize = .zero
+  RCTUnsafeExecuteOnMainQueueSync {
+    size = RCTViewportSize()
+  }
+  return size
+}
 
 class HostFittedSheet: UIView {
   var _modalViewController: SheetViewController?
@@ -91,7 +102,7 @@ class HostFittedSheet: UIView {
 
   private var _alertWindow: UIWindow?
   private lazy var presentViewController: UIViewController = {
-    _alertWindow = UIWindow(frame: .init(origin: .zero, size: RCTScreenSize()))
+    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
     let controller = UIViewController()
     _alertWindow?.rootViewController = controller
     _alertWindow?.windowLevel = UIWindow.Level.alert
@@ -153,7 +164,7 @@ class HostFittedSheet: UIView {
     }
 
     var sheetWidth: CGFloat {
-        return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(UIScreen.main.bounds.width))
+        return CGFloat(sheetMaxWidthSize?.floatValue ?? Float(viewPort().width))
     }
 
     init(bridge: RCTBridge) {
