@@ -5,10 +5,7 @@ import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet2';
-import {
-  useSafeAreaFrame,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const KeyboardExample = () => {
   const frame = useSafeAreaInsets();

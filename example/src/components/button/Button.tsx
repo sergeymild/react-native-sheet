@@ -1,6 +1,5 @@
 import React, { memo } from 'react';
-import { ViewStyle, TextStyle } from 'react-native';
-import { ShowcaseButton, ShowcaseLabel } from '@gorhom/showcase-template';
+import { ViewStyle, TextStyle, TouchableOpacity, Text } from 'react-native';
 
 interface ButtonProps {
   label: string;
@@ -15,9 +14,11 @@ const ButtonComponent = ({
   style,
   onPress,
 }: ButtonProps) => (
-  <ShowcaseButton containerStyle={style} onPress={onPress}>
-    <ShowcaseLabel style={labelStyle}>{label}</ShowcaseLabel>
-  </ShowcaseButton>
+  <TouchableOpacity
+    style={style}
+    onPress={onPress}
+    children={<Text children={label} style={labelStyle} />}
+  />
 );
 
 export const Button = memo(ButtonComponent);

@@ -7,9 +7,9 @@ import { createContactListMockData } from '../../utilities/createMockData';
 import { FittedSheet } from 'react-native-sheet2';
 
 const Sim: React.FC = () => {
-  const data = useMemo(() => createContactListMockData(5), []);
+  const data = useMemo(() => createContactListMockData(100), []);
   const renderItem = useCallback(
-    (item, index) => (
+    (item: any, index: any) => (
       <ContactItem
         key={`${item.name}.${index}`}
         title={`${index}: ${item.name}`}
@@ -37,7 +37,11 @@ export const SimpleExample = () => {
 
       <FittedSheet
         ref={bottomSheetRef}
-        params={{ backgroundColor: 'yellow', topLeftRightCornerRadius: 20 }}
+        params={{
+          backgroundColor: 'yellow',
+          topLeftRightCornerRadius: 20,
+          maxHeight: 300,
+        }}
       >
         <View style={styles.contentContainerStyle}>
           <Sim />
@@ -51,6 +55,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
+    paddingTop: 100,
   },
   contentContainerStyle: {
     paddingTop: 12,

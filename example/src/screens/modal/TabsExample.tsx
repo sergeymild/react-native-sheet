@@ -56,7 +56,7 @@ const SheetView = () => {
         setTabIndex(index);
         setTimeout(
           (idx) => {
-            sheetContext.passScrollViewReactTag(
+            sheetContext?.passScrollViewReactTag(
               `${FITTED_SHEET_SCROLL_VIEW}_${
                 idx === 0 ? 'general' : idx === 1 ? 'setting' : 'list'
               }`

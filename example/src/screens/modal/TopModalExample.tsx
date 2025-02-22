@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
   AppState,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,10 +9,8 @@ import {
 } from 'react-native';
 import { Button } from '../../components/button';
 import { TopModal } from 'react-native-sheet2';
-import { useNavigation } from '@react-navigation/native';
 
 export const TopModalExample = () => {
-  const navigation = useNavigation();
   // refs
   const modalRef = useRef<TopModal>(null);
 

@@ -31,17 +31,18 @@ export const LoaderExample = () => {
         params={{ backgroundColor: 'white', maxHeight: 500 }}
         onSheetDismiss={() => setLoading(-1)}
       >
-        {isLoading === -1 && (
-          <TouchableOpacity
-            style={{ height: 50, marginBottom: 50 }}
-            onPress={() => {
-              setLoading(0);
-              setTimeout(() => setLoading(1), 2000);
-            }}
-          >
-            <Text style={{ color: 'black' }}>Start</Text>
-          </TouchableOpacity>
-        )}
+        {isLoading === -1 &&
+          ((
+            <TouchableOpacity
+              style={{ height: 50, marginBottom: 50 }}
+              onPress={() => {
+                setLoading(0);
+                setTimeout(() => setLoading(1), 2000);
+              }}
+            >
+              <Text style={{ color: 'black' }}>Start</Text>
+            </TouchableOpacity>
+          ) as any)}
         {isLoading === 0 && (
           <View
             accessibilityLabel={'loading'}

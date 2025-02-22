@@ -25,7 +25,7 @@ const DetachedExample = () => {
   }, []);
 
   const renderItem = useCallback(
-    (item, index) => (
+    (item: any, index: any) => (
       <ContactItem
         key={`${item.name}.${index}`}
         title={`${index}: ${item.name}`}
