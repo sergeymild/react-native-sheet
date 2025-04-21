@@ -8,5 +8,3 @@ import {
 export { FittedSheet, FITTED_SHEET_SCROLL_VIEW, useFittedSheetContext };
 
 export type { FittedSheetParams };
-
-export { TopModal } from './TopModal';

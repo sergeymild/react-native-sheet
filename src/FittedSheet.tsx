@@ -76,15 +76,9 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     this.setState({ show: true, data });
   };
 
-  data = () => this.state.data;
-
   onLayout = (e: LayoutChangeEvent) => {
     console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
     this.setState({ height: e.nativeEvent.layout.height });
-  };
-
-  toggle = () => {
-    this.setState({ show: !this.state.show });
   };
 
   passScrollViewReactTag = (nativeId: string) => {
@@ -144,6 +138,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       dim.height - (StatusBar.currentHeight ?? 56)
     );
+    maxHeight = 600;
 
     const paramsMaxWidth = isLandscape
       ? this.props.params?.maxLandscapeWidth

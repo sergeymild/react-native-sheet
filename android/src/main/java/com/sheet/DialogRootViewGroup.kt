@@ -5,6 +5,8 @@ import android.content.res.Resources
 import android.graphics.Outline
 import android.view.View
 import android.view.ViewOutlineProvider
+import androidx.appcompat.app.AppCompatActivity
+import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.PixelUtil
 import kotlin.math.max
 import kotlin.math.min
@@ -63,12 +65,14 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     if (reactView == null) return
     ensureLayoutParams()
     this.sheetMaxHeightSize = h.toDouble()
-    val newHeight = allowedHeight()
+    var newHeight = allowedHeight()
     val newWidth = allowedWidth()
+//    newHeight = PixelUtil.toPixelFromDIP(600.0).toInt()
     println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.toDP()} :${newWidth.toDP()}")
     translationX = ((screenWidth - newWidth) / 2).toFloat()
     layoutParams?.height = newHeight
     layoutParams?.width = newWidth
+    parent.requestLayout()
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
