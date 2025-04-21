@@ -40,9 +40,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
   var params: ReadableMap? = null
     set(value) {
-      mHostView.sheetMaxHeightSize = value.double("maxHeight", -1.0).toPxD()
-      mHostView.sheetMaxWidthSize = value.double("maxWidth", -1.0).toPxD()
-      mHostView.sheetMinHeightSize = value.double("minHeight", -1.0).toPxD()
+      mHostView.sheetMaxHeightSize = value.double("maxHeight", Double.MAX_VALUE).toPxD()
+      mHostView.sheetMaxWidthSize = value.double("maxPortraitWidth", Double.MAX_VALUE).toPxD()
+      mHostView.sheetMinHeightSize = value.double("minHeight", Double.MIN_VALUE).toPxD()
 
       field = value
     }
@@ -57,7 +57,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params?.bool("isSystemUILight", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity? {
-    return (context as ReactContext)?.currentActivity as? AppCompatActivity
+    return (context as? ReactContext)?.currentActivity as? AppCompatActivity
   }
 
   private val sheet: FragmentModalBottomSheet?

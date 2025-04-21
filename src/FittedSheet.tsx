@@ -136,9 +136,9 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
-      dim.height - (StatusBar.currentHeight ?? 56)
+      // dim.height - (StatusBar.currentHeight ?? 56)
+      dim.height - (StatusBar.currentHeight ?? 0)
     );
-    maxHeight = 600;
 
     const paramsMaxWidth = isLandscape
       ? this.props.params?.maxLandscapeWidth
@@ -160,6 +160,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       maxWidth,
       nativeHeight,
       h: Dimensions.get('window').height,
+      sb: StatusBar.currentHeight,
       dim: dim.width,
     });
     return (
