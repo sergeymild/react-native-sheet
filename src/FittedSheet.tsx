@@ -42,15 +42,13 @@ interface Props {
 interface State {
   show: boolean;
   data: any | null;
-  maxHeight: number;
+  height?: number;
 }
 
 export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
 
 interface Context {
   hide: (passThroughParam?: any) => void;
-  increaseHeight: (by: number) => void;
-  decreaseHeight: (by: number) => void;
   passScrollViewReactTag: (nativeId: string) => void;
 }
 
@@ -71,7 +69,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   private sheetRef = React.createRef<any>();
   constructor(props: Props) {
     super(props);
-    this.state = { show: false, data: null, maxHeight: -1 };
+    this.state = { show: false, data: null };
   }
 
   show = (data?: any) => {
@@ -81,7 +79,8 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   data = () => this.state.data;
 
   onLayout = (e: LayoutChangeEvent) => {
-    this.setState({ maxHeight: e.nativeEvent.layout.height });
+    console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
+    this.setState({ height: e.nativeEvent.layout.height });
   };
 
   toggle = () => {
@@ -91,19 +90,6 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   passScrollViewReactTag = (nativeId: string) => {
     console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
     this.sheetRef.current?.setNativeProps({ passScrollViewReactTag: nativeId });
-  };
-
-  increaseHeight = (by: number) => {
-    //this.sheetRef.current?.setNativeProps({ increaseHeight: by });
-    this.setState({ maxHeight: this.state.maxHeight + by });
-  };
-
-  decreaseHeight = (by: number) => {
-    const minHeight = this.props.params?.minHeight;
-    this.setState({
-      maxHeight: Math.max(minHeight ?? 0, this.state.maxHeight - by),
-    });
-    //this.sheetRef.current?.setNativeProps({ decreaseHeight: by });
   };
 
   hide = (passThroughParam?: any) => {
@@ -153,11 +139,10 @@ export class FittedSheet extends React.PureComponent<Props, State> {
 
     const dim = this.viewportSize();
     const isLandscape = dim.width > dim.height;
-    console.log('🍓[FittedSheet.render]', dim);
 
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
-      dim.height - (StatusBar.currentHeight ?? 0)
+      dim.height - (StatusBar.currentHeight ?? 56)
     );
 
     const paramsMaxWidth = isLandscape
@@ -168,17 +153,30 @@ export class FittedSheet extends React.PureComponent<Props, State> {
     if (this.props.params?.applyMaxHeightToMinHeight) {
       minHeight = maxHeight;
     }
+
+    let nativeHeight = this.state.height;
+    if (nativeHeight) {
+      nativeHeight = Math.max(nativeHeight ?? 0, minHeight ?? 0);
+      nativeHeight = Math.min(nativeHeight, maxHeight);
+    }
+
+    console.log('[FittedSheet.render]', {
+      maxHeight,
+      maxWidth,
+      nativeHeight,
+      h: Dimensions.get('window').height,
+      dim: dim.width,
+    });
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
-        style={{ width: maxWidth, maxHeight, minHeight, position: 'absolute' }}
+        style={{ maxWidth: maxWidth, position: 'absolute' }}
+        calculatedHeight={nativeHeight}
         fittedSheetParams={
           this.props.params
             ? {
                 ...this.props.params,
-                maxHeight,
-                maxWidth,
                 backgroundColor: this.props.params.backgroundColor
                   ? processColor(this.props.params.backgroundColor)
                   : undefined,
@@ -186,20 +184,18 @@ export class FittedSheet extends React.PureComponent<Props, State> {
             : {}
         }
       >
-        <FittedSheetContext.Provider value={this}>
-          <View
-            nativeID={'fitted-sheet-root-view'}
-            style={{ maxHeight, minHeight, maxWidth }}
-            onLayout={this.onLayout}
-          >
-            {this.props.children &&
-              typeof this.props.children === 'function' &&
-              this.props.children(this.state.data)}
-            {this.props.children &&
-              typeof this.props.children !== 'function' &&
-              this.props.children}
-          </View>
-        </FittedSheetContext.Provider>
+        <View
+          nativeID={'fitted-sheet-root-view'}
+          style={{ width: maxWidth, maxHeight, backgroundColor: 'red' }}
+          onLayout={this.onLayout}
+        >
+          {this.props.children &&
+            typeof this.props.children === 'function' &&
+            this.props.children(this.state.data)}
+          {this.props.children &&
+            typeof this.props.children !== 'function' &&
+            this.props.children}
+        </View>
       </_FittedSheet>
     );
   }

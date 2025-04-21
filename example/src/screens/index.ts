@@ -33,12 +33,6 @@ export const screens = [
         getScreen: () => require('./modal/List2Example').List2Example,
       },
       {
-        name: 'IncreaseDecreaseHeight',
-        slug: 'Modal/IncreaseDecreaseHeight',
-        getScreen: () =>
-          require('./modal/IncreaseDecreaseHeight').IncreaseDecreaseHeight,
-      },
-      {
         name: 'KeyboardExample',
         slug: 'Modal/KeyboardExample',
         getScreen: () => require('./modal/KeyboardExample').default,
@@ -52,16 +46,6 @@ export const screens = [
         name: 'QueueExample',
         slug: 'Modal/QueueExample',
         getScreen: () => require('./modal/QueueExample').QueueExample,
-      },
-      {
-        name: 'Queue2Example',
-        slug: 'Modal/Queue2Example',
-        getScreen: () => require('./modal/Queue2Example').Queue2Example,
-      },
-      {
-        name: 'TopModalExample',
-        slug: 'Modal/TopModalExample',
-        getScreen: () => require('./modal/TopModalExample').TopModalExample,
       },
       {
         name: 'DismissPreventExample',

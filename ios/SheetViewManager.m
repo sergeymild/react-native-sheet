@@ -7,6 +7,7 @@ RCT_EXPORT_VIEW_PROPERTY(onSheetDismiss, RCTDirectEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(fittedSheetParams, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(passScrollViewReactTag, NSString)
+RCT_EXPORT_VIEW_PROPERTY(calculatedHeight, NSNumber)
 
 RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(viewportSize)

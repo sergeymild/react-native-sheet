@@ -537,7 +537,7 @@ public class SheetViewController: UIViewController {
                        options: UIView.AnimationOptions = [.curveEaseOut],
                        animated: Bool = true,
                        complete: (() -> Void)? = nil) {
-        debugPrint("ShetViewController.resizeTo", size)
+        //debugPrint("ShetViewController.resizeTo", size)
         let previousSize = self.currentSize
         self.currentSize = size
 

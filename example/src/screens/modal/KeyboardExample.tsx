@@ -31,37 +31,26 @@ const KeyboardExample = () => {
       <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
-        params={{ maxHeight: 800 }}
         ref={bottomSheetRef}
         onSheetDismiss={() => {
           setKH(0);
           setCount(2);
         }}
       >
-        <View
-          style={[
-            styles.contentContainerStyle,
-            { paddingBottom: keyboardHeight > 0 ? keyboardHeight : 34 },
-          ]}
-        >
-          <TextInput
-            style={{ height: 32, width: '100%', backgroundColor: 'yellow' }}
-          />
-          <ContactList count={count} />
-          <KeyboardSpacer
-            handleAndroid
-            onToggle={(e) => {
-              setKH(e);
-              setTimeout(() => {
-                setCount(20);
-                // setTimeout(() => {
-                //   setCount(4)
-                // }, 1000)
-              }, 1000);
-              console.log('[KeyboardExample.]', e);
-            }}
-          />
-        </View>
+        <TextInput style={{ height: 132, backgroundColor: 'yellow' }} />
+        <ContactList count={count} />
+        <KeyboardSpacer
+          handleAndroid
+          onToggle={(e) => {
+            setTimeout(() => {
+              setCount(20);
+              // setTimeout(() => {
+              //   setCount(4)
+              // }, 1000)
+            }, 5000);
+            console.log('[KeyboardExample.]', e);
+          }}
+        />
       </FittedSheet>
     </View>
   );
@@ -70,26 +59,10 @@ const KeyboardExample = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
   },
   contentContainerStyle: {
     paddingHorizontal: 24,
     backgroundColor: 'white',
-  },
-  message: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: 'black',
-  },
-  emoji: {
-    fontSize: 156,
-    textAlign: 'center',
-    alignSelf: 'center',
-  },
-  emojiContainer: {
-    overflow: 'hidden',
-    justifyContent: 'center',
   },
 });
 

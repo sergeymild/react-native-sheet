@@ -26,7 +26,6 @@ const ListExample = () => {
           backgroundColor: 'white',
           maxLandscapeWidth: 560,
           maxPortraitWidth: 300,
-          maxHeight: 500,
           topLeftRightCornerRadius: 8,
         }}
       >
