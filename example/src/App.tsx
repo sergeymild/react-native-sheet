@@ -1,12 +1,49 @@
 import * as React from 'react';
 
-import { StyleSheet, View } from 'react-native';
-import { SimpleExample } from './screens/modal/SimpleExample';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { screens } from './screens';
+
+const Stack = createNativeStackNavigator<any>();
+
+const Buttons = () => {
+  const nav = useNavigation();
+  return (
+    <>
+      <ScrollView>
+        {screens.map((screen) => (
+          <TouchableOpacity
+            key={screen.slug}
+            onPress={() => {
+              nav.navigate(screen.name);
+            }}
+          >
+            <Text children={screen.slug} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </>
+  );
+};
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <SimpleExample />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name={'Buttons'} component={Buttons} />
+          {screens.map((s) => (
+            <Stack.Screen {...s} getComponent={s.getScreen} />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }

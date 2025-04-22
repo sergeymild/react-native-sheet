@@ -17,16 +17,16 @@ class SheetViewManager: RCTViewManager {
   override static func requiresMainQueueSetup() -> Bool {
     return true
   }
-
+  
   override func view() -> UIView! {
     let v = HostFittedSheet(bridge: bridge)
     return v
   }
-
+  
   private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet {
     return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet
   }
-
+  
   @objc
   final func dismiss(_ node: NSNumber) {
     DispatchQueue.main.async {
@@ -35,13 +35,13 @@ class SheetViewManager: RCTViewManager {
       debugPrint("😀dismiss")
     }
   }
-@objc
+  @objc
   func viewportSize() -> [String: CGFloat] {
     let size = viewPort()
     return ["width": size.width, "height": size.height]
   }
-
-
+  
+  
   deinit {
     debugPrint("😀 deinit view manager")
   }
@@ -66,15 +66,15 @@ final class HostFittedSheet: UIView {
   private var _isPresented = false
   private var _sheetSize: CGFloat?
   private var _scrollViewTag: String?
-private var sheetMaxWidthSize: CGFloat?
+  private var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
   private var sheetBackgroundColor: UIColor?
-
+  
   private var sheetMaxWidth: CGFloat {
-      return sheetMaxWidthSize ?? viewPort().width
+    return sheetMaxWidthSize ?? viewPort().width
   }
-
+  
   private var _alertWindow: UIWindow?
   private lazy var presentViewController: UIViewController = {
     _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
@@ -85,51 +85,49 @@ private var sheetMaxWidthSize: CGFloat?
     _alertWindow?.makeKeyAndVisible()
     return controller
   }()
-
-
+  
+  
   @objc
   func setPassScrollViewReactTag(_ tag: String) {
     debugPrint("😀 setPassScrollViewReactTag", tag)
     if self._modalViewController == nil {
-            self._scrollViewTag = tag
-        } else {
-            let scrollView = self._reactSubview?.find(
-                FITTED_SHEET_SCROLL_VIEW,
-                deepIndex: 0
-            ) as? RCTScrollView
-            if scrollView != nil {
-                self._modalViewController?.handleScrollView(scrollView!.scrollView)
-            }
-            debugPrint("😀 setPassScrollViewReactTag found", scrollView)
+      self._scrollViewTag = tag
+    } else {
+      let scrollView = self._reactSubview?.find(
+        FITTED_SHEET_SCROLL_VIEW,
+        deepIndex: 0
+      ) as? RCTScrollView
+      if scrollView != nil {
+        self._modalViewController?.handleScrollView(scrollView!.scrollView)
+      }
+      debugPrint("😀 setPassScrollViewReactTag found", scrollView)
     }
-    debugPrint("😀 setPassScrollViewReactTag found", scrollView, self._modalViewController)
-    self._modalViewController?.handleScrollView(scrollView.scrollView)
   }
-
+  
   @objc
   func setFittedSheetParams(_ params: NSDictionary) {
     debugPrint("😀 setFittedSheetParams", params)
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxPortraitWidth"])
-
+    
     if UIDevice.current.orientation.isLandscape {
       sheetMaxWidthSize = RCTConvert.cgFloat(params["maxLandscapeWidth"])
     }
-
+    
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
     sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])
   }
-
+  
   init(bridge: RCTBridge) {
     self._bridge = bridge
     super.init(frame: .zero)
     _touchHandler = RCTSurfaceTouchHandler()
   }
-
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
     debugPrint("😀 insertReactSubview")
     super.insertReactSubview(subview, at: atIndex)
@@ -137,35 +135,35 @@ private var sheetMaxWidthSize: CGFloat?
     viewController.view.insertSubview(subview, at: 0)
     _reactSubview = subview
   }
-
+  
   override func removeReactSubview(_ subview: UIView!) {
     debugPrint("😀 removeReactSubview")
     super.removeReactSubview(subview)
     _touchHandler?.detach(from: subview)
     _reactSubview = nil
   }
-
+  
   // need to leave it empty
   override func didUpdateReactSubviews() {}
-
+  
   override func didMoveToWindow() {
     super.didMoveToWindow()
     tryToPresent()
   }
-
-
-
-
+  
+  
+  
+  
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     debugPrint("😀 didMoveToSuperview _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
     if _isPresented && superview == nil {
-        destroy()
+      destroy()
     } else {
-        tryToPresent()
+      tryToPresent()
     }
   }
-
+  
   // MARK: calculatedSize
   @objc
   func setCalculatedHeight(_ height: NSNumber) {
@@ -173,7 +171,7 @@ private var sheetMaxWidthSize: CGFloat?
     _sheetSize = RCTConvert.cgFloat(height)
     _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
   }
-
+  
   private func initializeSheet(_ size: CGSize) {
     self._modalViewController = SheetViewController(
       controller: self.viewController,
@@ -192,7 +190,7 @@ private var sheetMaxWidthSize: CGFloat?
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
   }
-
+  
   private func tryAttachScrollView() {
     if let tag = self._scrollViewTag {
       self.setPassScrollViewReactTag(tag)
@@ -203,19 +201,19 @@ private var sheetMaxWidthSize: CGFloat?
       }
     }
   }
-
+  
   private func tryToPresent() {
     if (!self.isUserInteractionEnabled && self.superview?.reactSubviews().contains(self) != nil) {
       return;
     }
-
+    
     if (!_isPresented) {
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
       debugPrint("😀 tryToPresent", size)
       RCTExecuteOnMainQueue { [weak self] in
         guard let self else { return }
-
+        
         self.initializeSheet(size)
         self.tryAttachScrollView()
         self.presentViewController.present(self._modalViewController!, animated: true)
@@ -226,11 +224,11 @@ private var sheetMaxWidthSize: CGFloat?
       }
     }
   }
-
+  
   func destroy() {
     debugPrint("😀 destroy")
     _isPresented = false
-
+    
     let cleanup = { [weak self] in
       guard let self = self else { return }
       debugPrint("😀 cleanup")
@@ -248,20 +246,20 @@ private var sheetMaxWidthSize: CGFloat?
       self._reactSubview = nil
       self._alertWindow = nil
     }
-
+    
     if self._modalViewController?.isBeingDismissed != true {
       debugPrint("😀 dismissViewController")
       self._modalViewController?.dismiss(animated: true, completion: cleanup)
     } else {
       cleanup()
     }
-
+    
   }
-
+  
   deinit {
     debugPrint("😀 deinit")
   }
-
+  
 }
 
 
@@ -271,14 +269,14 @@ extension UIView {
     if self.nativeID?.contains(nId) == true || self.accessibilityIdentifier?.contains(nId) == true {
       return self
     }
-
+    
     let index = deepIndex + 1
     for subview in subviews {
       if let v = subview.find(nId, deepIndex: index) {
         return v
       }
     }
-
+    
     return nil
   }
 }
