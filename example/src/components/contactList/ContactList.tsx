@@ -83,9 +83,6 @@ const ContactListComponent = ({
       renderItem={renderFlatListItem}
       keyboardDismissMode="interactive"
       indicatorStyle="black"
-      onLayout={(e) =>
-        console.log('🍓[ContactList.layout]', e.nativeEvent.layout.height)
-      }
       contentContainerStyle={[rest.contentContainerStyle]}
     />
   );
