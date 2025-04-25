@@ -9,14 +9,17 @@ import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.react.uimanager.JSPointerDispatcher
 import com.facebook.react.uimanager.JSTouchDispatcher
 import com.facebook.react.uimanager.RootView
+import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
 
-open class BaseRNView(context: Context?) : ViewGroup(context), RootView {
+abstract class BaseRNView(context: Context?) : ViewGroup(context), RootView {
   private val reactContext: ReactContext
     get() = context as ReactContext
   private val mJSTouchDispatcher = JSTouchDispatcher(this)
   private var mJSPointerDispatcher: JSPointerDispatcher? = null
+
+  abstract fun getRnViewId(): Int
 
   init {
     if (ReactFeatureFlags.dispatchPointerEvents) {
@@ -26,25 +29,26 @@ open class BaseRNView(context: Context?) : ViewGroup(context), RootView {
 
   private val eventDispatcher: EventDispatcher
     get() {
-      val reactContext = reactContext
-      return reactContext.getNativeModule(UIManagerModule::class.java)!!.eventDispatcher
+      return UIManagerHelper.getEventDispatcherForReactTag(reactContext, getRnViewId())!!
+//      val reactContext = reactContext
+//      return reactContext.getNativeModule(UIManagerModule::class.java)!!.eventDispatcher
     }
 
-  override fun onChildStartedNativeGesture(p0: View?, p1: MotionEvent?) {
+  override fun onChildStartedNativeGesture(p0: View?, p1: MotionEvent) {
     mJSTouchDispatcher.onChildStartedNativeGesture(p1, eventDispatcher)
     mJSPointerDispatcher?.onChildStartedNativeGesture(p0, p1, eventDispatcher)
   }
 
-  override fun onChildStartedNativeGesture(p0: MotionEvent?) {
+  override fun onChildStartedNativeGesture(p0: MotionEvent) {
     this.onChildStartedNativeGesture(null, p0)
   }
 
-  override fun onChildEndedNativeGesture(p0: View?, p1: MotionEvent?) {
+  override fun onChildEndedNativeGesture(p0: View, p1: MotionEvent) {
     mJSTouchDispatcher.onChildEndedNativeGesture(p1, eventDispatcher)
     mJSPointerDispatcher?.onChildEndedNativeGesture()
   }
 
-  override fun handleException(t: Throwable?) {
+  override fun handleException(t: Throwable) {
     reactContext.handleException(RuntimeException(t))
   }
 
