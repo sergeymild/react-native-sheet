@@ -3,20 +3,13 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 react {
-  autolinkLibrariesWithApp()
+    autolinkLibrariesWithApp()
 }
-
-def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
-
-def reactNativeArchitectures() {
-    def value = project.getProperties().get("reactNativeArchitectures")
-    return value ? value.split(",") : ["armeabi-v7a", "arm64-v8a"]
-}
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
@@ -27,15 +20,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-    }
-
-    splits {
-        abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include (*reactNativeArchitectures())
-        }
     }
     signingConfigs {
         debug {
@@ -63,12 +47,23 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
-  implementation("com.facebook.react:hermes-android")
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
 }
 
-// Since our library doesn't invoke codegen automatically we need to do it here.
+// Run Codegen during development for the example app.
 tasks.register('invokeLibraryCodegen', Exec) {
   workingDir "$rootDir/../../"
-  commandLine "npx", "bob", "build", "--target", "codegen"
+  def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+
+  if (isWindows) {
+    commandLine 'cmd', '/c', 'npx bob build --target codegen'
+  } else {
+    commandLine 'sh', '-c', 'npx bob build --target codegen'
+  }
 }
+
 preBuild.dependsOn invokeLibraryCodegen
