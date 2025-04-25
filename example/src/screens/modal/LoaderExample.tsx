@@ -30,7 +30,7 @@ function useMaxHeight() {
     Dimensions.get('window')
   );
 
-  return Dimensions.get('window').height - insets.top;
+  return Dimensions.get('window').height - insets.top - insets.bottom;
 }
 
 export const LoaderExample = () => {

@@ -41,7 +41,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   var params: ReadableMap? = null
     set(value) {
       mHostView.sheetMaxHeightSize = value.double("maxHeight", Double.MAX_VALUE).toPxD()
-      mHostView.sheetMaxWidthSize = value.double("maxPortraitWidth", Double.MAX_VALUE).toPxD()
+      mHostView.sheetMaxWidthSize = value.double("maxWidth", Double.MAX_VALUE).toPxD()
       mHostView.sheetMinHeightSize = value.double("minHeight", Double.MIN_VALUE).toPxD()
 
       field = value
