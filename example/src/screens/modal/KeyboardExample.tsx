@@ -1,14 +1,12 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet2';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const KeyboardExample = () => {
-  const frame = useSafeAreaInsets();
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);

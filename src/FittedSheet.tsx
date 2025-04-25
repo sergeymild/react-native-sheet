@@ -33,7 +33,7 @@ type Children =
   | React.ReactElement
   | React.ReactElement[];
 
-interface Props {
+export interface SheetProps {
   readonly params?: FittedSheetParams;
   readonly onSheetDismiss?: (passThroughParam?: any) => void;
   readonly children?: Children;
@@ -63,14 +63,21 @@ export const useFittedSheetContext = () => {
   }
 };
 
-export class FittedSheet extends React.PureComponent<Props, State> {
+export class FittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
   private shouldShowBack = false;
   private onHidePassThroughParam?: any;
   private sheetRef = React.createRef<any>();
-  constructor(props: Props) {
+
+  private dimensions: { width: number; height: number };
+  private isLandscape: boolean;
+
+  constructor(props: SheetProps) {
     super(props);
     this.state = { show: false, data: null };
+
+    this.dimensions = this.viewportSize();
+    this.isLandscape = this.dimensions.width > this.dimensions.height;
   }
 
   show = (data?: any) => {
@@ -95,27 +102,35 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   };
 
   private onDismiss = () => {
+    console.log('[FittedSheet.onDismiss]');
     if (this.shouldShowBack) {
-      this.setState({ show: false }, () => this.show(this.state.data));
+      this.setState({ show: false, height: undefined }, () =>
+        this.show(this.state.data)
+      );
       this.shouldShowBack = false;
       return;
     }
-    this.setState({ show: false });
+    this.setState({ show: false, height: undefined });
     const passValue = this.onHidePassThroughParam;
     this.onHidePassThroughParam = undefined;
     this.props.onSheetDismiss?.(passValue);
   };
 
   componentDidMount() {
+    console.log('[FittedSheet.componentDidMount]');
     this.cleanup = Dimensions.addEventListener('change', () => {
       if (!this.state.show) return;
       if (this.shouldShowBack) return;
       this.shouldShowBack = true;
+      this.dimensions = this.viewportSize();
+      this.isLandscape = this.dimensions.width > this.dimensions.height;
+
       this.hide();
     }).remove;
   }
 
   componentWillUnmount() {
+    console.log('[FittedSheet.componentWillUnmount]');
     this.hide();
     this.cleanup?.();
     this.cleanup = undefined;
@@ -131,19 +146,19 @@ export class FittedSheet extends React.PureComponent<Props, State> {
   render() {
     if (!this.state.show) return null;
 
-    const dim = this.viewportSize();
-    const isLandscape = dim.width > dim.height;
-
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       // dim.height - (StatusBar.currentHeight ?? 56)
-      dim.height - (StatusBar.currentHeight ?? 0)
+      this.dimensions.height - (StatusBar.currentHeight ?? 0)
     );
 
-    const paramsMaxWidth = isLandscape
+    const paramsMaxWidth = this.isLandscape
       ? this.props.params?.maxLandscapeWidth
       : this.props.params?.maxPortraitWidth;
-    let maxWidth = Math.min(paramsMaxWidth ?? Number.MAX_VALUE, dim.width);
+    let maxWidth = Math.min(
+      paramsMaxWidth ?? Number.MAX_VALUE,
+      this.dimensions.width
+    );
     let minHeight = this.props.params?.minHeight;
     if (this.props.params?.applyMaxHeightToMinHeight) {
       minHeight = maxHeight;
@@ -161,7 +176,7 @@ export class FittedSheet extends React.PureComponent<Props, State> {
       nativeHeight,
       h: Dimensions.get('window').height,
       sb: StatusBar.currentHeight,
-      dim: dim.width,
+      dim: this.dimensions.width,
     });
     return (
       <_FittedSheet
@@ -172,15 +187,16 @@ export class FittedSheet extends React.PureComponent<Props, State> {
         fittedSheetParams={
           this.props.params
             ? {
-              ...this.props.params,
-              passScrollViewReactTag: this.state.passScrollViewReactTag,
-              backgroundColor: this.props.params.backgroundColor
-                ? processColor(this.props.params.backgroundColor)
-                : undefined,
-            }
+                ...this.props.params,
+                maxWidth,
+                passScrollViewReactTag: this.state.passScrollViewReactTag,
+                backgroundColor: this.props.params.backgroundColor
+                  ? processColor(this.props.params.backgroundColor)
+                  : undefined,
+              }
             : {
-              passScrollViewReactTag: this.state.passScrollViewReactTag,
-            }
+                passScrollViewReactTag: this.state.passScrollViewReactTag,
+              }
         }
       >
         <View

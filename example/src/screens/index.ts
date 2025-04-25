@@ -50,9 +50,4 @@ export const screens = [
     getScreen: () =>
       require('./modal/DismissPreventExample').DismissPreventExample,
   },
-  {
-    name: 'TabsExample',
-    slug: 'Modal/TabsExample',
-    getScreen: () => require('./modal/TabsExample').TabsExample,
-  },
 ];

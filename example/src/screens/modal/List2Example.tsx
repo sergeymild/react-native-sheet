@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
@@ -17,12 +17,6 @@ const DetachedExample = () => {
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current!.show();
   }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current!.hide();
-  }, []);
-  const handleClosePress = useCallback(() => {
-    bottomSheetRef.current?.hide();
-  }, []);
 
   const renderItem = useCallback(
     (item: any, index: any) => (
@@ -38,8 +32,6 @@ const DetachedExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
-      <Button label="Close" onPress={handleClosePress} />
       <FittedSheet ref={bottomSheetRef}>
         {() => (
           <View style={styles.sheetContainer}>{data.map(renderItem)}</View>

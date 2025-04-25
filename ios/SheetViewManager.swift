@@ -107,12 +107,7 @@ final class HostFittedSheet: UIView {
   @objc
   func setFittedSheetParams(_ params: NSDictionary) {
     debugPrint("😀 setFittedSheetParams", params)
-    sheetMaxWidthSize = RCTConvert.cgFloat(params["maxPortraitWidth"])
-    
-    if UIDevice.current.orientation.isLandscape {
-      sheetMaxWidthSize = RCTConvert.cgFloat(params["maxLandscapeWidth"])
-    }
-    
+    sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
     sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])

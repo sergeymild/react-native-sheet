@@ -3,7 +3,10 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
-import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet2';
+import {
+  FITTED_SHEET_SCROLL_VIEW,
+  useFittedSheetContext,
+} from 'react-native-sheet2';
 
 export interface ContactListProps {
   count?: number;
@@ -21,6 +24,7 @@ const ContactListComponent = ({
   onItemPress,
   ...rest
 }: ContactListProps) => {
+  const context = useFittedSheetContext();
   // hooks
 
   //#region variables
@@ -73,6 +77,11 @@ const ContactListComponent = ({
     <FlatList
       {...rest}
       data={data}
+      onLayout={() =>
+        context?.passScrollViewReactTag(
+          rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW
+        )
+      }
       nativeID={rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW}
       refreshing={false}
       onRefresh={onRefresh}
