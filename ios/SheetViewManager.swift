@@ -72,7 +72,7 @@ final class HostFittedSheet: UIView {
   private var sheetBackgroundColor: UIColor?
   
   private var sheetMaxWidth: CGFloat {
-      return sheetMaxWidthSize ?? viewPort().width
+    return sheetMaxWidthSize ?? viewPort().width
   }
   
   private var _alertWindow: UIWindow?
@@ -102,12 +102,7 @@ final class HostFittedSheet: UIView {
   @objc
   func setFittedSheetParams(_ params: NSDictionary) {
     debugPrint("😀 setFittedSheetParams", params)
-    sheetMaxWidthSize = RCTConvert.cgFloat(params["maxPortraitWidth"])
-    
-    if UIDevice.current.orientation.isLandscape {
-      sheetMaxWidthSize = RCTConvert.cgFloat(params["maxLandscapeWidth"])
-    }
-
+    sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
     sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])
@@ -150,9 +145,9 @@ final class HostFittedSheet: UIView {
     super.didMoveToSuperview()
     debugPrint("😀 didMoveToSuperview _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
     if _isPresented && superview == nil {
-        destroy()
+      destroy()
     } else {
-        tryToPresent()
+      tryToPresent()
     }
   }
   
@@ -182,7 +177,7 @@ final class HostFittedSheet: UIView {
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
   }
-
+  
   private func tryAttachScrollView() {
     if let tag = self._scrollViewTag {
       self.setPassScrollViewReactTag(tag)

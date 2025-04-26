@@ -54,12 +54,8 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     if (reactView == null) return
     this.sheetMaxHeightSize = h.toDouble()
     if (sheetMaxHeightSize == Double.MAX_VALUE) return
-    var newHeight = allowedHeight
+    val newHeight = allowedHeight
     val newWidth = allowedWidth
-//    ((((context as ReactContext).currentActivity as? AppCompatActivity)?.supportFragmentManager?.fragments?.getOrNull(1) as? FragmentModalBottomSheet)?.dialog as? CustomBottomSheetDialog)?.window?.decorView?.let {
-//      newHeight -= ViewCompat.getRootWindowInsets(it)?.systemGestureInsets?.bottom ?: 0
-//      newHeight -= ViewCompat.getRootWindowInsets(it)?.systemGestureInsets?.top ?: 0
-//    }
     println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.toDP()} :${metrics.displayMetrics.heightPixels.toDP()}")
     ensureLayoutParams()
     translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()

@@ -38,6 +38,11 @@ export const screens = [
         getScreen: () => require('./modal/KeyboardExample').default,
       },
       {
+        name: 'Keyboard2Example',
+        slug: 'Modal/Keyboard2Example',
+        getScreen: () => require('./modal/Keyboard2Example').default,
+      },
+      {
         name: 'PropsExample',
         slug: 'Modal/PropsExample',
         getScreen: () => require('./modal/PropsExample').PropsExample,

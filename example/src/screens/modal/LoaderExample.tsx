@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,6 +11,7 @@ import {
 import { Button } from '../../components/button';
 import { FittedSheet } from 'react-native-sheet2';
 import { ContactList } from '../../components/contactList';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Sim: React.FC = () => {
   return <ContactList count={50} />;
@@ -18,6 +20,15 @@ const Sim: React.FC = () => {
 export const LoaderExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [isLoading, setLoading] = useState<-1 | 0 | 1>(-1);
+  const insets = useSafeAreaInsets();
+  const maxHeight =
+    Dimensions.get('window').height - insets.top - insets.bottom;
+  console.log(
+    '[LoaderExample.LoaderExample]',
+    insets.top,
+    insets.bottom,
+    maxHeight
+  );
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current!.show();
@@ -28,7 +39,7 @@ export const LoaderExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <FittedSheet
         ref={bottomSheetRef}
-        params={{ backgroundColor: 'white' }}
+        params={{ backgroundColor: 'white', maxHeight }}
         onSheetDismiss={() => setLoading(-1)}
       >
         {isLoading === -1 && (
