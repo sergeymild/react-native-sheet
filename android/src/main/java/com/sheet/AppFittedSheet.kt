@@ -9,18 +9,14 @@ import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
-import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.UIManagerHelper
-import com.facebook.react.uimanager.UIManagerModule
-import com.facebook.react.uimanager.common.UIManagerType
-import com.facebook.react.uimanager.events.RCTEventEmitter
 
-fun androidx.fragment.app.Fragment.safeShow(
+fun Fragment.safeShow(
   manager: FragmentManager,
   tag: String?
 ) {
@@ -30,31 +26,20 @@ fun androidx.fragment.app.Fragment.safeShow(
 }
 
 internal fun AppFittedSheet.onSheetDismiss() {
-  (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
-    .receiveEvent(id, "onSheetDismiss", Arguments.createMap())
+  val reactEventDispatcher = UIManagerHelper.getEventDispatcherForReactTag(context as ReactContext, id)
+  val surfaceId = UIManagerHelper.getSurfaceId(context)
+  reactEventDispatcher?.dispatchEvent(SheetDismissEvent(surfaceId, id))
 }
 
-class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
+open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
 
-  var params: ReadableMap? = null
-    set(value) {
-      mHostView.sheetMaxHeightSize = value.double("maxHeight", Double.MAX_VALUE).toPxD()
-      mHostView.sheetMaxWidthSize = value.double("maxWidth", Double.MAX_VALUE).toPxD()
-      mHostView.sheetMinHeightSize = value.double("minHeight", Double.MIN_VALUE).toPxD()
 
-      field = value
-    }
-
-  private val dismissable: Boolean
-    get() = params.bool("dismissable", true)
-  private val topLeftRightCornerRadius: Float
-    get() = params.float("topLeftRightCornerRadius", 0f)
-  private val backgroundColor: Int
-    get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
-  private val isSystemUILight: Boolean
-    get() = params?.bool("isSystemUILight", false) ?: false
+  var dismissable = true
+  var topLeftRightCornerRadius: Float = 0F
+  var _backgroundColor: Int = Color.TRANSPARENT
+  var isSystemUILight: Boolean = false
 
   private fun getCurrentActivity(): AppCompatActivity? {
     return (context as? ReactContext)?.currentActivity as? AppCompatActivity
@@ -69,7 +54,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
     val sheet = this.sheet
     mHostView.setCornerRadius(topLeftRightCornerRadius)
-    mHostView.setBackgroundColor(backgroundColor)
+    mHostView.setBackgroundColor(_backgroundColor)
     if (sheet == null) {
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
@@ -100,13 +85,13 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
-    val ctx = context as ReactContext? ?: return
-    val module = UIManagerHelper.getUIManager(ctx, UIManagerType.DEFAULT) as? UIManagerModule ?: return
-    ctx.runOnNativeModulesQueueThread {
-      val resolveShadowNode = module?.uiImplementation?.resolveShadowNode(child.id) ?: return@runOnNativeModulesQueueThread
-      val height = resolveShadowNode.layoutHeight
-      if (height > 0) mHostView.setVirtualHeight(height)
-    }
+//    val ctx = context as ReactContext? ?: return
+//    val module = UIManagerHelper.getUIManager(ctx, UIManagerType.DEFAULT) as? UIManagerModule ?: return
+//    ctx.runOnNativeModulesQueueThread {
+//      val resolveShadowNode = module?.uiImplementation?.resolveShadowNode(child.id) ?: return@runOnNativeModulesQueueThread
+//      val height = resolveShadowNode.layoutHeight
+//      if (height > 0) mHostView.setVirtualHeight(height)
+//    }
   }
 
   override fun getChildCount(): Int = mHostView.childCount

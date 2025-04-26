@@ -9,10 +9,27 @@
  */
 #pragma once
 
-
+#include <react/renderer/components/view/ViewProps.h>
+#include <react/renderer/core/PropsParserContext.h>
 
 namespace facebook::react {
 
+class SheetViewProps final : public ViewProps {
+ public:
+  SheetViewProps() = default;
+  SheetViewProps(const PropsParserContext& context, const SheetViewProps &sourceProps, const RawProps &rawProps);
 
+#pragma mark - Props
+
+  bool dismissable{false};
+  double maxWidth{0.0};
+  double maxHeight{0.0};
+  double minHeight{0.0};
+  double calculatedHeight{0.0};
+  double topLeftRightCornerRadius{0.0};
+  std::string backgroundColor{};
+  bool isSystemUILight{false};
+  std::string passScrollViewReactTag{};
+};
 
 } // namespace facebook::react

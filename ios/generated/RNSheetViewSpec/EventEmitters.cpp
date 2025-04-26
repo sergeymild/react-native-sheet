@@ -13,4 +13,12 @@
 
 namespace facebook::react {
 
+void SheetViewEventEmitter::onSheetDismiss(OnSheetDismiss $event) const {
+  dispatchEvent("sheetDismiss", [](jsi::Runtime &runtime) {
+    auto $payload = jsi::Object(runtime);
+    
+    return $payload;
+  });
+}
+
 } // namespace facebook::react

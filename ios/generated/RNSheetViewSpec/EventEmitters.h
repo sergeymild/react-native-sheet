@@ -13,5 +13,13 @@
 
 
 namespace facebook::react {
+class SheetViewEventEmitter : public ViewEventEmitter {
+ public:
+  using ViewEventEmitter::ViewEventEmitter;
 
+  struct OnSheetDismiss {
+      
+    };
+  void onSheetDismiss(OnSheetDismiss value) const;
+};
 } // namespace facebook::react

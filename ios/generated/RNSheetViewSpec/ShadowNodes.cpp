@@ -12,6 +12,6 @@
 
 namespace facebook::react {
 
-
+extern const char SheetViewComponentName[] = "SheetView";
 
 } // namespace facebook::react

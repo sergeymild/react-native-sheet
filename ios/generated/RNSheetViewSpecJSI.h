@@ -15,5 +15,66 @@
 namespace facebook::react {
 
 
+  class JSI_EXPORT NativeSheetCxxSpecJSI : public TurboModule {
+protected:
+  NativeSheetCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
+
+public:
+  virtual void dismiss(jsi::Runtime &rt) = 0;
+  virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
+
+};
+
+template <typename T>
+class JSI_EXPORT NativeSheetCxxSpec : public TurboModule {
+public:
+  jsi::Value create(jsi::Runtime &rt, const jsi::PropNameID &propName) override {
+    return delegate_.create(rt, propName);
+  }
+
+  std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override {
+    return delegate_.getPropertyNames(runtime);
+  }
+
+  static constexpr std::string_view kModuleName = "Sheet";
+
+protected:
+  NativeSheetCxxSpec(std::shared_ptr<CallInvoker> jsInvoker)
+    : TurboModule(std::string{NativeSheetCxxSpec::kModuleName}, jsInvoker),
+      delegate_(reinterpret_cast<T*>(this), jsInvoker) {}
+
+
+private:
+  class Delegate : public NativeSheetCxxSpecJSI {
+  public:
+    Delegate(T *instance, std::shared_ptr<CallInvoker> jsInvoker) :
+      NativeSheetCxxSpecJSI(std::move(jsInvoker)), instance_(instance) {
+
+    }
+
+    void dismiss(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::dismiss) == 1,
+          "Expected dismiss(...) to have 1 parameters");
+
+      return bridging::callFromJs<void>(
+          rt, &T::dismiss, jsInvoker_, instance_);
+    }
+    jsi::Object getConstants(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::getConstants) == 1,
+          "Expected getConstants(...) to have 1 parameters");
+
+      return bridging::callFromJs<jsi::Object>(
+          rt, &T::getConstants, jsInvoker_, instance_);
+    }
+
+  private:
+    friend class NativeSheetCxxSpec;
+    T *instance_;
+  };
+
+  Delegate delegate_;
+};
 
 } // namespace facebook::react

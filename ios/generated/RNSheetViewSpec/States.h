@@ -14,6 +14,16 @@
 
 namespace facebook::react {
 
+class SheetViewState {
+public:
+  SheetViewState() = default;
 
+#ifdef ANDROID
+  SheetViewState(SheetViewState const &previousState, folly::dynamic data){};
+  folly::dynamic getDynamic() const {
+    return {};
+  };
+#endif
+};
 
 } // namespace facebook::react

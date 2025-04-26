@@ -16,7 +16,7 @@
 
 namespace facebook::react {
 
-
+using SheetViewComponentDescriptor = ConcreteComponentDescriptor<SheetViewShadowNode>;
 
 void RNSheetViewSpec_registerComponentDescriptorsFromCodegen(
   std::shared_ptr<const ComponentDescriptorProviderRegistry> registry);

@@ -14,6 +14,20 @@
 
 namespace facebook::react {
 
+SheetViewProps::SheetViewProps(
+    const PropsParserContext &context,
+    const SheetViewProps &sourceProps,
+    const RawProps &rawProps): ViewProps(context, sourceProps, rawProps),
 
+    dismissable(convertRawProp(context, rawProps, "dismissable", sourceProps.dismissable, {false})),
+    maxWidth(convertRawProp(context, rawProps, "maxWidth", sourceProps.maxWidth, {0.0})),
+    maxHeight(convertRawProp(context, rawProps, "maxHeight", sourceProps.maxHeight, {0.0})),
+    minHeight(convertRawProp(context, rawProps, "minHeight", sourceProps.minHeight, {0.0})),
+    calculatedHeight(convertRawProp(context, rawProps, "calculatedHeight", sourceProps.calculatedHeight, {0.0})),
+    topLeftRightCornerRadius(convertRawProp(context, rawProps, "topLeftRightCornerRadius", sourceProps.topLeftRightCornerRadius, {0.0})),
+    backgroundColor(convertRawProp(context, rawProps, "backgroundColor", sourceProps.backgroundColor, {})),
+    isSystemUILight(convertRawProp(context, rawProps, "isSystemUILight", sourceProps.isSystemUILight, {false})),
+    passScrollViewReactTag(convertRawProp(context, rawProps, "passScrollViewReactTag", sourceProps.passScrollViewReactTag, {}))
+      {}
 
 } // namespace facebook::react

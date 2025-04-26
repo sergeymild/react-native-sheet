@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
@@ -6,7 +6,7 @@ import { FlatList, Text, View } from 'react-native';
 import {
   FITTED_SHEET_SCROLL_VIEW,
   useFittedSheetContext,
-} from 'react-native-sheet2';
+} from 'react-native-sheet';
 
 export interface ContactListProps {
   count?: number;

@@ -32,7 +32,67 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
+namespace JS {
+  namespace NativeSheet {
+    struct Constants {
+
+      struct Builder {
+        struct Input {
+          RCTRequired<id<NSObject>> insets;
+        };
+
+        /** Initialize with a set of values */
+        Builder(const Input i);
+        /** Initialize with an existing Constants */
+        Builder(Constants i);
+        /** Builds the object. Generally used only by the infrastructure. */
+        NSDictionary *buildUnsafeRawValue() const { return _factory(); };
+      private:
+        NSDictionary *(^_factory)(void);
+      };
+
+      static Constants fromUnsafeRawValue(NSDictionary *const v) { return {v}; }
+      NSDictionary *unsafeRawValue() const { return _v; }
+    private:
+      Constants(NSDictionary *const v) : _v(v) {}
+      NSDictionary *_v;
+    };
+  }
+}
+@protocol NativeSheetSpec <RCTBridgeModule, RCTTurboModule>
+
+- (void)dismiss;
+- (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)constantsToExport;
+- (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)getConstants;
+
+@end
+
+@interface NativeSheetSpecBase : NSObject {
+@protected
+facebook::react::EventEmitterCallback _eventEmitterCallback;
+}
+- (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper;
 
 
+@end
+
+namespace facebook::react {
+  /**
+   * ObjC++ class for module 'NativeSheet'
+   */
+  class JSI_EXPORT NativeSheetSpecJSI : public ObjCTurboModule {
+  public:
+    NativeSheetSpecJSI(const ObjCTurboModule::InitParams &params);
+  };
+} // namespace facebook::react
+inline JS::NativeSheet::Constants::Builder::Builder(const Input i) : _factory(^{
+  NSMutableDictionary *d = [NSMutableDictionary new];
+  auto insets = i.insets.get();
+  d[@"insets"] = insets;
+  return d;
+}) {}
+inline JS::NativeSheet::Constants::Builder::Builder(Constants i) : _factory(^{
+  return i.unsafeRawValue();
+}) {}
 NS_ASSUME_NONNULL_END
 #endif // RNSheetViewSpec_H

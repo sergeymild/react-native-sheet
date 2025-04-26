@@ -13,6 +13,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol RCTSheetViewViewProtocol <NSObject>
 
+@end
 
 NS_ASSUME_NONNULL_END

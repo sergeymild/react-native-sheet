@@ -1,11 +1,17 @@
 {
-  "name": "react-native-sheet2",
-  "version": "1.3.0",
-  "description": "Native implementation of Bottom sheet",
-  "main": "src/index",
-  "module": "src/index",
-  "react-native": "src/index",
-  "source": "src/index",
+  "name": "react-native-sheet",
+  "version": "0.1.0",
+  "description": "F",
+  "source": "./src/index.tsx",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "src",
     "lib",
@@ -26,7 +32,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-ttttt-example",
+    "example": "yarn workspace react-native-sheet-example",
     "test": "jest",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -41,14 +47,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sergeymild/react-native-ttttt.git"
+    "url": "git+https://github.com/sergeymild/react-native-sheet.git"
   },
   "author": "SergeyMild <sergeymild@yandex.ru> (https://github.com/sergeymild)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sergeymild/react-native-ttttt/issues"
+    "url": "https://github.com/sergeymild/react-native-sheet/issues"
   },
-  "homepage": "https://github.com/sergeymild/react-native-ttttt#readme",
+  "homepage": "https://github.com/sergeymild/react-native-sheet#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -72,8 +78,7 @@
     "prettier": "^3.0.3",
     "react": "19.0.0",
     "react-native": "0.78.2",
-    "react-native-builder-bob": "0.39.1",
-    "react-native-safe-area-context": "^5.4.0",
+    "react-native-builder-bob": "^0.40.6",
     "release-it": "^17.10.0",
     "turbo": "^1.10.7",
     "typescript": "^5.2.2"
@@ -86,6 +91,37 @@
     "example"
   ],
   "packageManager": "yarn@3.6.1",
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
   "prettier": {
     "quoteProps": "consistent",
     "singleQuote": true,
@@ -112,15 +148,10 @@
       ]
     ]
   },
-  "create-react-native-library": {
-    "languages": "kotlin-objc",
-    "type": "fabric-view",
-    "version": "0.49.8"
-  },
   "codegenConfig": {
     "name": "RNSheetViewSpec",
     "type": "all",
-    "jsSrcsDir": "src/spec",
+    "jsSrcsDir": "src",
     "outputDir": {
       "ios": "ios/generated",
       "android": "android/generated"
@@ -134,5 +165,10 @@
       }
     },
     "includesGeneratedCode": true
+  },
+  "create-react-native-library": {
+    "languages": "kotlin-objc",
+    "type": "fabric-view",
+    "version": "0.49.8"
   }
 }

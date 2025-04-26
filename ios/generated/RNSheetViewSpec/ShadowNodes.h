@@ -18,6 +18,15 @@
 
 namespace facebook::react {
 
+JSI_EXPORT extern const char SheetViewComponentName[];
 
+/*
+ * `ShadowNode` for <SheetView> component.
+ */
+using SheetViewShadowNode = ConcreteViewShadowNode<
+    SheetViewComponentName,
+    SheetViewProps,
+    SheetViewEventEmitter,
+    SheetViewState>;
 
 } // namespace facebook::react

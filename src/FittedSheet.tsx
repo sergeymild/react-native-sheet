@@ -3,15 +3,15 @@ import {
   Dimensions,
   findNodeHandle,
   type LayoutChangeEvent,
-  NativeModules,
   Platform,
-  processColor,
-  requireNativeComponent,
   StatusBar,
   View,
 } from 'react-native';
 
-export const _FittedSheet = requireNativeComponent<any>('SheetView');
+import She from './SheetViewNativeComponent';
+import SheetModule from './NativeSheet';
+
+export const _FittedSheet = She;
 
 export interface FittedSheetParams {
   readonly applyMaxHeightToMinHeight?: boolean;
@@ -98,9 +98,10 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
     this.onHidePassThroughParam = passThroughParam;
     const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
-    NativeModules.SheetView.dismiss(tag);
+    SheetModule.dismiss();
   };
 
+  // @ts-ignore
   private onDismiss = () => {
     console.log('[FittedSheet.onDismiss]');
     if (this.shouldShowBack) {
@@ -115,6 +116,10 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
     this.onHidePassThroughParam = undefined;
     this.props.onSheetDismiss?.(passValue);
   };
+
+  private insets(): { top: number; bottom: number } {
+    return SheetModule.getConstants().insets as any;
+  }
 
   componentDidMount() {
     console.log('[FittedSheet.componentDidMount]');
@@ -138,18 +143,18 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
 
   private viewportSize(): { width: number; height: number } {
     if (Platform.OS === 'ios') {
-      return NativeModules.SheetView.viewportSize();
+      return SheetModule.viewportSize();
     }
     return Dimensions.get('screen');
   }
 
   render() {
     if (!this.state.show) return null;
-
+    console.log('[FittedSheet.render.insets]', this.insets());
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       // dim.height - (StatusBar.currentHeight ?? 56)
-      this.dimensions.height - (StatusBar.currentHeight ?? 0)
+      this.dimensions.height - this.insets().top - this.insets().bottom
     );
 
     const paramsMaxWidth = this.isLandscape
@@ -182,22 +187,18 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
-        style={{ maxWidth: maxWidth, position: 'absolute' }}
-        calculatedHeight={nativeHeight}
-        fittedSheetParams={
-          this.props.params
-            ? {
-                ...this.props.params,
-                maxWidth,
-                passScrollViewReactTag: this.state.passScrollViewReactTag,
-                backgroundColor: this.props.params.backgroundColor
-                  ? processColor(this.props.params.backgroundColor)
-                  : undefined,
-              }
-            : {
-                passScrollViewReactTag: this.state.passScrollViewReactTag,
-              }
+        style={{ width: maxWidth, position: 'absolute' }}
+        backgroundColor={this.props.params?.backgroundColor ?? 'white'}
+        dismissable={this.props.params?.dismissable ?? true}
+        maxWidth={maxWidth}
+        maxHeight={maxHeight}
+        minHeight={minHeight}
+        topLeftRightCornerRadius={
+          this.props.params?.topLeftRightCornerRadius ?? 20
         }
+        isSystemUILight={this.props.params?.isSystemUILight ?? true}
+        calculatedHeight={nativeHeight}
+        passScrollViewReactTag={this.state.passScrollViewReactTag}
       >
         <View
           nativeID={'fitted-sheet-root-view'}

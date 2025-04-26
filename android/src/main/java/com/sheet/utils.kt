@@ -11,14 +11,6 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.PixelUtil
 
 
-fun Int.toDP(): Int {
-  return PixelUtil.toDIPFromPixel(this.toFloat()).toInt()
-}
-
-fun Double.toPxD(): Double {
-  return PixelUtil.toPixelFromDIP(this.toFloat()).toDouble()
-}
-
 fun ReadableMap?.bool(value: String, default: Boolean): Boolean {
   if (this == null) return default
   if (!hasKey(value)) return default

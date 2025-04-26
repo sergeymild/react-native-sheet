@@ -1,59 +1,91 @@
 package com.sheet
 
+import android.graphics.Color
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.common.MapBuilder
-import com.facebook.react.uimanager.LayoutShadowNode
-import com.facebook.react.uimanager.NativeViewHierarchyOptimizer
-import com.facebook.react.uimanager.PixelUtil
-import com.facebook.react.uimanager.ReactStylesDiffMap
-import com.facebook.react.uimanager.StateWrapper
+import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.UIViewOperationQueue
 import com.facebook.react.uimanager.ViewGroupManager
-import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.ViewManagerDelegate
 import com.facebook.react.uimanager.util.ReactFindViewUtil
+import com.facebook.react.viewmanagers.SheetViewManagerDelegate
+import com.facebook.react.viewmanagers.SheetViewManagerInterface
 
+@ReactModule(name = SheetViewManager.NAME)
+class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager<SheetView>(reactContext),
+  SheetViewManagerInterface<SheetView> {
+  private val mDelegate: ViewManagerDelegate<SheetView>
 
-class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
-  override fun getName() = "SheetView"
-
-  override fun createViewInstance(reactContext: ThemedReactContext): AppFittedSheet {
-    return AppFittedSheet(reactContext)
+  init {
+    mDelegate = SheetViewManagerDelegate(this)
   }
 
-  override fun createViewInstance(reactTag: Int, reactContext: ThemedReactContext, initialProps: ReactStylesDiffMap?, stateWrapper: StateWrapper?): AppFittedSheet {
-    val view = super.createViewInstance(reactTag, reactContext, initialProps, stateWrapper)
-    println("🥲 createViewInstance id: $reactTag view: $view")
-    return view
+  override fun getDelegate(): ViewManagerDelegate<SheetView> {
+    return mDelegate
   }
 
-  @ReactProp(name = "fittedSheetParams")
-  fun fittedSheetParams(view: AppFittedSheet, params: ReadableMap) {
-    println("🥲 fittedSheetParams $params")
-    view.params = params
+  override fun getName(): String {
+    return NAME
   }
 
-  @ReactProp(name = "calculatedHeight")
-  fun calculatedHeight(view: AppFittedSheet, height: Double) {
-    println("🥲 calculatedHeight $height")
-    view.mHostView.setVirtualHeight(PixelUtil.toPixelFromDIP(height.toFloat()))
+  public override fun createViewInstance(context: ThemedReactContext): SheetView {
+    return SheetView(context)
   }
 
-  @ReactProp(name = "passScrollViewReactTag")
-  fun passScrollViewReactTag(view: AppFittedSheet, nativeId: String) {
-    val v = ReactFindViewUtil.findView(view, nativeId) ?: return
+  override fun setBackgroundColor(view: SheetView, value: String?) {
+    println("==========setBackgroundColor $value")
+    view._backgroundColor = Color.parseColor(value ?: "#ffffff")
+  }
+
+  override fun setDismissable(view: SheetView, value: Boolean) {
+    println("==========setDismissable $value")
+    view.dismissable = value
+  }
+
+  override fun setMaxWidth(view: SheetView, value: Double) {
+    println("==========setMaxWidth $value")
+    view.mHostView.sheetMaxWidthSize = value.dpToPx()
+  }
+
+  override fun setMaxHeight(view: SheetView, value: Double) {
+    println("==========setMaxHeight $value")
+    view.mHostView.sheetMaxHeightSize = value.dpToPx()
+  }
+
+  override fun setMinHeight(view: SheetView, value: Double) {
+    println("==========setMinHeight $value")
+    view.mHostView.sheetMinHeightSize = value.dpToPx()
+  }
+
+  override fun setTopLeftRightCornerRadius(view: SheetView, value: Double) {
+    println("==========setTopLeftRightCornerRadius $value")
+    view.topLeftRightCornerRadius = value.dpToPx()
+  }
+
+  override fun setIsSystemUILight(view: SheetView, value: Boolean) {
+    println("==========setIsSystemUILight $value")
+    view.isSystemUILight = value
+  }
+
+  override fun setPassScrollViewReactTag(view: SheetView, value: String?) {
+    println("==========setPassScrollViewReactTag $value")
+    value ?: return
+    val v = ReactFindViewUtil.findView(view, value) ?: return
     view.setNewNestedScrollView(v)
   }
 
-  override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
-    return MapBuilder.builder<String, Any>()
-      .put("onSheetDismiss", MapBuilder.of("registrationName", "onSheetDismiss"))
-      .build()
+  override fun setCalculatedHeight(view: SheetView, value: Double) {
+    println("==========setCalculatedHeight $value")
+    view.mHostView.setVirtualHeight(value.dpToPx())
   }
 
-  override fun onAfterUpdateTransaction(view: AppFittedSheet) {
+  override fun onAfterUpdateTransaction(view: SheetView) {
     super.onAfterUpdateTransaction(view)
+    println("==========onAfterUpdateTransaction")
     view.showOrUpdate()
+  }
+
+  companion object {
+    const val NAME = "SheetView"
   }
 }

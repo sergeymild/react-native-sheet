@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,28 +10,15 @@ import {
 } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 import { ContactList } from '../../components/contactList';
-import {
-  useSafeAreaFrame,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
 
 const Sim: React.FC = () => {
   return <ContactList count={50} />;
 };
 
 function useMaxHeight() {
-  const insets = useSafeAreaInsets();
-  const frame = useSafeAreaFrame();
-  console.log(
-    '[FittedSheet.useMaxHeight]',
-    insets,
-    frame,
-    Dimensions.get('window')
-  );
-
-  return Dimensions.get('window').height - insets.top - insets.bottom;
+  return Dimensions.get('window').height - (StatusBar.currentHeight ?? 0);
 }
 
 export const LoaderExample = () => {
