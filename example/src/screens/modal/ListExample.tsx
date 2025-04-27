@@ -1,12 +1,10 @@
 import { useCallback, useRef } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { FittedSheet } from 'react-native-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const ListExample = () => {
-  const insest = useSafeAreaInsets();
+export const ListExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
 
   const handlePresentPress = useCallback(() => {
@@ -15,8 +13,6 @@ const ListExample = () => {
   const handleDismissPress = useCallback(() => {
     bottomSheetRef.current?.hide();
   }, []);
-
-  console.log('[ListExample.ListExample]', insest.bottom, insest.top);
 
   // renders
   return (
@@ -30,8 +26,6 @@ const ListExample = () => {
           backgroundColor: 'white',
           maxLandscapeWidth: 560,
           maxPortraitWidth: 300,
-          maxHeight:
-            Dimensions.get('window').height - insest.bottom - insest.top,
           topLeftRightCornerRadius: 8,
         }}
       >

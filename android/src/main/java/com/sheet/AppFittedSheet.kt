@@ -48,6 +48,13 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   private val sheet: FragmentModalBottomSheet?
     get() = getCurrentActivity()?.supportFragmentManager?.findFragmentByTag(fragmentTag) as FragmentModalBottomSheet?
 
+  override fun setId(id: Int) {
+    super.setId(id)
+    println("👀 setId $id")
+    // Forward the ID to our content view, so event dispatching behaves correctly
+    mHostView.id = id
+  }
+
   fun showOrUpdate() {
     println("🥲 showOrUpdate")
     UiThreadUtil.assertOnUiThread()

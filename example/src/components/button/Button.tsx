@@ -17,7 +17,9 @@ const ButtonComponent = ({
   <TouchableOpacity
     style={style}
     onPress={onPress}
-    children={<Text children={label} style={labelStyle} />}
+    children={
+      <Text pointerEvents={'none'} children={label} style={labelStyle} />
+    }
   />
 );
 

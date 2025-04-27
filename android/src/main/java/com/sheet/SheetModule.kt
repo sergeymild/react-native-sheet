@@ -4,10 +4,6 @@ import android.view.ViewGroup
 import com.facebook.react.bridge.ReactApplicationContext
 
 class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(reactContext) {
-  override fun dismiss() {
-    println("__________- dismiss")
-  }
-
   override fun getTypedExportedConstants(): Map<String, Any> {
     return getInitialWindowMetrics()
   }

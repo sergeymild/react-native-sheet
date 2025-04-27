@@ -5,7 +5,7 @@ import { ContactItem } from '../../components/contactItem';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { FittedSheet } from 'react-native-sheet';
 
-const DetachedExample = () => {
+export const DetachedExample = () => {
   // refs
 
   const bottomSheetRef = useRef<FittedSheet>(null);

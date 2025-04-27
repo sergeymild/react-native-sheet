@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
 import { FittedSheet } from 'react-native-sheet';
 
-const DynamicSnapPointExample = () => {
+export const DynamicSnapPointExample = () => {
   // state
   const [count, setCount] = useState(0);
 
@@ -11,6 +11,7 @@ const DynamicSnapPointExample = () => {
 
   // callbacks
   const handleIncreaseContentPress = useCallback(() => {
+    console.log('[DynamicSnapPointExample.handleIncreaseContentPress]');
     setCount((state) => state + 1);
   }, []);
   const handleDecreaseContentPress = useCallback(() => {
@@ -19,9 +20,6 @@ const DynamicSnapPointExample = () => {
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
-  }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
   }, []);
 
   const emojiContainerStyle = useMemo(
@@ -36,7 +34,6 @@ const DynamicSnapPointExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
       <FittedSheet
         ref={bottomSheetRef}
         params={{
@@ -66,7 +63,11 @@ const DynamicSnapPointExample = () => {
           <View style={emojiContainerStyle}>
             <Text style={styles.emoji}>😍</Text>
           </View>
-          <Button label="Yes" onPress={handleIncreaseContentPress} />
+          <Button
+            label="Yes"
+            onPress={handleIncreaseContentPress}
+            style={{ height: 32, backgroundColor: 'red' }}
+          />
           <Button label="Maybe" onPress={handleDecreaseContentPress} />
         </View>
       </FittedSheet>

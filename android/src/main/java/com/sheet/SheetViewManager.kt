@@ -1,6 +1,7 @@
 package com.sheet
 
 import android.graphics.Color
+import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -32,9 +33,15 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
     return SheetView(context)
   }
 
-  override fun setBackgroundColor(view: SheetView, value: String?) {
+  override fun setSheetBackgroundColor(view: SheetView, value: Int?) {
     println("==========setBackgroundColor $value")
-    view._backgroundColor = Color.parseColor(value ?: "#ffffff")
+    value ?: return
+    view._backgroundColor = ColorPropConverter.getColor(view, view.context)
+  }
+
+  override fun dismissSheet(view: SheetView) {
+    println("==========dismissSheet")
+    view.dismiss()
   }
 
   override fun setDismissable(view: SheetView, value: Boolean) {

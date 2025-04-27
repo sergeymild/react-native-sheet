@@ -6,7 +6,7 @@ import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet';
 
-const KeyboardExample = () => {
+export const KeyboardExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
