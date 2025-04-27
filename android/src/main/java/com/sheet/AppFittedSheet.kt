@@ -15,6 +15,7 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.UIManagerHelper
+import com.facebook.react.uimanager.events.EventDispatcher
 
 fun Fragment.safeShow(
   manager: FragmentManager,
@@ -40,6 +41,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   var topLeftRightCornerRadius: Float = 0F
   var _backgroundColor: Int = Color.TRANSPARENT
   var isSystemUILight: Boolean = false
+
+  var eventDispatcher: EventDispatcher?
+    get() = mHostView.eventDispatcher
+    set(eventDispatcher) {
+      mHostView.eventDispatcher = eventDispatcher
+    }
 
   private fun getCurrentActivity(): AppCompatActivity? {
     return (context as? ReactContext)?.currentActivity as? AppCompatActivity

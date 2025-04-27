@@ -1,11 +1,11 @@
 package com.sheet
 
-import android.graphics.Color
 import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
 import com.facebook.react.uimanager.util.ReactFindViewUtil
@@ -91,6 +91,17 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
     println("==========onAfterUpdateTransaction")
     view.showOrUpdate()
   }
+
+  protected override fun addEventEmitters(
+    reactContext: ThemedReactContext,
+    view: SheetView
+  ) {
+    val dispatcher = UIManagerHelper.getEventDispatcherForReactTag(reactContext, view.id)
+    if (dispatcher != null) {
+      view.eventDispatcher = dispatcher
+    }
+  }
+
 
   companion object {
     const val NAME = "SheetView"

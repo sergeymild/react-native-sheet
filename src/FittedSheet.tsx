@@ -186,7 +186,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
-        style={{ width: maxWidth, position: 'absolute', zIndex: 100 }}
+        style={{ width: maxWidth, position: 'absolute' }}
         sheetBackgroundColor={processColor(
           this.props.params?.backgroundColor ?? 'white'
         )}
@@ -203,12 +203,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       >
         <View
           nativeID={'fitted-sheet-root-view'}
-          style={{
-            width: maxWidth,
-            maxHeight,
-            backgroundColor: 'red',
-            zIndex: 100,
-          }}
+          style={{ width: maxWidth, maxHeight }}
           onLayout={this.onLayout}
         >
           {this.props.children &&

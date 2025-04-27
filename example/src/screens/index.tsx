@@ -9,12 +9,18 @@ import { QueueExample } from './modal/QueueExample';
 import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
+import { ModalExample } from './modal/ModalExample';
 
 export const screens = [
   {
     name: 'Dynamic Snap Point',
     slug: 'Modal/DynamicSnapPointExample',
     getScreen: () => <DynamicSnapPointExample />,
+  },
+  {
+    name: 'ModalExample',
+    slug: 'Modal/ModalExample',
+    getScreen: () => <ModalExample />,
   },
   {
     name: 'Detached',

@@ -2,6 +2,7 @@ package com.sheet
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,6 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.JSPointerDispatcher
 import com.facebook.react.uimanager.JSTouchDispatcher
 import com.facebook.react.uimanager.RootView
-import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.events.EventDispatcher
 
 abstract class BaseRNView(context: Context?) : ViewGroup(context), RootView {
@@ -24,10 +24,7 @@ abstract class BaseRNView(context: Context?) : ViewGroup(context), RootView {
     jSPointerDispatcher = JSPointerDispatcher(this)
   }
 
-  private val eventDispatcher: EventDispatcher?
-    get() {
-      return UIManagerHelper.getEventDispatcherForReactTag(reactContext, getRnViewId())
-    }
+  internal var eventDispatcher: EventDispatcher? = null
 
   override fun handleException(t: Throwable) {
     reactContext.handleException(RuntimeException(t))
