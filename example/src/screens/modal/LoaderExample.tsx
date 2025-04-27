@@ -1,8 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Dimensions,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,12 +15,7 @@ const Sim: React.FC = () => {
   return <ContactList count={50} />;
 };
 
-function useMaxHeight() {
-  return Dimensions.get('window').height - (StatusBar.currentHeight ?? 0);
-}
-
 export const LoaderExample = () => {
-  const maxHeight = useMaxHeight();
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [isLoading, setLoading] = useState<-1 | 0 | 1>(-1);
 
@@ -33,11 +26,7 @@ export const LoaderExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <FittedSheet
-        ref={bottomSheetRef}
-        params={{ backgroundColor: 'white', maxHeight }}
-        onSheetDismiss={() => setLoading(-1)}
-      >
+      <FittedSheet ref={bottomSheetRef} onSheetDismiss={() => setLoading(-1)}>
         {isLoading === -1 &&
           ((
             <TouchableOpacity
@@ -72,7 +61,6 @@ export const LoaderExample = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 24,
   },
   contentContainerStyle: {

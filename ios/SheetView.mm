@@ -4,8 +4,10 @@
 #import <Sheet/EventEmitters.h>
 #import <Sheet/Props.h>
 #import <Sheet/RCTComponentViewHelpers.h>
+#import <React/RCTConversions.h>
 
 #import "RCTFabricComponentsPlugins.h"
+#import "Sheet-Swift.h"
 
 using namespace facebook::react;
 
@@ -14,12 +16,20 @@ using namespace facebook::react;
 @end
 
 @implementation SheetView {
-    UIView * _view;
+  HostFittedSheet * _view2;
+  UIView * _view;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
     return concreteComponentDescriptorProvider<SheetViewComponentDescriptor>();
+}
+
+- (std::shared_ptr<const SheetViewEventEmitter>)modalEventEmitter
+{
+  if (!_eventEmitter) return nullptr;
+  assert(std::dynamic_pointer_cast<const SheetViewEventEmitter>(_eventEmitter));
+  return std::static_pointer_cast<const SheetViewEventEmitter>(_eventEmitter);
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -29,8 +39,20 @@ using namespace facebook::react;
     _props = defaultProps;
 
     _view = [[UIView alloc] init];
+    _view2 = [[HostFittedSheet alloc] init];
+    
+    
+    
+    __weak SheetView *weakSelf = self;
+    _view2.onSheetDismiss = ^{
+      NSLog(@"😀  ---- onSheetDismiss");
+      auto eventEmitter = [weakSelf modalEventEmitter];
+      if (eventEmitter) {
+        eventEmitter->onSheetDismiss({});
+      }
+    };
 
-    self.contentView = _view;
+    self.contentView = _view2;
   }
 
   return self;
@@ -38,16 +60,45 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
+  NSLog(@"😀 updateProps");
     const auto &oldViewProps = *std::static_pointer_cast<SheetViewProps const>(_props);
     const auto &newViewProps = *std::static_pointer_cast<SheetViewProps const>(props);
-
+    
+  [_view2 setFittedSheetParams:@{
+    @"maxWidth": @(newViewProps.maxWidth),
+    @"dismissable": @(newViewProps.dismissable),
+    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius),
+    @"backgroundColor": RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor)
+  }];
+  NSLog(@"----- %f", newViewProps.calculatedHeight);
+  [_view2 setCalculatedHeight:newViewProps.calculatedHeight];
     
 
     [super updateProps:props oldProps:oldProps];
 }
 
-Class<RCTComponentViewProtocol> SheetViewCls(void)
-{
+- (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  NSLog(@"😀 mountChildComponentView");
+  [_view2 insertReactSubview:childComponentView atIndex:index];
+}
+
+- (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  NSLog(@"😀 unmountChildComponentView");
+  [_view2 removeReactSubview:childComponentView];
+}
+
+- (void)prepareForRecycle {
+  NSLog(@"😀 prepareForRecycle");
+  [super prepareForRecycle];
+  [_view2 destroy];
+}
+
+- (void)finalizeUpdates:(RNComponentViewUpdateMask)updateMask {
+  [super finalizeUpdates:updateMask];
+  [_view2 finalizeUpdates];
+}
+
+Class<RCTComponentViewProtocol> SheetViewCls(void) {
     return SheetView.class;
 }
 

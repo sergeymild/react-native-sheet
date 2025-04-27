@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/sergeymild/react-native-sheet.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
-  s.private_header_files = "ios/**/*.h"
-s.swift_version = '5.0'
+  s.public_header_files = 'ios/Sheet-Bridging-Header.h'
+  s.swift_version = '5.0'
 
   install_modules_dependencies(s)
 

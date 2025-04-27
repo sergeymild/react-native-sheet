@@ -1,4 +1,4 @@
-
+#import <React/RCTUtils.h>
 #import "SheetModule.h"
 #import "RCTTypeSafety/RCTTypedModuleConstants.h"
 
@@ -12,11 +12,12 @@ RCT_EXPORT_MODULE(Sheet)
 }
 
 - (ModuleConstants<JS::NativeSheet::Constants>)getConstants {
+  __block ModuleConstants<JS::NativeSheet::Constants> constants;
   
-  
-  ModuleConstants<JS::NativeSheet::Constants> constants;
-  constants = typedConstants<JS::NativeSheet::Constants>({
-    .insets = [[NSDictionary alloc] init]
+  RCTUnsafeExecuteOnMainQueueSync(^{
+    constants = typedConstants<JS::NativeSheet::Constants>({
+      .insets = @{@"top": @(RCTKeyWindow().safeAreaInsets.top), @"bottom": @(0)}
+    });
   });
   
 
@@ -24,7 +25,7 @@ RCT_EXPORT_MODULE(Sheet)
 }
 
 - (void)dismiss {
-  
+  NSLog(@"======== dismiss");
 }
 
 - (std::shared_ptr<TurboModule>)getTurboModule:(const ObjCTurboModule::InitParams &)params {

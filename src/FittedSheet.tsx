@@ -4,6 +4,7 @@ import {
   findNodeHandle,
   type LayoutChangeEvent,
   Platform,
+  processColor,
   StatusBar,
   View,
 } from 'react-native';
@@ -188,7 +189,9 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
         style={{ width: maxWidth, position: 'absolute' }}
-        backgroundColor={this.props.params?.backgroundColor ?? 'white'}
+        sheetBackgroundColor={processColor(
+          this.props.params?.backgroundColor ?? 'white'
+        )}
         dismissable={this.props.params?.dismissable ?? true}
         maxWidth={maxWidth}
         maxHeight={maxHeight}
