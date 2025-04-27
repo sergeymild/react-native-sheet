@@ -26,10 +26,6 @@
 
 namespace facebook::react {
   
-    static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_dismiss(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
-      return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, VoidKind, "dismiss", @selector(dismiss), args, count);
-    }
-
     static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_getConstants(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
       return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, ObjectKind, "getConstants", @selector(getConstants), args, count);
     }
@@ -37,9 +33,6 @@ namespace facebook::react {
   NativeSheetSpecJSI::NativeSheetSpecJSI(const ObjCTurboModule::InitParams &params)
     : ObjCTurboModule(params) {
       
-        methodMap_["dismiss"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_dismiss};
-        
-        
         methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_getConstants};
         
   }

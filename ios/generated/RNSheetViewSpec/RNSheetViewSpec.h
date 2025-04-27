@@ -61,7 +61,6 @@ namespace JS {
 }
 @protocol NativeSheetSpec <RCTBridgeModule, RCTTurboModule>
 
-- (void)dismiss;
 - (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)constantsToExport;
 - (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)getConstants;
 

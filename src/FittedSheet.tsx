@@ -1,7 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import {
   Dimensions,
-  findNodeHandle,
   type LayoutChangeEvent,
   Platform,
   processColor,
@@ -9,7 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import She from './SheetViewNativeComponent';
+import She, { Commands } from './SheetViewNativeComponent';
 import SheetModule from './NativeSheet';
 
 export const _FittedSheet = She;
@@ -97,9 +96,8 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
   hide = (passThroughParam?: any) => {
     if (!this.state.show) return;
     this.onHidePassThroughParam = passThroughParam;
-    const tag = findNodeHandle(this.sheetRef.current);
-    if (!tag) return;
-    SheetModule.dismiss();
+    console.log('[FittedSheet.hide]', Commands.dismissSheet);
+    Commands.dismissSheet(this.sheetRef.current);
   };
 
   // @ts-ignore

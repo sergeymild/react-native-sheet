@@ -24,8 +24,8 @@ RCT_EXPORT_MODULE(Sheet)
   return constants;
 }
 
-- (void)dismiss {
-  NSLog(@"======== dismiss");
+- (void)dismiss:(NSInteger)tag {
+  NSLog(@"😀 dismissModule %d", [[NSNumber alloc] initWithInt:tag].intValue);
 }
 
 - (std::shared_ptr<TurboModule>)getTurboModule:(const ObjCTurboModule::InitParams &)params {

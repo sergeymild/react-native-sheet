@@ -1,9 +1,14 @@
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import type { ProcessedColorValue, ViewProps } from 'react-native';
+import type {
+  HostComponent,
+  ProcessedColorValue,
+  ViewProps,
+} from 'react-native';
 import type {
   DirectEventHandler,
   Double,
 } from 'react-native/Libraries/Types/CodegenTypes';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 
 interface NativeProps extends ViewProps {
   dismissable: boolean;
@@ -19,3 +24,12 @@ interface NativeProps extends ViewProps {
 }
 
 export default codegenNativeComponent<NativeProps>('SheetView');
+
+type MyNativeViewType = HostComponent<NativeProps>;
+export interface NativeCommands {
+  dismissSheet: (viewRef: React.ElementRef<MyNativeViewType>) => void;
+}
+
+export const Commands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: ['dismissSheet'],
+});

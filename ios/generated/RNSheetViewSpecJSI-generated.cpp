@@ -11,12 +11,6 @@
 
 namespace facebook::react {
 
-static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_dismiss(jsi::Runtime &rt, TurboModule &turboModule, const jsi::Value* args, size_t count) {
-  static_cast<NativeSheetCxxSpecJSI *>(&turboModule)->dismiss(
-    rt
-  );
-  return jsi::Value::undefined();
-}
 static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_getConstants(jsi::Runtime &rt, TurboModule &turboModule, const jsi::Value* args, size_t count) {
   return static_cast<NativeSheetCxxSpecJSI *>(&turboModule)->getConstants(
     rt
@@ -25,7 +19,6 @@ static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_getConstants(jsi::Runtime
 
 NativeSheetCxxSpecJSI::NativeSheetCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker)
   : TurboModule("Sheet", jsInvoker) {
-  methodMap_["dismiss"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_dismiss};
   methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_getConstants};
 }
 

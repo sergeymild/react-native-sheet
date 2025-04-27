@@ -14,7 +14,31 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol RCTSheetViewViewProtocol <NSObject>
-
+- (void)dismissSheet;
 @end
+
+RCT_EXTERN inline void RCTSheetViewHandleCommand(
+  id<RCTSheetViewViewProtocol> componentView,
+  NSString const *commandName,
+  NSArray const *args)
+{
+  if ([commandName isEqualToString:@"dismissSheet"]) {
+#if RCT_DEBUG
+  if ([args count] != 0) {
+    RCTLogError(@"%@ command %@ received %d arguments, expected %d.", @"SheetView", commandName, (int)[args count], 0);
+    return;
+  }
+#endif
+
+  
+
+  [componentView dismissSheet];
+  return;
+}
+
+#if RCT_DEBUG
+  RCTLogError(@"%@ received command %@, which is not a supported command.", @"SheetView", commandName);
+#endif
+}
 
 NS_ASSUME_NONNULL_END

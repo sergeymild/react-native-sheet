@@ -1,17 +1,47 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { LoaderExample } from './screens/modal/LoaderExample';
-import { useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { screens } from './screens';
+
+const Stack = createNativeStackNavigator<any>();
+
+const Buttons = () => {
+  const nav = useNavigation();
+  return (
+    <>
+      <ScrollView>
+        {screens.map((screen, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              nav.navigate(screen.name);
+            }}
+          >
+            <Text children={screen.slug} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </>
+  );
+};
 
 export default function App() {
-  const [state, setState] = useState(0);
   return (
-    <View style={styles.container} key={444}>
-      {state === 0 && <LoaderExample />}
-      <TouchableOpacity
-        onPress={() => (state === 0 ? setState(1) : setState(0))}
-      >
-        <Text children={'Toggle'} />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name={'Buttons'} component={Buttons} />
+          {screens.map((s) => (
+            <Stack.Screen {...s} getComponent={s.getScreen} />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }
@@ -19,11 +49,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 100,
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+    flexGrow: 1,
   },
 });

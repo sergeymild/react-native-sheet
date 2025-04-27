@@ -98,6 +98,14 @@ using namespace facebook::react;
   [_view2 finalizeUpdates];
 }
 
+- (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args {
+  RCTSheetViewHandleCommand(self, commandName, args);
+}
+
+- (void)dismissSheet {
+  [_view2 dismiss];
+}
+
 Class<RCTComponentViewProtocol> SheetViewCls(void) {
     return SheetView.class;
 }

@@ -81,7 +81,7 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-    debugPrint("😀 insertReactSubview")
+    debugPrint("😀 insertReactSubview", subview.tag as Any)
     //super.insertReactSubview(subview, at: atIndex)
     _touchHandler = RCTSurfaceTouchHandler()
     _touchHandler?.attach(to: subview)
@@ -90,7 +90,7 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
-    debugPrint("😀 removeReactSubview")
+    debugPrint("😀 removeReactSubview", subview.tag as Any)
     //super.removeReactSubview(subview)
     _touchHandler?.detach(from: subview)
     _reactSubview?.removeFromSuperview()
@@ -114,17 +114,6 @@ public final class HostFittedSheet: UIView {
     } else {
       tryToPresent()
     }
-  }
-
-
-  public override func didMoveToSuperview() {
-    super.didMoveToSuperview()
-//    debugPrint("😀 didMoveToSuperview _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
-//    if _isPresented && superview == nil {
-//      destroy()
-//    } else {
-//      tryToPresent()
-//    }
   }
 
   // MARK: calculatedSize
@@ -188,6 +177,11 @@ public final class HostFittedSheet: UIView {
         }
       }
     }
+  }
+  
+  @objc
+  public func dismiss() {
+    _modalViewController?.dismiss(animated: true)
   }
 
   @objc

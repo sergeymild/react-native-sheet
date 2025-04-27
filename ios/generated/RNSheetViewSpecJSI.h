@@ -20,7 +20,6 @@ protected:
   NativeSheetCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
 
 public:
-  virtual void dismiss(jsi::Runtime &rt) = 0;
   virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
 
 };
@@ -52,14 +51,6 @@ private:
 
     }
 
-    void dismiss(jsi::Runtime &rt) override {
-      static_assert(
-          bridging::getParameterCount(&T::dismiss) == 1,
-          "Expected dismiss(...) to have 1 parameters");
-
-      return bridging::callFromJs<void>(
-          rt, &T::dismiss, jsInvoker_, instance_);
-    }
     jsi::Object getConstants(jsi::Runtime &rt) override {
       static_assert(
           bridging::getParameterCount(&T::getConstants) == 1,
