@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet",
-  "version": "0.1.0",
+  "version": "6.1.0",
   "description": "F",
   "source": "./src/index.tsx",
   "main": "./lib/module/index.js",
@@ -78,7 +78,7 @@
     "prettier": "^3.0.3",
     "react": "19.0.0",
     "react-native": "0.78.2",
-    "react-native-builder-bob": "^0.40.6",
+    "react-native-builder-bob": "0.39.1",
     "release-it": "^17.10.0",
     "turbo": "^1.10.7",
     "typescript": "^5.2.2"

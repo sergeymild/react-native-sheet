@@ -147,6 +147,10 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
     return Dimensions.get('screen');
   }
 
+  private _shouldSetResponder(): boolean {
+    return true;
+  }
+
   render() {
     if (!this.state.show) return null;
     console.log('[FittedSheet.render.insets]', this.insets());
@@ -186,6 +190,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
+        onStartShouldSetResponder={this._shouldSetResponder}
         style={{ width: maxWidth, position: 'absolute' }}
         sheetBackgroundColor={processColor(
           this.props.params?.backgroundColor ?? 'white'
@@ -203,7 +208,10 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       >
         <View
           nativeID={'fitted-sheet-root-view'}
-          style={{ width: maxWidth, maxHeight }}
+          style={{
+            width: maxWidth,
+            maxHeight,
+          }}
           onLayout={this.onLayout}
         >
           {this.props.children &&

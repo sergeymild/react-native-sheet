@@ -91,7 +91,7 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   }
 
   @RequiresApi(Build.VERSION_CODES.M)
-  override fun dispatchProvideStructure(structure: ViewStructure?) {
+  override fun dispatchProvideStructure(structure: ViewStructure) {
     mHostView.dispatchProvideStructure(structure)
   }
 

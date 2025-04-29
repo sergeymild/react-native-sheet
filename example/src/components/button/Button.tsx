@@ -15,11 +15,15 @@ const ButtonComponent = ({
   onPress,
 }: ButtonProps) => (
   <TouchableOpacity
-    style={style}
+    style={[style, { height: 30, borderBottomWidth: 1 }]}
     onPress={onPress}
-    children={
-      <Text pointerEvents={'none'} children={label} style={labelStyle} />
-    }
+    onPressIn={() => {
+      console.log('[Button.onPressIn]');
+    }}
+    onPressOut={() => {
+      console.log('[Button.onPressOut]');
+    }}
+    children={<Text children={label} style={labelStyle} />}
   />
 );
 

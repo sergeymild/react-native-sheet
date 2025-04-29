@@ -72,7 +72,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   override fun addView(child: View, index: Int, params: LayoutParams) {
     println("😀 DialogRootViewGroup.addView ${child.id}")
     if (reactView != null) removeView(reactView)
-    super.addView(child, -1, params)
+    super.addView(child, index, params)
     reactView = child
     setVirtualHeight(sheetMaxHeightSize)
   }
