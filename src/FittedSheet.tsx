@@ -84,12 +84,14 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
   };
 
   onLayout = (e: LayoutChangeEvent) => {
-    console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
+    if (__DEV__)
+      console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
     this.setState({ height: e.nativeEvent.layout.height });
   };
 
   passScrollViewReactTag = (nativeId: string) => {
-    console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
+    if (__DEV__)
+      console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
     this.setState({ passScrollViewReactTag: nativeId });
   };
   hide = (passThroughParam?: any) => {
@@ -101,7 +103,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
 
   // @ts-ignore
   private onDismiss = () => {
-    console.log('[FittedSheet.onDismiss]');
+    if (__DEV__) console.log('[FittedSheet.onDismiss]');
     if (this.shouldShowBack) {
       this.setState({ show: false, height: undefined }, () =>
         this.show(this.state.data)
@@ -120,7 +122,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentDidMount() {
-    console.log('[FittedSheet.componentDidMount]', this.insets());
+    if (__DEV__) console.log('[FittedSheet.componentDidMount]', this.insets());
     this.cleanup = Dimensions.addEventListener('change', () => {
       if (!this.state.show) return;
       if (this.shouldShowBack) return;
@@ -133,7 +135,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentWillUnmount() {
-    console.log('[FittedSheet.componentWillUnmount]');
+    if (__DEV__) console.log('[FittedSheet.componentWillUnmount]');
     this.hide();
     this.cleanup?.();
     this.cleanup = undefined;
@@ -152,10 +154,8 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
 
   render() {
     if (!this.state.show) return null;
-    console.log('[FittedSheet.render.insets]', this.insets());
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
-      // dim.height - (StatusBar.currentHeight ?? 56)
       this.dimensions.height - this.insets().top - this.insets().bottom
     );
 
@@ -177,14 +177,17 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
       nativeHeight = Math.min(nativeHeight, maxHeight);
     }
 
-    console.log('[FittedSheet.render]', {
-      maxHeight,
-      maxWidth,
-      nativeHeight,
-      h: Dimensions.get('window').height,
-      sb: StatusBar.currentHeight,
-      dim: this.dimensions.width,
-    });
+    if (__DEV__) {
+      console.log('[FittedSheet.render]', {
+        maxHeight,
+        maxWidth,
+        nativeHeight,
+        h: Dimensions.get('window').height,
+        sb: StatusBar.currentHeight,
+        dim: this.dimensions.width,
+      });
+    }
+    const background = this.props?.params?.backgroundColor ?? 'white';
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
@@ -207,7 +210,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
           style={{
             width: maxWidth,
             maxHeight,
-            backgroundColor: this.props.params?.backgroundColor ?? 'white',
+            backgroundColor: background,
           }}
           onLayout={this.onLayout}
         >

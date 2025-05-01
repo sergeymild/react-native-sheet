@@ -24,7 +24,6 @@ public final class HostFittedSheet: UIView {
   public var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
-
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
   }
@@ -40,7 +39,7 @@ public final class HostFittedSheet: UIView {
     _alertWindow?.windowLevel = UIWindow.Level.alert
     _alertWindow?.isHidden = false
     _alertWindow?.makeKeyAndVisible()
-    
+
     presentViewController = controller
   }
 
@@ -69,7 +68,7 @@ public final class HostFittedSheet: UIView {
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
   }
-  
+
   public override init(frame: CGRect) {
     super.init(frame: frame)
   }
@@ -176,7 +175,7 @@ public final class HostFittedSheet: UIView {
       }
     }
   }
-  
+
   @objc
   public func dismiss() {
     _modalViewController?.dismiss(animated: true)

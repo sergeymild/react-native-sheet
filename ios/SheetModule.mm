@@ -16,7 +16,10 @@ RCT_EXPORT_MODULE(Sheet)
   
   RCTUnsafeExecuteOnMainQueueSync(^{
     constants = typedConstants<JS::NativeSheet::Constants>({
-      .insets = @{@"top": @(RCTKeyWindow().safeAreaInsets.top), @"bottom": @(0)}
+      .insets = @{
+        @"top": @(RCTKeyWindow().safeAreaInsets.top),
+        @"bottom": @(RCTKeyWindow().safeAreaInsets.bottom)
+      }
     });
   });
   

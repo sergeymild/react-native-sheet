@@ -81,7 +81,6 @@ internal fun getSafeAreaInsets(view: View): EdgeInsets? {
       left = max(windowInsets.left - visibleRect.left, 0f))
 }
 
-
 internal fun edgeInsetsToJavaMap(insets: EdgeInsets): Map<String, Float> {
   return mapOf(
     "top" to insets.top.pxToDp(),
