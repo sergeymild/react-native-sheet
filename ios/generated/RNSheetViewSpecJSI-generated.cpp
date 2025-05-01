@@ -16,10 +16,16 @@ static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_getConstants(jsi::Runtime
     rt
   );
 }
+static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_viewportSize(jsi::Runtime &rt, TurboModule &turboModule, const jsi::Value* args, size_t count) {
+  return static_cast<NativeSheetCxxSpecJSI *>(&turboModule)->viewportSize(
+    rt
+  );
+}
 
 NativeSheetCxxSpecJSI::NativeSheetCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker)
   : TurboModule("Sheet", jsInvoker) {
   methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_getConstants};
+  methodMap_["viewportSize"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_viewportSize};
 }
 
 

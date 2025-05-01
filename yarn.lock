@@ -1829,16 +1829,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@evilmartians/lefthook@npm:^1.5.0":
-  version: 1.11.12
-  resolution: "@evilmartians/lefthook@npm:1.11.12"
-  bin:
-    lefthook: bin/index.js
-  checksum: 11419c0a4564ef27d42c231a47676454edbef9679d3140be80862145c03e84ffdb576ab5ff51fd86a337c67b8397101321a90a0d3712531409362d6ed437ac02
-  conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=arm64 | cpu=ia32)
-  languageName: node
-  linkType: hard
-
 "@hapi/hoek@npm:^9.0.0, @hapi/hoek@npm:^9.3.0":
   version: 9.3.0
   resolution: "@hapi/hoek@npm:9.3.0"
@@ -11393,7 +11383,6 @@ __metadata:
     "@eslint/compat": ^1.2.7
     "@eslint/eslintrc": ^3.3.0
     "@eslint/js": ^9.22.0
-    "@evilmartians/lefthook": ^1.5.0
     "@react-native-community/cli": 15.0.1
     "@react-native/eslint-config": ^0.78.0
     "@release-it/conventional-changelog": ^9.0.2

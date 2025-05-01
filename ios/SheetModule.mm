@@ -18,13 +18,23 @@ RCT_EXPORT_MODULE(Sheet)
     constants = typedConstants<JS::NativeSheet::Constants>({
       .insets = @{
         @"top": @(RCTKeyWindow().safeAreaInsets.top),
-        @"bottom": @(RCTKeyWindow().safeAreaInsets.bottom)
+        @"bottom": @(0)
       }
     });
   });
   
 
   return constants;
+}
+
+- (NSDictionary *)viewportSize {
+  NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:2];
+  RCTUnsafeExecuteOnMainQueueSync(^{
+    auto size = RCTViewportSize();
+    dict[@"width"] = @(size.width);
+    dict[@"height"] = @(size.height);
+  });
+  return dict;
 }
 
 - (void)dismiss:(NSInteger)tag {

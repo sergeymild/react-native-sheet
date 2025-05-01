@@ -21,6 +21,7 @@ protected:
 
 public:
   virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
+  virtual jsi::Object viewportSize(jsi::Runtime &rt) = 0;
 
 };
 
@@ -58,6 +59,14 @@ private:
 
       return bridging::callFromJs<jsi::Object>(
           rt, &T::getConstants, jsInvoker_, instance_);
+    }
+    jsi::Object viewportSize(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::viewportSize) == 1,
+          "Expected viewportSize(...) to have 1 parameters");
+
+      return bridging::callFromJs<jsi::Object>(
+          rt, &T::viewportSize, jsInvoker_, instance_);
     }
 
   private:

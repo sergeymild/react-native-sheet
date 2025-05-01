@@ -26,6 +26,10 @@
 
 namespace facebook::react {
   
+    static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_viewportSize(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
+      return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, ObjectKind, "viewportSize", @selector(viewportSize), args, count);
+    }
+
     static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_getConstants(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
       return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, ObjectKind, "getConstants", @selector(getConstants), args, count);
     }
@@ -33,6 +37,9 @@ namespace facebook::react {
   NativeSheetSpecJSI::NativeSheetSpecJSI(const ObjCTurboModule::InitParams &params)
     : ObjCTurboModule(params) {
       
+        methodMap_["viewportSize"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_viewportSize};
+        
+        
         methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_getConstants};
         
   }

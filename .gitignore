@@ -22,6 +22,7 @@ build/
 !default.perspectivev3
 xcuserdata
 *.xccheckout
+example/android/.kotlin
 *.moved-aside
 DerivedData
 *.hmap

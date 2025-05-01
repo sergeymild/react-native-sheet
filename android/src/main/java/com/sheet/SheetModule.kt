@@ -1,7 +1,9 @@
 package com.sheet
 
 import android.view.ViewGroup
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.WritableMap
 
 class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(reactContext) {
   override fun getTypedExportedConstants(): Map<String, Any> {
@@ -14,5 +16,9 @@ class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(react
     return if (insets == null) {
       emptyMap()
     } else mapOf("insets" to edgeInsetsToJavaMap(insets))
+  }
+
+  override fun viewportSize(): WritableMap {
+    return Arguments.createMap()
   }
 }

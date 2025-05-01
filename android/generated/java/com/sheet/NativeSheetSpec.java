@@ -16,6 +16,7 @@ import com.facebook.proguard.annotations.DoNotStrip;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.turbomodule.core.interfaces.TurboModule;
 import java.util.Arrays;
@@ -62,4 +63,8 @@ public abstract class NativeSheetSpec extends ReactContextBaseJavaModule impleme
     }
     return constants;
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  @DoNotStrip
+  public abstract WritableMap viewportSize();
 }

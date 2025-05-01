@@ -143,7 +143,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
 
   private viewportSize(): { width: number; height: number } {
     if (Platform.OS === 'ios') {
-      //return SheetModule.viewportSize();
+      return SheetModule.viewportSize();
     }
     return Dimensions.get('screen');
   }

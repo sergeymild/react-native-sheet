@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet",
-  "version": "6.1.4",
+  "version": "6.1.5",
   "description": "Native implementation of Bottom sheet",
   "main": "src/index",
   "module": "src/index",
@@ -57,7 +57,6 @@
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.0",
     "@eslint/js": "^9.22.0",
-    "@evilmartians/lefthook": "^1.5.0",
     "@react-native-community/cli": "15.0.1",
     "@react-native/eslint-config": "^0.78.0",
     "@release-it/conventional-changelog": "^9.0.2",

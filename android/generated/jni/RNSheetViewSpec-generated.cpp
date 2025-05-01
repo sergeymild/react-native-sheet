@@ -17,9 +17,15 @@ static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_getConstants(faceb
   return static_cast<JavaTurboModule &>(turboModule).invokeJavaMethod(rt, ObjectKind, "getConstants", "()Ljava/util/Map;", args, count, cachedMethodId);
 }
 
+static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_viewportSize(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
+  static jmethodID cachedMethodId = nullptr;
+  return static_cast<JavaTurboModule &>(turboModule).invokeJavaMethod(rt, ObjectKind, "viewportSize", "()Lcom/facebook/react/bridge/WritableMap;", args, count, cachedMethodId);
+}
+
 NativeSheetSpecJSI::NativeSheetSpecJSI(const JavaTurboModule::InitParams &params)
   : JavaTurboModule(params) {
   methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_getConstants};
+  methodMap_["viewportSize"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_viewportSize};
 }
 
 std::shared_ptr<TurboModule> RNSheetViewSpec_ModuleProvider(const std::string &moduleName, const JavaTurboModule::InitParams &params) {
