@@ -35,12 +35,6 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
     return SheetView(context)
   }
 
-  override fun setSheetBackgroundColor(view: SheetView, value: Int?) {
-    println("==========setBackgroundColor $value")
-    value ?: return
-    view._backgroundColor = ColorPropConverter.getColor(view, view.context)
-  }
-
   override fun dismissSheet(view: SheetView) {
     println("==========dismissSheet")
     view.dismiss()

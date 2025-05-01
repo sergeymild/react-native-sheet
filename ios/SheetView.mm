@@ -7,7 +7,7 @@
 #import <React/RCTConversions.h>
 
 #import "RCTFabricComponentsPlugins.h"
-#import "Sheet-Swift.h"
+#import <Sheet/Sheet-Swift.h>
 
 using namespace facebook::react;
 
@@ -67,8 +67,7 @@ using namespace facebook::react;
   [_view2 setFittedSheetParams:@{
     @"maxWidth": @(newViewProps.maxWidth),
     @"dismissable": @(newViewProps.dismissable),
-    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius),
-    @"backgroundColor": RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor)
+    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
   }];
   NSLog(@"----- %f", newViewProps.calculatedHeight);
   [_view2 setCalculatedHeight:newViewProps.calculatedHeight];

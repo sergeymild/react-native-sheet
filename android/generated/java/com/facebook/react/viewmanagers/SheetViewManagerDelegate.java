@@ -11,7 +11,6 @@ package com.facebook.react.viewmanagers;
 
 import android.view.View;
 import androidx.annotation.Nullable;
-import com.facebook.react.bridge.ColorPropConverter;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.BaseViewManager;
 import com.facebook.react.uimanager.BaseViewManagerDelegate;
@@ -41,9 +40,6 @@ public class SheetViewManagerDelegate<T extends View, U extends BaseViewManager<
         break;
       case "topLeftRightCornerRadius":
         mViewManager.setTopLeftRightCornerRadius(view, value == null ? 0f : ((Double) value).doubleValue());
-        break;
-      case "sheetBackgroundColor":
-        mViewManager.setSheetBackgroundColor(view, ColorPropConverter.getColor(value, view.getContext()));
         break;
       case "isSystemUILight":
         mViewManager.setIsSystemUILight(view, value == null ? false : (boolean) value);

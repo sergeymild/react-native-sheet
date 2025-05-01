@@ -3,7 +3,6 @@ import {
   Dimensions,
   type LayoutChangeEvent,
   Platform,
-  processColor,
   StatusBar,
   View,
 } from 'react-native';
@@ -192,10 +191,6 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
         ref={this.sheetRef}
         onStartShouldSetResponder={this._shouldSetResponder}
         style={{ width: maxWidth, position: 'absolute' }}
-        sheetBackgroundColor={
-          processColor(this.props.params?.backgroundColor ?? 'white') ??
-          undefined
-        }
         dismissable={this.props.params?.dismissable ?? true}
         maxWidth={maxWidth}
         maxHeight={maxHeight}
@@ -212,6 +207,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
           style={{
             width: maxWidth,
             maxHeight,
+            backgroundColor: this.props.params?.backgroundColor ?? 'white',
           }}
           onLayout={this.onLayout}
         >

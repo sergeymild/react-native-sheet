@@ -1,6 +1,6 @@
 {
   "name": "react-native-sheet",
-  "version": "6.1.3",
+  "version": "6.1.4",
   "description": "F",
   "source": "./src/index.tsx",
   "main": "./src/index.tsx",

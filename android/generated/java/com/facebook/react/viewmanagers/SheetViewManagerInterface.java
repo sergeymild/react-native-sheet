@@ -20,7 +20,6 @@ public interface SheetViewManagerInterface<T extends View> extends ViewManagerWi
   void setMinHeight(T view, double value);
   void setCalculatedHeight(T view, double value);
   void setTopLeftRightCornerRadius(T view, double value);
-  void setSheetBackgroundColor(T view, @Nullable Integer value);
   void setIsSystemUILight(T view, boolean value);
   void setPassScrollViewReactTag(T view, @Nullable String value);
   void dismissSheet(T view);

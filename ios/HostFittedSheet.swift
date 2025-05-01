@@ -24,7 +24,6 @@ public final class HostFittedSheet: UIView {
   public var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
-  private var sheetBackgroundColor: UIColor?
 
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
@@ -69,7 +68,6 @@ public final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
-    sheetBackgroundColor = params["backgroundColor"] as? UIColor
   }
   
   public override init(frame: CGRect) {
@@ -141,7 +139,7 @@ public final class HostFittedSheet: UIView {
     self._modalViewController?.autoAdjustToKeyboard = false
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
-    self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
+    self._modalViewController?.contentBackgroundColor = .clear
   }
 
   private func tryAttachScrollView() {

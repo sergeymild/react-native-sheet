@@ -1,9 +1,5 @@
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import type {
-  HostComponent,
-  ProcessedColorValue,
-  ViewProps,
-} from 'react-native';
+import type { HostComponent, ViewProps } from 'react-native';
 import type {
   DirectEventHandler,
   Double,
@@ -17,7 +13,6 @@ interface NativeProps extends ViewProps {
   minHeight?: Double;
   calculatedHeight?: Double;
   topLeftRightCornerRadius?: Double;
-  sheetBackgroundColor?: ProcessedColorValue;
   isSystemUILight: boolean;
   passScrollViewReactTag?: string;
   onSheetDismiss: DirectEventHandler<null>;

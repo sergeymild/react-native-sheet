@@ -25,7 +25,6 @@ SheetViewProps::SheetViewProps(
     minHeight(convertRawProp(context, rawProps, "minHeight", sourceProps.minHeight, {0.0})),
     calculatedHeight(convertRawProp(context, rawProps, "calculatedHeight", sourceProps.calculatedHeight, {0.0})),
     topLeftRightCornerRadius(convertRawProp(context, rawProps, "topLeftRightCornerRadius", sourceProps.topLeftRightCornerRadius, {0.0})),
-    sheetBackgroundColor(convertRawProp(context, rawProps, "sheetBackgroundColor", sourceProps.sheetBackgroundColor, {})),
     isSystemUILight(convertRawProp(context, rawProps, "isSystemUILight", sourceProps.isSystemUILight, {false})),
     passScrollViewReactTag(convertRawProp(context, rawProps, "passScrollViewReactTag", sourceProps.passScrollViewReactTag, {}))
       {}
