@@ -69,7 +69,7 @@ public final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
-    sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])
+    sheetBackgroundColor = params["backgroundColor"] as? UIColor
   }
   
   public override init(frame: CGRect) {

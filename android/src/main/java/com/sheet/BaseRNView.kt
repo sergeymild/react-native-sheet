@@ -2,14 +2,11 @@ package com.sheet
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.UiThread
 import com.facebook.react.bridge.GuardedRunnable
-import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.config.ReactFeatureFlags
@@ -23,11 +20,9 @@ import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
 import com.facebook.react.views.view.ReactViewGroup
 
-abstract class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
+open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
   internal var stateWrapper: StateWrapper? = null
   internal var eventDispatcher: EventDispatcher? = null
-
-  abstract fun getRnViewId(): Int
 
   private var viewWidth = 0
   private var viewHeight = 0

@@ -5,10 +5,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { screens } from './screens';
-import { useEffect, useState } from 'react';
 
-const Buttons = (props: { onSelect: (name: string) => void }) => {
+const Stack = createNativeStackNavigator<any>();
+
+const Buttons = () => {
+  const nav = useNavigation();
   return (
     <>
       <ScrollView>
@@ -16,7 +20,7 @@ const Buttons = (props: { onSelect: (name: string) => void }) => {
           <TouchableOpacity
             key={index}
             onPress={() => {
-              props.onSelect(screen.name);
+              nav.navigate(screen.name);
             }}
           >
             <Text children={screen.slug} />
@@ -28,16 +32,16 @@ const Buttons = (props: { onSelect: (name: string) => void }) => {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState<string | undefined>(undefined);
   return (
     <View style={styles.container}>
-      <Buttons onSelect={setScreen} />
-      {!!screen && (
-        <View
-          style={{ flex: 1 }}
-          children={screens.find((s) => s.name === screen)?.getScreen()}
-        />
-      )}
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name={'Buttons'} component={Buttons} />
+          {screens.map((s) => (
+            <Stack.Screen {...s} component={s.getScreen()} key={s.slug} />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }
@@ -45,7 +49,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 100,
     flexGrow: 1,
   },
 });

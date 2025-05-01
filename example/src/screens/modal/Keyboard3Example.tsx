@@ -1,12 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet';
 
-export const Keyboard2Example = () => {
+export const Keyboard3Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
@@ -32,6 +32,14 @@ export const Keyboard2Example = () => {
           setCount(2);
         }}
       >
+        <View style={{ minHeight: 50 }}>
+          <Text>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Esse
+            necessitatibus non quod rem! Aperiam architecto, aut dicta
+            dignissimos dolor doloribus fuga harum ipsum laudantium odio, qui
+            rerum sed, sequi tempora!
+          </Text>
+        </View>
         <ContactList count={count} />
         <TextInput style={{ height: 56, backgroundColor: 'yellow' }} />
         <KeyboardSpacer

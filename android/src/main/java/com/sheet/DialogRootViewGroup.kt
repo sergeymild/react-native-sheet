@@ -22,10 +22,6 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
 
   private val metrics: Resources by lazy { Resources.getSystem() }
 
-  override fun getRnViewId(): Int {
-    return reactView?.id ?: -1
-  }
-
   fun setCornerRadius(r: Float) {
     setOutlineProvider(object : ViewOutlineProvider() {
       override fun getOutline(view: View, outline: Outline) {
