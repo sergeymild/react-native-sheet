@@ -1,19 +1,15 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, TextInput, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet2';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const Keyboard2Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
-  const insets = useSafeAreaInsets();
-  const maxHeight =
-    Dimensions.get('window').height - insets.top - insets.bottom;
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
@@ -31,7 +27,6 @@ export const Keyboard2Example = () => {
 
       <FittedSheet
         ref={bottomSheetRef}
-        params={{ maxHeight }}
         onSheetDismiss={() => {
           setKH(0);
           setCount(2);

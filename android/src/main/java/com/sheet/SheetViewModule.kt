@@ -1,6 +1,7 @@
 package com.sheet
 
 import android.util.Log
+import android.view.ViewGroup
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -29,6 +30,18 @@ class SheetViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
     return null
+  }
+
+  override fun getConstants(): Map<String, Any> {
+    return getInitialWindowMetrics()
+  }
+
+  private fun getInitialWindowMetrics(): Map<String, Any> {
+    val decorView = reactApplicationContext.currentActivity?.window?.decorView as ViewGroup? ?: return emptyMap()
+    val insets = getSafeAreaInsets(decorView)
+    return if (insets == null) {
+      emptyMap()
+    } else mapOf("insets" to edgeInsetsToJavaMap(insets))
   }
 
   @ReactMethod
