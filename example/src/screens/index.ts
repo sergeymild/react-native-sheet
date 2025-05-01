@@ -1,68 +1,69 @@
+import { LoaderExample } from './modal/LoaderExample';
+import { SimpleExample } from './modal/SimpleExample';
+import ListExample from './modal/ListExample';
+import { List2Example } from './modal/List2Example';
+import KeyboardExample from './modal/KeyboardExample';
+import { Keyboard2Example } from './modal/Keyboard2Example';
+import { PropsExample } from './modal/PropsExample';
+import { QueueExample } from './modal/QueueExample';
+import { DismissPreventExample } from './modal/DismissPreventExample';
+import DetachedExample from './modal/DetachedExample';
+import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
+
 export const screens = [
   {
-    title: 'Modal',
-    data: [
-      {
-        name: 'Dynamic Snap Point',
-        slug: 'Modal/DynamicSnapPointExample',
-        getScreen: () => require('./modal/DynamicSnapPointExample').default,
-      },
-      {
-        name: 'Detached',
-        slug: 'Modal/DetachedExample',
-        getScreen: () => require('./modal/DetachedExample').default,
-      },
-      {
-        name: 'Simple',
-        slug: 'Modal/DetachedExample2',
-        getScreen: () => require('./modal/SimpleExample').SimpleExample,
-      },
-      {
-        name: 'LoaderExample',
-        slug: 'Modal/LoaderExample',
-        getScreen: () => require('./modal/LoaderExample').LoaderExample,
-      },
-      {
-        name: 'ListExample',
-        slug: 'Modal/ListExample3',
-        getScreen: () => require('./modal/ListExample').default,
-      },
-      {
-        name: 'List2Example',
-        slug: 'Modal/List2Example',
-        getScreen: () => require('./modal/List2Example').List2Example,
-      },
-      {
-        name: 'KeyboardExample',
-        slug: 'Modal/KeyboardExample',
-        getScreen: () => require('./modal/KeyboardExample').default,
-      },
-      {
-        name: 'Keyboard2Example',
-        slug: 'Modal/Keyboard2Example',
-        getScreen: () => require('./modal/Keyboard2Example').default,
-      },
-      {
-        name: 'PropsExample',
-        slug: 'Modal/PropsExample',
-        getScreen: () => require('./modal/PropsExample').PropsExample,
-      },
-      {
-        name: 'QueueExample',
-        slug: 'Modal/QueueExample',
-        getScreen: () => require('./modal/QueueExample').QueueExample,
-      },
-      {
-        name: 'DismissPreventExample',
-        slug: 'Modal/DismissPreventExample',
-        getScreen: () =>
-          require('./modal/DismissPreventExample').DismissPreventExample,
-      },
-      {
-        name: 'TabsExample',
-        slug: 'Modal/TabsExample',
-        getScreen: () => require('./modal/TabsExample').TabsExample,
-      },
-    ],
+    name: 'Dynamic Snap Point',
+    slug: 'Modal/DynamicSnapPointExample',
+    getScreen: () => DynamicSnapPointExample,
+  },
+  {
+    name: 'Detached',
+    slug: 'Modal/DetachedExample',
+    getScreen: () => DetachedExample,
+  },
+  {
+    name: 'Simple',
+    slug: 'Modal/DetachedExample2',
+    getScreen: () => SimpleExample,
+  },
+  {
+    name: 'LoaderExample',
+    slug: 'Modal/LoaderExample',
+    getScreen: () => LoaderExample,
+  },
+  {
+    name: 'ListExample',
+    slug: 'Modal/ListExample3',
+    getScreen: () => ListExample,
+  },
+  {
+    name: 'List2Example',
+    slug: 'Modal/List2Example',
+    getScreen: () => List2Example,
+  },
+  {
+    name: 'KeyboardExample',
+    slug: 'Modal/KeyboardExample',
+    getScreen: () => KeyboardExample,
+  },
+  {
+    name: 'Keyboard2Example',
+    slug: 'Modal/Keyboard2Example',
+    getScreen: () => Keyboard2Example,
+  },
+  {
+    name: 'PropsExample',
+    slug: 'Modal/PropsExample',
+    getScreen: () => PropsExample,
+  },
+  {
+    name: 'QueueExample',
+    slug: 'Modal/QueueExample',
+    getScreen: () => QueueExample,
+  },
+  {
+    name: 'DismissPreventExample',
+    slug: 'Modal/DismissPreventExample',
+    getScreen: () => DismissPreventExample,
   },
 ];

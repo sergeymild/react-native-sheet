@@ -42,6 +42,15 @@ class SheetViewManager: RCTViewManager {
     return ["width": size.width, "height": size.height]
   }
   
+  override func constantsToExport() -> [AnyHashable : Any]! {
+    var constants: [AnyHashable : Any] = [:]
+    constants["insets"] = [
+      "top": RCTKeyWindow()?.safeAreaInsets.top ?? 0,
+      "bottom": 0
+    ]
+    return constants
+  }
+  
   deinit {
     debugPrint("😀 deinit view manager")
   }
@@ -69,7 +78,6 @@ final class HostFittedSheet: UIView {
   private var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
-  private var sheetBackgroundColor: UIColor?
   
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
@@ -105,7 +113,6 @@ final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
-    sheetBackgroundColor = RCTConvert.uiColor(params["backgroundColor"])
   }
   
   init(bridge: RCTBridge) {
@@ -175,7 +182,7 @@ final class HostFittedSheet: UIView {
     self._modalViewController?.autoAdjustToKeyboard = false
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
-    self._modalViewController?.contentBackgroundColor = self.sheetBackgroundColor ?? .clear
+    self._modalViewController?.contentBackgroundColor = .clear
   }
   
   private func tryAttachScrollView() {

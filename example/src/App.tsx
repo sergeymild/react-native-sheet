@@ -1,24 +1,48 @@
-import * as React from 'react';
-
-import { StyleSheet, View } from 'react-native';
-import { ShowcaseApp } from '@gorhom/showcase-template';
+import React from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { screens } from './screens';
 
-const author = {
-  username: 'SergeyMild',
-  url: 'https://github.com/sergeymild',
+const Stack = createNativeStackNavigator<any>();
+
+const Buttons = () => {
+  const nav = useNavigation();
+  return (
+    <>
+      <ScrollView>
+        {screens.map((screen, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              nav.navigate(screen.name);
+            }}
+          >
+            <Text children={screen.slug} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </>
+  );
 };
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <ShowcaseApp
-        name="Bottom Sheet"
-        description={''}
-        version={'0.0'}
-        author={author}
-        data={screens}
-      />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name={'Buttons'} component={Buttons} />
+          {screens.map((s) => (
+            <Stack.Screen {...s} component={s.getScreen()} key={s.slug} />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
     </View>
   );
 }

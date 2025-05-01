@@ -42,8 +42,6 @@ const DynamicSnapPointExample = () => {
         params={{
           maxLandscapeWidth: 400,
           topLeftRightCornerRadius: 20,
-          maxPortraitWidth: 350,
-          isStatusBarBgLight: false,
         }}
         onSheetDismiss={() => setCount(0)}
       >

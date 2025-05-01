@@ -7,7 +7,7 @@ import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet2';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const KeyboardExample = () => {
+export const Keyboard2Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
@@ -65,5 +65,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
-
-export default KeyboardExample;
