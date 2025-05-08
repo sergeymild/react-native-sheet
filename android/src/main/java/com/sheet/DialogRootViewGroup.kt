@@ -3,6 +3,7 @@ package com.sheet
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Outline
+import android.os.Looper
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.appcompat.app.AppCompatActivity
@@ -62,7 +63,11 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
     layoutParams?.height = newHeight
     layoutParams?.width = newWidth
-    parent?.requestLayout()
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      parent.requestLayout()
+    } else {
+      post { parent?.requestLayout() }
+    }
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {

@@ -38,7 +38,7 @@ export const Keyboard2Example = () => {
           handleAndroid
           onToggle={(e) => {
             setTimeout(() => {
-              setCount(20);
+              // setCount(20);
               // setTimeout(() => {
               //   setCount(4)
               // }, 1000)
