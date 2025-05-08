@@ -4,7 +4,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 
 export const Keyboard2Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
@@ -38,7 +38,7 @@ export const Keyboard2Example = () => {
           handleAndroid
           onToggle={(e) => {
             setTimeout(() => {
-              setCount(20);
+              // setCount(20);
               // setTimeout(() => {
               //   setCount(4)
               // }, 1000)

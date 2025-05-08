@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 
 export const DismissPreventExample = () => {
   // refs

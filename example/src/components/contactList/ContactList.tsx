@@ -3,7 +3,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
-import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet2';
+import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet';
 
 export interface ContactListProps {
   count?: number;

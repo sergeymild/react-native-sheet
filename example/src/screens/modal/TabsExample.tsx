@@ -11,7 +11,7 @@ import {
   FITTED_SHEET_SCROLL_VIEW,
   FittedSheet,
   useFittedSheetContext,
-} from 'react-native-sheet2';
+} from 'react-native-sheet';
 
 import { SceneMap, TabView } from 'react-native-tab-view';
 
