@@ -22,7 +22,7 @@ using namespace facebook::react;
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
-    return concreteComponentDescriptorProvider<SheetViewComponentDescriptor>();
+  return concreteComponentDescriptorProvider<SheetViewComponentDescriptor>();
 }
 
 - (std::shared_ptr<const SheetViewEventEmitter>)modalEventEmitter
@@ -37,7 +37,7 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const SheetViewProps>();
     _props = defaultProps;
-
+    
     _view = [[UIView alloc] init];
     _view2 = [[HostFittedSheet alloc] init];
     
@@ -51,29 +51,37 @@ using namespace facebook::react;
         eventEmitter->onSheetDismiss({});
       }
     };
-
+    
     self.contentView = _view2;
   }
-
+  
   return self;
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   NSLog(@"😀 updateProps");
-    const auto &oldViewProps = *std::static_pointer_cast<SheetViewProps const>(_props);
-    const auto &newViewProps = *std::static_pointer_cast<SheetViewProps const>(props);
-    
-  [_view2 setFittedSheetParams:@{
-    @"maxWidth": @(newViewProps.maxWidth),
-    @"dismissable": @(newViewProps.dismissable),
-    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
-  }];
+  const auto &oldViewProps = *std::static_pointer_cast<SheetViewProps const>(_props);
+  const auto &newViewProps = *std::static_pointer_cast<SheetViewProps const>(props);
+  
+  if (oldViewProps.maxWidth != newViewProps.maxWidth || oldViewProps.dismissable != newViewProps.dismissable || oldViewProps.topLeftRightCornerRadius != newViewProps.topLeftRightCornerRadius) {
+    [_view2 setFittedSheetParams:@{
+      @"maxWidth": @(newViewProps.maxWidth),
+      @"dismissable": @(newViewProps.dismissable),
+      @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
+    }];
+  }
+  
+  if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
+    [_view2 setPassScrollViewReactTag];
+  }
+  
+  
   NSLog(@"----- %f", newViewProps.calculatedHeight);
   [_view2 setCalculatedHeight:newViewProps.calculatedHeight];
-    
-
-    [super updateProps:props oldProps:oldProps];
+  
+  
+  [super updateProps:props oldProps:oldProps];
 }
 
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
@@ -106,7 +114,7 @@ using namespace facebook::react;
 }
 
 Class<RCTComponentViewProtocol> SheetViewCls(void) {
-    return SheetView.class;
+  return SheetView.class;
 }
 
 

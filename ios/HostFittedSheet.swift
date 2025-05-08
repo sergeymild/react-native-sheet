@@ -1,8 +1,6 @@
 import UIKit
 import React
 
-let FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView"
-
 func viewPort() -> CGSize {
   var size: CGSize = .zero
   RCTUnsafeExecuteOnMainQueueSync {
@@ -20,7 +18,6 @@ public final class HostFittedSheet: UIView {
   private var _reactSubview: UIView?
   private var _isPresented = false
   private var _sheetSize: CGFloat?
-  private var _scrollViewTag: String?
   public var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
@@ -45,20 +42,9 @@ public final class HostFittedSheet: UIView {
 
 
   @objc
-  func setPassScrollViewReactTag(_ tag: String) {
-    debugPrint("😀 setPassScrollViewReactTag", tag)
-    if self._modalViewController == nil {
-      self._scrollViewTag = tag
-    } else {
-      let scrollView = self._reactSubview?.find(
-        FITTED_SHEET_SCROLL_VIEW,
-        deepIndex: 0
-      ) as? RCTScrollView
-      if scrollView != nil {
-        self._modalViewController?.handleScrollView(scrollView!.scrollView)
-      }
-      debugPrint("😀 setPassScrollViewReactTag found", scrollView as Any)
-    }
+  public func setPassScrollViewReactTag() {
+    debugPrint("😀 setPassScrollViewReactTag")
+    tryAttachScrollView()
   }
 
   @objc
@@ -142,13 +128,12 @@ public final class HostFittedSheet: UIView {
   }
 
   private func tryAttachScrollView() {
-    if let tag = self._scrollViewTag {
-      self.setPassScrollViewReactTag(tag)
-    } else {
-      let scrollView = self._reactSubview?.find(FITTED_SHEET_SCROLL_VIEW, deepIndex: 0) as? RCTScrollView
-      if scrollView != nil {
-        self._modalViewController?.handleScrollView(scrollView!.scrollView)
-      }
+    guard let controller = _modalViewController else { return }
+    debugPrint("😀 tryAttachScrollView")
+    let scrollView = self._reactSubview?.find(deepIndex: 0)
+    if let v = scrollView {
+      debugPrint("😀 tryAttachScrollView.found")
+      controller.handleScrollView(v)
     }
   }
 
@@ -219,15 +204,13 @@ public final class HostFittedSheet: UIView {
 
 
 extension UIView {
-  func find(_ nId: String, deepIndex: Int) -> UIView? {
+  func find(deepIndex: Int) -> UIScrollView? {
     if deepIndex >= 100 { return nil }
-    if self.nativeID?.contains(nId) == true || self.accessibilityIdentifier?.contains(nId) == true {
-      return self
-    }
+    if self is UIScrollView { return self as? UIScrollView }
 
     let index = deepIndex + 1
     for subview in subviews {
-      if let v = subview.find(nId, deepIndex: index) {
+      if let v = subview.find(deepIndex: index) {
         return v
       }
     }

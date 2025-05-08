@@ -16,8 +16,6 @@
 
 package com.behavior;
 
-import com.google.android.material.R;
-
 import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -27,7 +25,6 @@ import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Parcel;
@@ -45,6 +42,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.ScrollView;
 
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntDef;
@@ -65,11 +63,14 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.Accessibilit
 import androidx.core.view.accessibility.AccessibilityViewCommand;
 import androidx.customview.view.AbsSavedState;
 import androidx.customview.widget.ViewDragHelper;
+
+import com.google.android.material.R;
 import com.google.android.material.internal.ViewUtils;
 import com.google.android.material.internal.ViewUtils.RelativePadding;
 import com.google.android.material.resources.MaterialResources;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -1527,7 +1528,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
   @Nullable
   @VisibleForTesting
   View findScrollingChild(View view) {
-    View fittedSheetScrollView = findView(view, "fittedSheetScrollView");
+    View fittedSheetScrollView = findView(view);
     if (fittedSheetScrollView == null) return null;
     fittedSheetScrollView.setNestedScrollingEnabled(true);
     return fittedSheetScrollView;
@@ -2299,24 +2300,16 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     };
   }
 
-
   @Nullable
-  private static String getNativeId(View view) {
-    Object tag = view.getTag(com.facebook.react.R.id.view_tag_native_id);
-    return tag instanceof String ? (String)tag : null;
-  }
-
-  @Nullable
-  public static View findView(View root, String nativeId) {
-    String tag = getNativeId(root);
-    if (tag != null && tag.contains(nativeId)) {
+  public static View findView(View root) {
+    if (root instanceof ScrollView) {
       return root;
     } else {
       if (root instanceof ViewGroup) {
         ViewGroup viewGroup = (ViewGroup)root;
 
         for(int i = 0; i < viewGroup.getChildCount(); ++i) {
-          View view = findView(viewGroup.getChildAt(i), nativeId);
+          View view = findView(viewGroup.getChildAt(i));
           if (view != null) {
             return view;
           }

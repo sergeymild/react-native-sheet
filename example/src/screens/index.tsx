@@ -10,6 +10,7 @@ import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
 import { Keyboard3Example } from './modal/Keyboard3Example';
+import { NamedExample } from './modal/NamedExample';
 
 export const screens = [
   {
@@ -31,6 +32,11 @@ export const screens = [
     name: 'LoaderExample',
     slug: 'Modal/LoaderExample',
     getScreen: () => LoaderExample,
+  },
+  {
+    name: 'NamedExample',
+    slug: 'Modal/NamedExample',
+    getScreen: () => NamedExample,
   },
   {
     name: 'ListExample',

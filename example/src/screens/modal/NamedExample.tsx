@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -8,22 +8,26 @@ import {
 } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
+import { FittedSheet } from 'react-native-sheet';
 import { ContactList } from '../../components/contactList';
+import {
+  attachScrollViewToFittedSheet,
+  dismissFittedSheet,
+  presentFittedSheet,
+} from '../../../../src/PublicSheetView';
 
-export const LoaderExample = () => {
-  const bottomSheetRef = useRef<FittedSheetRef>(null);
+export const NamedExample = () => {
   const [isLoading, setLoading] = useState<-1 | 0 | 1>(-1);
 
   const handlePresentPress = useCallback(() => {
-    bottomSheetRef.current?.show();
+    presentFittedSheet('Named');
   }, []);
 
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <FittedSheet
-        ref={bottomSheetRef}
+        name={'Named'}
         params={{ backgroundColor: 'white' }}
         onSheetDismiss={() => setLoading(-1)}
       >
@@ -54,13 +58,18 @@ export const LoaderExample = () => {
           </View>
         )}
         {isLoading === 1 && (
-          <ContactList
-            count={50}
-            onReady={() => {
-              console.log('[LoaderExample.onRea]');
-              bottomSheetRef.current?.attachScrollViewToSheet();
-            }}
-          />
+          <>
+            <TouchableOpacity onPress={() => dismissFittedSheet('Named')}>
+              <Text>Dismiss</Text>
+            </TouchableOpacity>
+            <ContactList
+              count={50}
+              onReady={() => {
+                console.log('[LoaderExample.onRea]');
+                attachScrollViewToFittedSheet('Named');
+              }}
+            />
+          </>
         )}
       </FittedSheet>
     </View>

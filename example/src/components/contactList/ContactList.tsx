@@ -3,10 +3,6 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
-import {
-  FITTED_SHEET_SCROLL_VIEW,
-  useFittedSheetContext,
-} from 'react-native-sheet';
 
 export interface ContactListProps {
   count?: number;
@@ -14,6 +10,7 @@ export interface ContactListProps {
   onRefresh?: () => void;
   nativeId?: string;
   readonly contentContainerStyle?: StyleProp<ViewStyle>;
+  onReady?: () => void;
 }
 
 const keyExtractor = (item: any, index: number) => `${item.name}.${index}`;
@@ -22,9 +19,9 @@ const ContactListComponent = ({
   count = 25,
   onRefresh,
   onItemPress,
+  onReady,
   ...rest
 }: ContactListProps) => {
-  const context = useFittedSheetContext();
   // hooks
 
   //#region variables
@@ -38,6 +35,7 @@ const ContactListComponent = ({
         return (
           <View style={{ height: 72 }}>
             <FlatList
+              onLayout={onReady}
               data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -70,19 +68,14 @@ const ContactListComponent = ({
         />
       );
     },
-    [onItemPress]
+    [onItemPress, onReady]
   );
 
   return (
     <FlatList
       {...rest}
       data={data}
-      onLayout={() =>
-        context?.passScrollViewReactTag(
-          rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW
-        )
-      }
-      nativeID={rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW}
+      onLayout={onReady}
       refreshing={false}
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}

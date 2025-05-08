@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import {
   Dimensions,
   type LayoutChangeEvent,
@@ -45,24 +45,7 @@ interface State {
   passScrollViewReactTag?: string;
 }
 
-export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
-
-interface Context {
-  hide: (passThroughParam?: any) => void;
-  passScrollViewReactTag: (nativeId: string) => void;
-}
-
-const FittedSheetContext = createContext<Context | null>(null);
-
-export const useFittedSheetContext = () => {
-  try {
-    return useContext(FittedSheetContext);
-  } catch {
-    return undefined;
-  }
-};
-
-export class FittedSheet extends React.PureComponent<SheetProps, State> {
+export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
   private shouldShowBack = false;
   private onHidePassThroughParam?: any;
@@ -89,10 +72,9 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
     this.setState({ height: e.nativeEvent.layout.height });
   };
 
-  passScrollViewReactTag = (nativeId: string) => {
-    if (__DEV__)
-      console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
-    this.setState({ passScrollViewReactTag: nativeId });
+  attachScrollViewToSheet = () => {
+    console.log('[FittedSheet.attachScrollViewToSheet]');
+    this.setState({ passScrollViewReactTag: Date.now().toString() });
   };
   hide = (passThroughParam?: any) => {
     if (!this.state.show) return;

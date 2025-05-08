@@ -1,8 +1,6 @@
 package com.sheet
 
-import androidx.core.graphics.toColor
-import androidx.core.graphics.toColorInt
-import com.facebook.react.bridge.ColorPropConverter
+import com.behavior.BottomSheetBehavior
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.PixelUtil.dpToPx
@@ -10,7 +8,6 @@ import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
-import com.facebook.react.uimanager.util.ReactFindViewUtil
 import com.facebook.react.viewmanagers.SheetViewManagerDelegate
 import com.facebook.react.viewmanagers.SheetViewManagerInterface
 
@@ -73,7 +70,7 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
   override fun setPassScrollViewReactTag(view: SheetView, value: String?) {
     println("==========setPassScrollViewReactTag $value")
     value ?: return
-    val v = ReactFindViewUtil.findView(view, value) ?: return
+    val v = BottomSheetBehavior.findView(view) ?: return
     view.setNewNestedScrollView(v)
   }
 
