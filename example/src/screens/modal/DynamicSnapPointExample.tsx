@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 
 const DynamicSnapPointExample = () => {
   // state
@@ -42,8 +42,6 @@ const DynamicSnapPointExample = () => {
         params={{
           maxLandscapeWidth: 400,
           topLeftRightCornerRadius: 20,
-          maxPortraitWidth: 350,
-          isStatusBarBgLight: false,
         }}
         onSheetDismiss={() => setCount(0)}
       >

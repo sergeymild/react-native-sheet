@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 
 export const List2Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);

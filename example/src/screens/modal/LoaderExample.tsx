@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 import { ContactList } from '../../components/contactList';
 
 const Sim: React.FC = () => {
@@ -28,7 +28,7 @@ export const LoaderExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
       <FittedSheet
         ref={bottomSheetRef}
-        params={{ backgroundColor: 'white', maxHeight: 500 }}
+        params={{ backgroundColor: 'white' }}
         onSheetDismiss={() => setLoading(-1)}
       >
         {isLoading === -1 && (
@@ -56,11 +56,7 @@ export const LoaderExample = () => {
             <ActivityIndicator />
           </View>
         )}
-        {isLoading === 1 && (
-          <View style={styles.contentContainerStyle}>
-            <Sim />
-          </View>
-        )}
+        {isLoading === 1 && <Sim />}
       </FittedSheet>
     </View>
   );

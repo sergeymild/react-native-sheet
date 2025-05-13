@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
-import { FittedSheet } from 'react-native-sheet2';
+import { FittedSheet } from 'react-native-sheet';
 
 const ListExample = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
@@ -26,7 +26,6 @@ const ListExample = () => {
           backgroundColor: 'white',
           maxLandscapeWidth: 560,
           maxPortraitWidth: 300,
-          maxHeight: 500,
           topLeftRightCornerRadius: 8,
         }}
       >

@@ -6,17 +6,13 @@ import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
 import { FittedSheet } from 'react-native-sheet';
 
-const KeyboardExample = () => {
+export const Keyboard2Example = () => {
   const bottomSheetRef = useRef<FittedSheet>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
-  }, []);
-
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
   }, []);
 
   console.log(
@@ -28,7 +24,6 @@ const KeyboardExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
         ref={bottomSheetRef}
@@ -37,13 +32,13 @@ const KeyboardExample = () => {
           setCount(2);
         }}
       >
-        <TextInput style={{ height: 132, backgroundColor: 'yellow' }} />
         <ContactList count={count} />
+        <TextInput style={{ height: 56, backgroundColor: 'yellow' }} />
         <KeyboardSpacer
           handleAndroid
           onToggle={(e) => {
             setTimeout(() => {
-              setCount(20);
+              // setCount(20);
               // setTimeout(() => {
               //   setCount(4)
               // }, 1000)
@@ -65,5 +60,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
 });
-
-export default KeyboardExample;

@@ -9,6 +9,7 @@ import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
@@ -18,8 +19,15 @@ import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.common.UIManagerType
 import com.facebook.react.uimanager.events.RCTEventEmitter
-import com.modal.safeShow
 
+fun androidx.fragment.app.Fragment.safeShow(
+  manager: FragmentManager,
+  tag: String?
+) {
+  val ft = manager.beginTransaction()
+  ft.add(this, tag)
+  ft.commitNowAllowingStateLoss()
+}
 
 internal fun AppFittedSheet.onSheetDismiss() {
   (context as ReactContext).getJSModule(RCTEventEmitter::class.java)
@@ -32,9 +40,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
 
   var params: ReadableMap? = null
     set(value) {
-      mHostView.sheetMaxHeightSize = value.double("maxHeight", -1.0).toPxD()
-      mHostView.sheetMaxWidthSize = value.double("maxWidth", -1.0).toPxD()
-      mHostView.sheetMinHeightSize = value.double("minHeight", -1.0).toPxD()
+      mHostView.sheetMaxHeightSize = value.double("maxHeight", Double.MAX_VALUE).toPxD()
+      mHostView.sheetMaxWidthSize = value.double("maxWidth", Double.MAX_VALUE).toPxD()
+      mHostView.sheetMinHeightSize = value.double("minHeight", Double.MIN_VALUE).toPxD()
 
       field = value
     }
@@ -49,7 +57,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params?.bool("isSystemUILight", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity? {
-    return (context as ReactContext)?.currentActivity as? AppCompatActivity
+    return (context as? ReactContext)?.currentActivity as? AppCompatActivity
   }
 
   private val sheet: FragmentModalBottomSheet?
@@ -114,7 +122,6 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
     println("🥲 onDetachedFromWindow: $id")
-    ModalHostShadowNode.attachedViews.remove(id)
   }
 
   override fun removeViewAt(index: Int) {
