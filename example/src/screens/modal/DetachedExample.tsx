@@ -3,12 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
 import { createContactListMockData } from '../../utilities/createMockData';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, FittedSheetRef } from 'react-native-sheet';
 
 const DetachedExample = () => {
   // refs
 
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   // variables
   const data = useMemo(() => createContactListMockData(2), []);
@@ -17,15 +17,9 @@ const DetachedExample = () => {
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current!.show();
   }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current!.hide();
-  }, []);
-  const handleClosePress = useCallback(() => {
-    bottomSheetRef.current?.hide();
-  }, []);
 
   const renderItem = useCallback(
-    (item, index) => (
+    (item: any, index: number) => (
       <ContactItem
         key={`${item.name}.${index}`}
         title={`${index}: ${item.name}`}
@@ -38,8 +32,6 @@ const DetachedExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
-      <Button label="Close" onPress={handleClosePress} />
       <FittedSheet ref={bottomSheetRef}>
         {() => (
           <View style={styles.sheetContainer}>{data.map(renderItem)}</View>

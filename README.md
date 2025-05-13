@@ -7,59 +7,65 @@ Native implementation of Bottom sheet
 ## Installation
 
 ```sh
-"react-native-sheet": "1.2.1"
+"react-native-sheet": "sergeymild/react-native-sheet#2.0.2"
 ```
 
 ## Usage
 
 ```typescript
-import {
-  FITTED_SHEET_SCROLL_VIEW,
-  FittedSheet,
-  useFittedSheetContext,
-} from 'react-native-sheet';
+import {FittedSheet, attachScrollViewToFittedSheet, FittedSheetRef, presentFittedSheet} from 'react-native-sheet';
 import { ScrollView, TouchableOpacity } from 'react-native';
 
 
 const RenderSheetComponent: React.FC = () => {
-  // context available in bottom sheet
-  // these are methods available: hide, passScrollViewReactTag
-  // method hide accepts parameters which will be passed to onDimiss callback from bottomSheet 
-  const sheetContext = useFittedSheetContext()
+  const [isLoading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000)
+  }, []) 
+  
+  if (isLoading) {
+    return <View style={{height: 200}}/>
+  }
   
   return (
-    <ScrollView
-      // used for find scrollView in Native Code
-      nativeId={FITTED_SHEET_SCROLL_VIEW}
-    />
+    // if scrollView creates dynamically in bottom sheet (for example after loading)
+    // you have call attachScrollViewToFittedSheet to enable nestedScroll
+    <ScrollView onLayout={() => attachScrollViewToFittedSheet("textSheet")}/>
   )
 }
 
 const App: React.FC = () => {
-  const sheetRef = useRef<FittedSheet>(null);
-  
-  useEffect(() => {
-    // if scrollView creates dynamically  in bottom sheet (for example after loading)
-    // you have to pass nativeID of scroll view by calling passScrollViewReactTag
-    sheetRef.current?.passScrollViewReactTag('scrollView')
-  }, [])
+  const sheetRef = useRef<FittedSheetRef>(null);
 
   return (
     <>
-      <TouchableOpacity onPress={() => {
-        // show also accept params which will be passed to render function
-        sheetRef.current?.show()
-      }}>
-        <Text>Show sheet</Text>
-      </TouchableOpacity>
+      <TouchableOpacity 
+        onPress={() => {
+            // show also accept params which will be passed to render function
+            sheetRef.current?.show()
+            // or you can call just pass the name of sheet which want to show 
+            // in this case there is no need to store ref on Sheet
+            presentFittedSheet("textSheet")
+        }}
+        children={<Text children="Show sheet</"/>}
+      />
 
 
       <FittedSheet
+        // can be any string.
+        // with this name sheet can be dismissed or presented via methods by passing that name
+        // `presentFittedSheet`, `dismissFittedSheet`
+        name="textSheet"
         ref={sheetRef}
         onSheetDismiss={(paramsPassedToHideMethod) => {
             // called when sheet completely hided
         }}
         params={{
+          // if max min should be setted as max height
+          applyMaxHeightToMinHeight: true | false,
+          // allow to dismiss
+          dismissable: false | true,
           // top left right corner sheet view radius
           topLeftRightCornerRadius: 20,
           // background color of sheet view
@@ -76,13 +82,8 @@ const App: React.FC = () => {
           isSystemUILight: false
         }}
         >
-          // data which was passed to .show() method 
-          {(data) => {
-            return (
-              <RenderSheetComponent/>
-            );
-        }}
-        
+          // data which was passed to .show() method or in presentFittedSheet methods
+          {(data) => <RenderSheetComponent/>)}
         // if you do not need data you can omit render function and pass just component
         <RenderSheetComponent/>
       </FittedSheet>

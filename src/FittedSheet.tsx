@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import {
   Dimensions,
   findNodeHandle,
@@ -46,24 +46,7 @@ interface State {
   passScrollViewReactTag?: string;
 }
 
-export const FITTED_SHEET_SCROLL_VIEW = 'fittedSheetScrollView';
-
-interface Context {
-  hide: (passThroughParam?: any) => void;
-  passScrollViewReactTag: (nativeId: string) => void;
-}
-
-const FittedSheetContext = createContext<Context | null>(null);
-
-export const useFittedSheetContext = () => {
-  try {
-    return useContext(FittedSheetContext);
-  } catch {
-    return undefined;
-  }
-};
-
-export class FittedSheet extends React.PureComponent<SheetProps, State> {
+export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
   private shouldShowBack = false;
   private onHidePassThroughParam?: any;
@@ -90,11 +73,11 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
     this.setState({ height: e.nativeEvent.layout.height });
   };
 
-  passScrollViewReactTag = (nativeId: string) => {
-    if (__DEV__)
-      console.log('🍓[FittedSheet.passScrollViewReactTag]', nativeId);
-    this.setState({ passScrollViewReactTag: nativeId });
+  attachScrollViewToSheet = () => {
+    console.log('[FittedSheet.attachScrollViewToSheet]');
+    this.setState({ passScrollViewReactTag: Date.now().toString() });
   };
+
   hide = (passThroughParam?: any) => {
     if (!this.state.show) return;
     this.onHidePassThroughParam = passThroughParam;
@@ -123,7 +106,7 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentDidMount() {
-    if (__DEV__) console.log('[FittedSheet.componentDidMount]');
+    if (__DEV__) console.log('[FittedSheet.componentDidMount]', this.insets());
     this.cleanup = Dimensions.addEventListener('change', () => {
       if (!this.state.show) return;
       if (this.shouldShowBack) return;
@@ -184,25 +167,21 @@ export class FittedSheet extends React.PureComponent<SheetProps, State> {
         dim: this.dimensions.width,
       });
     }
-    const background = this.props?.params?.backgroundColor ?? 'white';
-    if (this.props.params?.backgroundColor) {
-      // @ts-ignore
-      delete this.props.params.backgroundColor;
-    }
+    const background = this.props?.params?.backgroundColor;
     return (
       <_FittedSheet
         onSheetDismiss={this.onDismiss}
         ref={this.sheetRef}
         style={{ width: maxWidth, position: 'absolute' }}
         calculatedHeight={nativeHeight}
+        passScrollViewReactTag={this.state.passScrollViewReactTag}
         fittedSheetParams={
           this.props.params
             ? {
                 ...this.props.params,
                 maxWidth,
-                passScrollViewReactTag: this.state.passScrollViewReactTag,
               }
-            : { passScrollViewReactTag: this.state.passScrollViewReactTag }
+            : undefined
         }
       >
         <View

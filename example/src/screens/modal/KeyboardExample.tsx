@@ -4,19 +4,15 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 const KeyboardExample = () => {
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
-  }, []);
-
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
   }, []);
 
   console.log(
@@ -28,7 +24,6 @@ const KeyboardExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
 
       <FittedSheet
         ref={bottomSheetRef}

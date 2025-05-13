@@ -1,10 +1,12 @@
+import { FittedSheetParams } from './FittedSheet';
 import {
-  FITTED_SHEET_SCROLL_VIEW,
-  FittedSheet,
-  useFittedSheetContext,
-  FittedSheetParams,
-} from './FittedSheet';
+  PublicSheetView,
+  type FittedSheetRef,
+  presentFittedSheet,
+  dismissFittedSheet,
+  attachScrollViewToFittedSheet,
+} from './PublicSheetView';
 
-export { FittedSheet, FITTED_SHEET_SCROLL_VIEW, useFittedSheetContext };
+export { PublicSheetView as FittedSheet, type FittedSheetRef };
 
 export type { FittedSheetParams };

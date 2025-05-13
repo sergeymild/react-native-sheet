@@ -2,24 +2,20 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 import { ContactList } from '../../components/contactList';
 
 export const PropsExample = () => {
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show({ count: 4 });
-  }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
   }, []);
 
   // renders
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
       <FittedSheet
         params={{ maxHeight: 600, backgroundColor: 'white' }}
         ref={bottomSheetRef}

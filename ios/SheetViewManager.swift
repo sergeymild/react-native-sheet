@@ -96,15 +96,8 @@ final class HostFittedSheet: UIView {
   
   @objc
   func setPassScrollViewReactTag(_ tag: NSNumber) {
-    debugPrint("😀 setPassScrollViewReactTag", tag)
-    guard let scrollView = self._bridge?.uiManager.view(forReactTag: tag) as? RCTScrollView else {
-      return
-    }
-    if self._modalViewController == nil {
-      self._scrollViewTag = tag
-    }
-    debugPrint("😀 setPassScrollViewReactTag found", scrollView, self._modalViewController)
-    self._modalViewController?.handleScrollView(scrollView.scrollView)
+    debugPrint("😀 setPassScrollViewReactTag")
+    tryAttachScrollView()
   }
   
   @objc
@@ -186,13 +179,12 @@ final class HostFittedSheet: UIView {
   }
   
   private func tryAttachScrollView() {
-    if let tag = self._scrollViewTag {
-      self.setPassScrollViewReactTag(tag)
-    } else {
-      let scrollView = self._reactSubview?.find(FITTED_SHEET_SCROLL_VIEW, deepIndex: 0) as? RCTScrollView
-      if scrollView != nil {
-        self._modalViewController?.handleScrollView(scrollView!.scrollView)
-      }
+    guard let controller = _modalViewController else { return }
+    debugPrint("😀 tryAttachScrollView")
+    let scrollView = self._reactSubview?.find(deepIndex: 0)
+    if let v = scrollView {
+      debugPrint("😀 tryAttachScrollView.found")
+      controller.handleScrollView(v)
     }
   }
   
@@ -209,11 +201,17 @@ final class HostFittedSheet: UIView {
         guard let self else { return }
         
         self.initializeSheet(size)
-        self.tryAttachScrollView()
         self.presentViewController.present(self._modalViewController!, animated: true)
         self._modalViewController?.didDismiss = { [weak self] _ in
           debugPrint("😀 _modalViewController.didDismiss")
           self?.onSheetDismiss?([:])
+        }
+        
+        // some delay to wait rn render
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+          guard let self else { return }
+          if !_isPresented { return }
+          tryAttachScrollView()
         }
       }
     }
@@ -229,7 +227,7 @@ final class HostFittedSheet: UIView {
       //ModalHostShadowView.attachedViews.removeValue(forKey: self.reactTag.intValue)
       self._modalViewController = nil
       self._reactSubview?.removeFromSuperview()
-      if let v = self._reactSubview {
+      if let _ = self._reactSubview {
         self._touchHandler?.detach(from: self._reactSubview)
       }
       self._touchHandler = nil
@@ -258,19 +256,17 @@ final class HostFittedSheet: UIView {
 
 
 extension UIView {
-  func find(_ nId: String, deepIndex: Int) -> UIView? {
-    if deepIndex >= 10 { return nil }
-    if self.nativeID?.contains(nId) == true || self.accessibilityIdentifier?.contains(nId) == true {
-      return self
-    }
-    
+  func find(deepIndex: Int) -> UIScrollView? {
+    if deepIndex >= 100 { return nil }
+    if self is RCTScrollView { return (self as? RCTScrollView)?.scrollView }
+
     let index = deepIndex + 1
     for subview in subviews {
-      if let v = subview.find(nId, deepIndex: index) {
+      if let v = subview.find(deepIndex: index) {
         return v
       }
     }
-    
+
     return nil
   }
 }

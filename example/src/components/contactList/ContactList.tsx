@@ -3,7 +3,6 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import { createContactListMockData } from '../../utilities/createMockData';
 import { ContactItem } from '../contactItem';
 import { FlatList, Text, View } from 'react-native';
-import { FITTED_SHEET_SCROLL_VIEW } from 'react-native-sheet';
 
 export interface ContactListProps {
   count?: number;
@@ -11,6 +10,7 @@ export interface ContactListProps {
   onRefresh?: () => void;
   nativeId?: string;
   readonly contentContainerStyle?: StyleProp<ViewStyle>;
+  onReady?: () => void;
 }
 
 const keyExtractor = (item: any, index: number) => `${item.name}.${index}`;
@@ -71,9 +71,8 @@ const ContactListComponent = ({
 
   return (
     <FlatList
-      {...rest}
+      onLayout={() => rest?.onReady?.()}
       data={data}
-      nativeID={rest.nativeId ?? FITTED_SHEET_SCROLL_VIEW}
       refreshing={false}
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}

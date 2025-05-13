@@ -7,11 +7,7 @@ import React, {
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
-import {
-  FITTED_SHEET_SCROLL_VIEW,
-  FittedSheet,
-  useFittedSheetContext,
-} from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 import { SceneMap, TabView } from 'react-native-tab-view';
 
@@ -22,21 +18,15 @@ const tabRoutes: any[] = [
 ];
 
 const Tab = () => {
-  return (
-    <ContactList count={100} nativeId={`${FITTED_SHEET_SCROLL_VIEW}_general`} />
-  );
+  return <ContactList count={100} nativeId={`tab_1_list`} />;
 };
 
 const Tab2 = () => {
-  return (
-    <ContactList count={100} nativeId={`${FITTED_SHEET_SCROLL_VIEW}_setting`} />
-  );
+  return <ContactList count={100} nativeId={`tab_2_list`} />;
 };
 
 const Tab3 = () => {
-  return (
-    <ContactList count={100} nativeId={`${FITTED_SHEET_SCROLL_VIEW}_list`} />
-  );
+  return <ContactList count={100} nativeId={`tab_3_list`} />;
 };
 
 const renderScene = SceneMap({
@@ -48,31 +38,21 @@ const renderScene = SceneMap({
 const SheetView = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const navigationState = { index: tabIndex, routes: tabRoutes };
-  const sheetContext = useFittedSheetContext();
   return (
-    <TabView
-      navigationState={navigationState}
-      onIndexChange={(index) => {
-        setTabIndex(index);
-        setTimeout(
-          (idx) => {
-            sheetContext.passScrollViewReactTag(
-              `${FITTED_SHEET_SCROLL_VIEW}_${
-                idx === 0 ? 'general' : idx === 1 ? 'setting' : 'list'
-              }`
-            );
-          },
-          0,
-          index
-        );
-      }}
-      renderScene={renderScene}
-    />
+    <View style={{ height: '100%', backgroundColor: 'green' }}>
+      <TabView
+        navigationState={navigationState}
+        onIndexChange={(index) => {
+          setTabIndex(index);
+        }}
+        renderScene={renderScene}
+      />
+    </View>
   );
 };
 
 export const TabsExample = () => {
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
@@ -84,10 +64,11 @@ export const TabsExample = () => {
       <Button label="Present" onPress={handlePresentPress} />
 
       <FittedSheet
+        name={'tabsSheet'}
         ref={bottomSheetRef}
         params={{
-          backgroundColor: 'white',
-          minHeight: Dimensions.get('screen').height - 50,
+          backgroundColor: 'yellow',
+          minHeight: Dimensions.get('screen').height - 200,
           topLeftRightCornerRadius: 8,
         }}
       >

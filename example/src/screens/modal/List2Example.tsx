@@ -2,10 +2,10 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 export const List2Example = () => {
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
@@ -17,12 +17,7 @@ export const List2Example = () => {
       <Button label="Present" onPress={handlePresentPress} />
 
       <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
-        <View
-          style={styles.contentContainerStyle}
-          onLayout={(e) =>
-            console.log('[ListExample.-----]', e.nativeEvent.layout.height)
-          }
-        >
+        <View style={styles.contentContainerStyle}>
           <ContactList count={50} />
         </View>
       </FittedSheet>

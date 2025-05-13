@@ -1,5 +1,6 @@
 package com.sheet
 
+import com.behavior.BottomSheetBehavior
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.PixelUtil
@@ -38,7 +39,7 @@ class SheetViewManager : ViewGroupManager<AppFittedSheet>() {
 
   @ReactProp(name = "passScrollViewReactTag")
   fun passScrollViewReactTag(view: AppFittedSheet, nativeId: String) {
-    val v = ReactFindViewUtil.findView(view, nativeId) ?: return
+    val v = BottomSheetBehavior.findView(view) ?: return
     view.setNewNestedScrollView(v)
   }
 

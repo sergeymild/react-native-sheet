@@ -1,32 +1,30 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '../../components/button';
 import { FittedSheet } from 'react-native-sheet';
+import {
+  dismissFittedSheet,
+  presentFittedSheet,
+} from '../../../../src/PublicSheetView';
 
 export const QueueExample = () => {
-  // refs
-  const bottomSheetRef = useRef<FittedSheet>(null);
-  const bottomSheetRef2 = useRef<FittedSheet>(null);
   const [value, setValue] = useState('empty');
 
   // callbacks
   const handlePresentPress = useCallback(() => {
-    bottomSheetRef.current!.show();
+    presentFittedSheet('first');
   }, []);
 
   const handlePresentPress2 = useCallback(() => {
-    bottomSheetRef2.current!.show();
+    presentFittedSheet('second');
   }, []);
 
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
 
-      <FittedSheet
-        ref={bottomSheetRef}
-        onSheetDismiss={() => setValue('empty')}
-      >
+      <FittedSheet name={'first'} onSheetDismiss={() => setValue('empty')}>
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 300 }}>
             <Button label="Present2" onPress={handlePresentPress2} />
@@ -35,14 +33,14 @@ export const QueueExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet ref={bottomSheetRef2}>
+      <FittedSheet name={'second'}>
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 300, backgroundColor: 'red' }} />
           <Button
             label="dismiss 2"
             onPress={() => {
               setValue('from sheet 2');
-              bottomSheetRef2.current?.hide();
+              dismissFittedSheet('second');
             }}
           />
         </View>

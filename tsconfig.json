@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "react-native-sheet2": ["./src/index"]
+      "react-native-sheet": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 const DynamicSnapPointExample = () => {
   // state
   const [count, setCount] = useState(0);
 
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   // callbacks
   const handleIncreaseContentPress = useCallback(() => {
@@ -19,9 +19,6 @@ const DynamicSnapPointExample = () => {
 
   const handlePresentPress = useCallback(() => {
     bottomSheetRef.current?.show();
-  }, []);
-  const handleDismissPress = useCallback(() => {
-    bottomSheetRef.current?.hide();
   }, []);
 
   const emojiContainerStyle = useMemo(
@@ -36,7 +33,6 @@ const DynamicSnapPointExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <Button label="Dismiss" onPress={handleDismissPress} />
       <FittedSheet
         ref={bottomSheetRef}
         params={{

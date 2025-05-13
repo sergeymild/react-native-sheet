@@ -9,6 +9,7 @@ import { QueueExample } from './modal/QueueExample';
 import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
+import { TabsExample } from './modal/TabsExample';
 
 export const screens = [
   {
@@ -20,11 +21,6 @@ export const screens = [
     name: 'Detached',
     slug: 'Modal/DetachedExample',
     getScreen: () => DetachedExample,
-  },
-  {
-    name: 'Simple',
-    slug: 'Modal/DetachedExample2',
-    getScreen: () => SimpleExample,
   },
   {
     name: 'LoaderExample',
