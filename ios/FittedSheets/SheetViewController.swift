@@ -115,13 +115,7 @@ public class SheetViewController: UIViewController {
 
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if let presenter = self.transition.presenter, self.options.shrinkPresentingViewController {
-            self.transition.restorePresentor(presenter, completion: { _ in
-                self.didDismiss?(self)
-            })
-        } else {
-            self.didDismiss?(self)
-        }
+        self.didDismiss?(self)
     }
 
     /// Handle a scroll view in the child view controller by watching for the offset for the scrollview and taking priority when at the top (so pulling up/down can grow/shrink the sheet instead of bouncing the child's scroll view)
@@ -225,7 +219,6 @@ public class SheetViewController: UIViewController {
                 UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
                     self.contentViewController.view.transform = CGAffineTransform.identity
                     self.contentViewHeightConstraint.constant = self.height(for: self.currentSize)
-                    self.transition.setPresentor(percentComplete: 0)
                     self.overlayView.alpha = 1
                 }, completion: { _ in
                     self.isPanning = false
@@ -236,7 +229,6 @@ public class SheetViewController: UIViewController {
 
                 if offset > 0 {
                     let percent = max(0, min(1, offset / max(1, newHeight)))
-                    self.transition.setPresentor(percentComplete: percent)
                     self.overlayView.alpha = 1 - percent
                     self.contentViewController.view.transform = CGAffineTransform(translationX: 0, y: offset)
                 } else {
@@ -261,7 +253,6 @@ public class SheetViewController: UIViewController {
                         animations: {
                         self.contentViewController.view.transform = CGAffineTransform(translationX: 0, y: self.contentViewController.view.bounds.height)
                         self.view.backgroundColor = UIColor.clear
-                        self.transition.setPresentor(percentComplete: 1)
                         self.overlayView.alpha = 0
                     }, completion: { complete in
                         self.attemptDismiss(animated: false)
@@ -277,7 +268,6 @@ public class SheetViewController: UIViewController {
                     animations: {
                     self.contentViewController.view.transform = CGAffineTransform.identity
                     self.contentViewHeightConstraint.constant = newContentHeight
-                    self.transition.setPresentor(percentComplete: 0)
                     self.overlayView.alpha = 1
                     self.view.layoutIfNeeded()
                 }, completion: { complete in

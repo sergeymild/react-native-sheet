@@ -163,10 +163,7 @@ final class HostFittedSheet: UIView {
     self._modalViewController = SheetViewController(
       controller: self.viewController,
       size: size.height,
-      options: .init(
-        shrinkPresentingViewController: false,
-        maxWidth: self.sheetMaxWidth
-      )
+      options: .init(maxWidth: self.sheetMaxWidth)
     )
 
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
