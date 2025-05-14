@@ -14,8 +14,8 @@ public class SheetContentViewController: UIViewController {
     public private(set) var childViewController: UIViewController
 
     private var options: SheetOptions
-    private (set) var size: CGFloat = 0
-    private (set) var preferredHeight: CGFloat
+    private(set) var size: CGFloat = 0
+    private(set) var preferredHeight: CGFloat
 
     public var contentBackgroundColor: UIColor? {
         get { self.childContainerView.backgroundColor }

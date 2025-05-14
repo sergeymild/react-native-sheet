@@ -25,8 +25,7 @@ public struct SheetOptions {
     public var shouldExtendBackground = true
     public var setIntrinsicHeightOnNavigationControllers = true
 
-    public var transitionAnimationOptions: UIView.AnimationOptions = [.curveEaseOut]
-    public var transitionDampening: CGFloat = 0.7
+    public var transitionAnimationOptions: UIView.AnimationOptions = [.curveEaseInOut]
     public var transitionDuration: TimeInterval = 0.4
     /// Transition velocity base value. Automatically adjusts based on the initial size of the sheet.
     public var transitionVelocity: CGFloat = 0.8

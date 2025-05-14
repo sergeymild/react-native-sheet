@@ -6,7 +6,6 @@ import {
   NativeModules,
   Platform,
   requireNativeComponent,
-  StatusBar,
   View,
 } from 'react-native';
 
@@ -49,8 +48,10 @@ interface State {
 export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
   private shouldShowBack = false;
-  private onHidePassThroughParam?: any;
+  onHidePassThroughParam?: any;
+  presentData?: any;
   private sheetRef = React.createRef<any>();
+  minimized = false;
 
   private dimensions: { width: number; height: number };
   private isLandscape: boolean;
@@ -64,12 +65,13 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   show = (data?: any) => {
+    this.presentData = data;
     this.setState({ show: true, data });
   };
 
   onLayout = (e: LayoutChangeEvent) => {
-    if (__DEV__)
-      console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
+    // if (__DEV__)
+    //   console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
     this.setState({ height: e.nativeEvent.layout.height });
   };
 
@@ -87,15 +89,21 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   };
 
   private onDismiss = () => {
-    if (__DEV__) console.log('[FittedSheet.onDismiss]');
+    if (__DEV__) console.log('[FittedSheet.onDismiss]', this.minimized);
     if (this.shouldShowBack) {
       this.setState({ show: false, height: undefined }, () =>
-        this.show(this.state.data)
+        this.show(this.presentData)
       );
       this.shouldShowBack = false;
       return;
     }
-    this.setState({ show: false, height: undefined });
+    this.setState({
+      show: false,
+      height: undefined,
+      data: undefined,
+      passScrollViewReactTag: undefined,
+    });
+    if (this.minimized) return;
     const passValue = this.onHidePassThroughParam;
     this.onHidePassThroughParam = undefined;
     this.props.onSheetDismiss?.(passValue);
@@ -106,7 +114,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentDidMount() {
-    if (__DEV__) console.log('[FittedSheet.componentDidMount]', this.insets());
+    //if (__DEV__) console.log('[FittedSheet.componentDidMount]');
     this.cleanup = Dimensions.addEventListener('change', () => {
       if (!this.state.show) return;
       if (this.shouldShowBack) return;
@@ -119,7 +127,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentWillUnmount() {
-    if (__DEV__) console.log('[FittedSheet.componentWillUnmount]');
+    //if (__DEV__) console.log('[FittedSheet.componentWillUnmount]');
     this.hide();
     this.cleanup?.();
     this.cleanup = undefined;
@@ -157,16 +165,16 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
       nativeHeight = Math.min(nativeHeight, maxHeight);
     }
 
-    if (__DEV__) {
-      console.log('[FittedSheet.render]', {
-        maxHeight,
-        maxWidth,
-        nativeHeight,
-        h: Dimensions.get('window').height,
-        sb: StatusBar.currentHeight,
-        dim: this.dimensions.width,
-      });
-    }
+    // if (__DEV__) {
+    //   console.log('[FittedSheet.render]', {
+    //     maxHeight,
+    //     maxWidth,
+    //     nativeHeight,
+    //     h: Dimensions.get('window').height,
+    //     sb: StatusBar.currentHeight,
+    //     dim: this.dimensions.width,
+    //   });
+    // }
     const background = this.props?.params?.backgroundColor;
     return (
       <_FittedSheet

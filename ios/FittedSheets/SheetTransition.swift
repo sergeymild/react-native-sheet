@@ -71,8 +71,6 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             UIView.animate(
                 withDuration: self.options.transitionDuration,
                 delay: 0,
-                usingSpringWithDamping: self.options.transitionDampening + ((heightPercent - 0.2) * 1.25 * 0.17),
-                initialSpringVelocity: self.options.transitionVelocity * heightPercent,
                 options: self.options.transitionAnimationOptions,
                 animations: {
                     contentView.transform = .identity

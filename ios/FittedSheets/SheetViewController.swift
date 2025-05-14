@@ -402,8 +402,6 @@ public class SheetViewController: UIViewController {
                     UIView.animate(
                         withDuration: animationDuration,
                         delay: 0,
-                        usingSpringWithDamping: self.options.transitionDampening,
-                        initialSpringVelocity: self.options.transitionVelocity,
                         options: self.options.transitionAnimationOptions,
                         animations: {
                         self.contentViewController.view.transform = CGAffineTransform(translationX: 0, y: self.contentViewController.view.bounds.height)
@@ -446,8 +444,6 @@ public class SheetViewController: UIViewController {
                 UIView.animate(
                     withDuration: animationDuration,
                     delay: 0,
-                    usingSpringWithDamping: self.options.transitionDampening,
-                    initialSpringVelocity: self.options.transitionVelocity,
                     options: self.options.transitionAnimationOptions,
                     animations: {
                     self.contentViewController.view.transform = CGAffineTransform.identity
@@ -645,8 +641,6 @@ public class SheetViewController: UIViewController {
         UIView.animate(
             withDuration: duration,
             delay: 0,
-            usingSpringWithDamping: self.options.transitionDampening,
-            initialSpringVelocity: self.options.transitionVelocity,
             options: self.options.transitionAnimationOptions,
             animations: {
                 contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
