@@ -45,7 +45,6 @@ public class SheetContentViewController: UIViewController {
     private var contentBottomConstraint: NSLayoutConstraint?
     private var navigationHeightConstraint: NSLayoutConstraint?
     public var childContainerView = UIView()
-    private let overflowView = UIView()
 
     public init(childViewController: UIViewController, options: SheetOptions) {
         self.options = options
@@ -69,7 +68,6 @@ public class SheetContentViewController: UIViewController {
             self.updateCornerCurve()
         }
         self.updateCornerRadius()
-        self.setupOverflowView()
 
         NotificationCenter.default.addObserver(self, selector: #selector(contentSizeDidChange), name: UIContentSizeCategory.didChangeNotification, object: nil)
     }
@@ -106,22 +104,6 @@ public class SheetContentViewController: UIViewController {
     private func updateCornerRadius() {
         self.contentWrapperView.layer.cornerRadius = self.cornerRadius
         self.childContainerView.layer.cornerRadius = self.cornerRadius
-    }
-
-    private func setupOverflowView() {
-        switch (self.options.transitionOverflowType) {
-            case .view(view: let view):
-                overflowView.backgroundColor = .clear
-                overflowView.addSubview(view) {
-                    $0.edges.pinToSuperview()
-                }
-            case .automatic:
-                overflowView.backgroundColor = self.childViewController.view.backgroundColor
-            case .color(color: let color):
-                overflowView.backgroundColor = color
-            case .none:
-                overflowView.backgroundColor = .clear
-        }
     }
 
     func updatePreferredHeight() {
@@ -177,12 +159,6 @@ public class SheetContentViewController: UIViewController {
 
         self.contentWrapperView.layer.masksToBounds = true
       self.contentWrapperView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-
-        self.contentView.addSubview(overflowView) {
-            $0.edges(.left, .right).pinToSuperview()
-            $0.height.set(200)
-            $0.top.align(with: self.contentView.al.bottom - 1)
-        }
     }
 
     private func setupChildContainerView() {
