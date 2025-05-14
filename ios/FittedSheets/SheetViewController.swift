@@ -12,11 +12,6 @@ import UIKit
 public class SheetViewController: UIViewController {
     public private(set) var options: SheetOptions
 
-	/// Default value for allowPullingPastMinHeight. Defaults to true.
-	public static var allowPullingPastMinHeight = true
-	/// Allow pulling below the minimum height and bounce back. Defaults to true.
-	public var allowPullingPastMinHeight = SheetViewController.allowPullingPastMinHeight
-
   public private(set) var currentSize: CGFloat = 0
     /// Allows dismissing of the sheet by pulling down
     public var dismissOnPull: Bool = true
@@ -230,9 +225,7 @@ public class SheetViewController: UIViewController {
         var newHeight = max(0, self.prePanHeight + (self.firstPanPoint.y - point.y))
         var offset: CGFloat = 0
         if newHeight < minHeight {
-            if self.allowPullingPastMinHeight {
-                offset = minHeight - newHeight
-            }
+            offset = minHeight - newHeight
             newHeight = minHeight
         }
       if newHeight > maxHeight {
