@@ -39,21 +39,6 @@ public class SheetContentViewController: UIViewController {
         }
     }
 
-    public var gripSize: CGSize = CGSize(width: 50, height: 6) {
-        didSet {
-            self.gripSizeConstraints.forEach({ $0.isActive = false })
-            Constraints(for: self.gripView) {
-                self.gripSizeConstraints = $0.size.set(self.gripSize)
-            }
-            self.gripView.layer.cornerRadius = self.gripSize.height / 2
-        }
-    }
-
-    public var gripColor: UIColor? {
-        get { return self.gripView.backgroundColor }
-        set { self.gripView.backgroundColor = newValue }
-    }
-
     weak var delegate: SheetContentViewDelegate?
 
     public var contentWrapperView = UIView()
@@ -61,9 +46,7 @@ public class SheetContentViewController: UIViewController {
     private var contentTopConstraint: NSLayoutConstraint?
     private var contentBottomConstraint: NSLayoutConstraint?
     private var navigationHeightConstraint: NSLayoutConstraint?
-    private var gripSizeConstraints: [NSLayoutConstraint] = []
     public var childContainerView = UIView()
-    public var gripView = UIView()
     private let overflowView = UIView()
 
     public init(childViewController: UIViewController, options: SheetOptions) {

@@ -103,18 +103,6 @@ public class SheetViewController: UIViewController {
         set { self.contentViewController.cornerCurve = newValue }
     }
 
-    public static var gripSize: CGSize = CGSize (width: 50, height: 6)
-    public var gripSize: CGSize {
-        get { return self.contentViewController.gripSize }
-        set { self.contentViewController.gripSize = newValue }
-    }
-
-    public static var gripColor: UIColor = UIColor(white: 0.868, black: 0.1)
-    public var gripColor: UIColor? {
-        get { return self.contentViewController.gripColor }
-        set { self.contentViewController.gripColor = newValue }
-    }
-
     let transition: SheetTransition
 
     public var didDismiss: ((SheetViewController) -> Void)?
@@ -155,8 +143,6 @@ public class SheetViewController: UIViewController {
         self.options = options
         self.transition = SheetTransition(options: options)
         super.init(nibName: nil, bundle: nil)
-        self.gripColor = SheetViewController.gripColor
-        self.gripSize = SheetViewController.gripSize
         self.cornerRadius = SheetViewController.cornerRadius
         self.updateOrderedSizes()
         self.modalPresentationStyle = .custom

@@ -65,23 +65,6 @@ public struct SheetOptions {
         self.maxWidth = maxWidth == 0 ? nil : maxWidth
         self.isRubberBandEnabled = isRubberBandEnabled ?? false
     }
-    
-//    @available(*, unavailable, message: "cornerRadius, gripSize and gripColor are now properties on SheetViewController. Use them instead.")
-//    public init(gripSize: CGSize? = nil,
-//                gripColor: UIColor? = nil,
-//                cornerRadius: CGFloat? = nil,
-//                presentingViewCornerRadius: CGFloat? = nil,
-//                setIntrinsicHeightOnNavigationControllers: Bool? = nil,
-//                useFullScreenMode: Bool? = nil,
-//                shrinkPresentingViewController: Bool? = nil,
-//                useInlineMode: Bool? = nil) {
-//        let defaultOptions = SheetOptions.default
-//        self.presentingViewCornerRadius = presentingViewCornerRadius ?? defaultOptions.presentingViewCornerRadius
-//        self.setIntrinsicHeightOnNavigationControllers = setIntrinsicHeightOnNavigationControllers ?? defaultOptions.setIntrinsicHeightOnNavigationControllers
-//        self.useFullScreenMode = useFullScreenMode ?? defaultOptions.useFullScreenMode
-//        self.shrinkPresentingViewController = shrinkPresentingViewController ?? defaultOptions.shrinkPresentingViewController
-//        self.useInlineMode = useInlineMode ?? defaultOptions.useInlineMode
-//    }
 }
 
 #endif // os(iOS) || os(tvOS) || os(watchOS)
