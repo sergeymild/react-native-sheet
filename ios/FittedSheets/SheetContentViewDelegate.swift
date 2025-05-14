@@ -11,7 +11,6 @@ import UIKit
 
 protocol SheetContentViewDelegate: AnyObject {
     func preferredHeightChanged(oldHeight: CGFloat, newSize: CGFloat)
-    func pullBarTapped()
 }
 
 #endif // os(iOS) || os(tvOS) || os(watchOS)

@@ -63,15 +63,6 @@ public class SheetViewController: UIViewController {
         }
     }
 
-    public static var minimumSpaceAbovePullBar: CGFloat = 0
-    public var minimumSpaceAbovePullBar: CGFloat {
-        didSet {
-            if self.isViewLoaded {
-                self.resize(to: self.currentSize)
-            }
-        }
-    }
-
     /// The default color of the overlay background
     public static var overlayColor = UIColor(white: 0, alpha: 0.25)
     /// The color of the overlay background
@@ -124,18 +115,6 @@ public class SheetViewController: UIViewController {
         set { self.contentViewController.gripColor = newValue }
     }
 
-    public static var pullBarBackgroundColor: UIColor = UIColor.clear
-    public var pullBarBackgroundColor: UIColor? {
-        get { return self.contentViewController.pullBarBackgroundColor }
-        set { self.contentViewController.pullBarBackgroundColor = newValue }
-    }
-
-    public static var treatPullBarAsClear: Bool = false
-    public var treatPullBarAsClear: Bool {
-        get { return self.contentViewController.treatPullBarAsClear }
-        set { self.contentViewController.treatPullBarAsClear = newValue }
-    }
-
     let transition: SheetTransition
 
     public var didDismiss: ((SheetViewController) -> Void)?
@@ -175,11 +154,9 @@ public class SheetViewController: UIViewController {
         self.sizes = sizes.count > 0 ? sizes : [.intrinsic]
         self.options = options
         self.transition = SheetTransition(options: options)
-        self.minimumSpaceAbovePullBar = SheetViewController.minimumSpaceAbovePullBar
         super.init(nibName: nil, bundle: nil)
         self.gripColor = SheetViewController.gripColor
         self.gripSize = SheetViewController.gripSize
-        self.pullBarBackgroundColor = SheetViewController.pullBarBackgroundColor
         self.cornerRadius = SheetViewController.cornerRadius
         self.updateOrderedSizes()
         self.modalPresentationStyle = .custom
@@ -203,7 +180,7 @@ public class SheetViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.compatibleAdditionalSafeAreaInsets = UIEdgeInsets(top: -self.options.pullBarHeight, left: 0, bottom: 0, right: 0)
+        self.compatibleAdditionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 
         self.view.backgroundColor = UIColor.clear
         self.addPanGestureRecognizer()
@@ -501,9 +478,9 @@ public class SheetViewController: UIViewController {
         let contentHeight: CGFloat
         let fullscreenHeight: CGFloat
         if self.options.useFullScreenMode {
-            fullscreenHeight = self.view.bounds.height - self.minimumSpaceAbovePullBar
+            fullscreenHeight = self.view.bounds.height
         } else {
-            fullscreenHeight = self.view.bounds.height - self.view.compatibleSafeAreaInsets.top - self.minimumSpaceAbovePullBar
+            fullscreenHeight = self.view.bounds.height - self.view.compatibleSafeAreaInsets.top
         }
         switch (size) {
             case .fixed(let height):
@@ -707,24 +684,6 @@ extension SheetViewController: UIGestureRecognizerDelegate {
 }
 
 extension SheetViewController: SheetContentViewDelegate {
-    func pullBarTapped() {
-        // Tapping the pull bar is just for accessibility
-        guard UIAccessibility.isVoiceOverRunning else { return }
-        let shouldDismiss = self.allowGestureThroughOverlay && (self.dismissOnOverlayTap || self.dismissOnPull)
-        guard !shouldDismiss else {
-            self.attemptDismiss(animated: true)
-            return
-        }
-
-        if self.sizes.count > 1 {
-            let index = (self.sizes.firstIndex(of: self.currentSize) ?? 0) + 1
-            if index >= self.sizes.count {
-                self.resize(to: self.sizes[0])
-            } else {
-                self.resize(to: self.sizes[index])
-            }
-        }
-    }
 
     func preferredHeightChanged(oldHeight: CGFloat, newSize: CGFloat) {
         if self.sizes.contains(.intrinsic) {

@@ -54,18 +54,6 @@ public class SheetContentViewController: UIViewController {
         set { self.gripView.backgroundColor = newValue }
     }
 
-    public var pullBarBackgroundColor: UIColor? {
-        get { return self.pullBarView.backgroundColor }
-        set { self.pullBarView.backgroundColor = newValue }
-    }
-    public var treatPullBarAsClear: Bool = SheetViewController.treatPullBarAsClear {
-        didSet {
-            if self.isViewLoaded {
-                self.updateCornerRadius()
-            }
-        }
-    }
-
     weak var delegate: SheetContentViewDelegate?
 
     public var contentWrapperView = UIView()
@@ -75,7 +63,6 @@ public class SheetContentViewController: UIViewController {
     private var navigationHeightConstraint: NSLayoutConstraint?
     private var gripSizeConstraints: [NSLayoutConstraint] = []
     public var childContainerView = UIView()
-    public var pullBarView = UIView()
     public var gripView = UIView()
     private let overflowView = UIView()
 
@@ -99,7 +86,6 @@ public class SheetContentViewController: UIViewController {
 
         self.setupContentView()
         self.setupChildContainerView()
-        self.setupPullBarView()
         self.setupChildViewController()
         self.updatePreferredHeight()
         if #available(iOS 13.0, *) {
@@ -145,8 +131,8 @@ public class SheetContentViewController: UIViewController {
     }
 
     private func updateCornerRadius() {
-        self.contentWrapperView.layer.cornerRadius = self.treatPullBarAsClear ? 0 : self.cornerRadius
-        self.childContainerView.layer.cornerRadius = self.treatPullBarAsClear ? self.cornerRadius : 0
+        self.contentWrapperView.layer.cornerRadius = self.cornerRadius
+        self.childContainerView.layer.cornerRadius = self.cornerRadius
     }
 
     private func setupOverflowView() {
@@ -219,9 +205,6 @@ public class SheetContentViewController: UIViewController {
             self.contentBottomConstraint = view.bottom.pinToSuperview()
                 view.top.pinToSuperview()
         }
-        if self.options.shouldExtendBackground, self.options.pullBarHeight > 0 {
-            self.childViewController.compatibleAdditionalSafeAreaInsets = UIEdgeInsets(top: self.options.pullBarHeight, left: 0, bottom: 0, right: 0)
-        }
 
         self.childViewController.didMove(toParent: self)
 
@@ -255,56 +238,11 @@ public class SheetContentViewController: UIViewController {
         self.contentWrapperView.addSubview(self.childContainerView)
 
         Constraints(for: self.childContainerView) { view in
-
-            if self.options.shouldExtendBackground {
-                view.top.pinToSuperview()
-            } else {
-                view.top.pinToSuperview(inset: self.options.pullBarHeight)
-            }
-            view.left.pinToSuperview()
-            view.right.pinToSuperview()
-            view.bottom.pinToSuperview()
+          view.top.pinToSuperview()
+          view.left.pinToSuperview()
+          view.right.pinToSuperview()
+          view.bottom.pinToSuperview()
         }
-    }
-
-    private func setupPullBarView() {
-        // If they didn't specify pull bar options, they don't want a pull bar
-        guard self.options.pullBarHeight > 0 else { return }
-        let pullBarView = self.pullBarView
-        pullBarView.isUserInteractionEnabled = true
-        pullBarView.backgroundColor = self.pullBarBackgroundColor
-        self.contentWrapperView.addSubview(pullBarView)
-        Constraints(for: pullBarView) {
-            $0.top.pinToSuperview()
-            $0.left.pinToSuperview()
-            $0.right.pinToSuperview()
-            $0.height.set(options.pullBarHeight)
-        }
-        self.pullBarView = pullBarView
-
-        let gripView = self.gripView
-        gripView.backgroundColor = self.gripColor
-        gripView.layer.cornerRadius = self.gripSize.height / 2
-        gripView.layer.masksToBounds = true
-        pullBarView.addSubview(gripView)
-        self.gripSizeConstraints.forEach({ $0.isActive = false })
-        Constraints(for: gripView) {
-            $0.centerY.alignWithSuperview()
-            $0.centerX.alignWithSuperview()
-            self.gripSizeConstraints = $0.size.set(self.gripSize)
-        }
-
-        pullBarView.isAccessibilityElement = true
-        pullBarView.accessibilityIdentifier = "pull-bar"
-        // This will be overriden whenever the sizes property is changed on SheetViewController
-        pullBarView.accessibilityTraits = [.button]
-
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(pullBarTapped))
-        pullBarView.addGestureRecognizer(tapGestureRecognizer)
-    }
-
-    @objc func pullBarTapped(_ gesture: UITapGestureRecognizer) {
-        self.delegate?.pullBarTapped()
     }
 
     @objc func contentSizeDidChange() {

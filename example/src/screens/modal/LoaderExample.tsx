@@ -35,7 +35,7 @@ export const LoaderExample = () => {
       <FittedSheet
         name={'loaderExample'}
         ref={bottomSheetRef}
-        params={{ backgroundColor: 'white' }}
+        params={{ backgroundColor: 'white', topLeftRightCornerRadius: 20 }}
         onSheetDismiss={() => setLoading(-1)}
       >
         <>

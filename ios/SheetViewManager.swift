@@ -164,8 +164,6 @@ final class HostFittedSheet: UIView {
       controller: self.viewController,
       sizes: [.fixed(size.height)],
       options: .init(
-        pullBarHeight: 0,
-        shouldExtendBackground: false,
         shrinkPresentingViewController: false,
         maxWidth: self.sheetMaxWidth
       )
