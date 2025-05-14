@@ -52,8 +52,6 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
             sheet.overlayView.alpha = 0
             
-            let heightPercent = contentView.bounds.height / UIScreen.main.bounds.height
-            
             UIView.performWithoutAnimation {
                 sheet.view.layoutIfNeeded()
             }
@@ -99,10 +97,14 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             )
         }
     }
+  
+  private func topSafe() -> CGFloat {
+    return UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.top ?? 0
+  }
 
     func restorePresentor(_ presenter: UIViewController, animated: Bool = true, animations: (() -> Void)? = nil, completion: ((Bool) -> Void)? = nil) {
         SheetTransition.currentPresenters.removeAll(where: { $0 == presenter })
-      let topSafeArea = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.top ?? 0
+      let topSafeArea = topSafe()
         UIView.animate(
             withDuration: self.options.transitionDuration,
             animations: {
@@ -132,7 +134,7 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
         
         var scale: CGFloat = min(1, 0.92 + (0.08 * percentComplete))
 
-      let topSafeArea = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.top ?? 0
+      let topSafeArea = topSafe()
 
         presenter.view.layer.transform = CATransform3DConcat(CATransform3DMakeTranslation(0, (1 - percentComplete) * topSafeArea/2, 0), CATransform3DMakeScale(scale, scale, 1))
         presenter.view.layer.cornerRadius = self.options.presentingViewCornerRadius * (1 - percentComplete)

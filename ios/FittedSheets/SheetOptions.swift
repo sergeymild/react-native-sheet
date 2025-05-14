@@ -12,20 +12,10 @@ import UIKit
 public struct SheetOptions {
     public static var `default` = SheetOptions()
     
-    public enum TransitionOverflowType {
-        case color(color: UIColor)
-        case view(view: UIView)
-        case none
-        case automatic
-    }
-    
     public var presentingViewCornerRadius: CGFloat = 12
 
     public var transitionAnimationOptions: UIView.AnimationOptions = [.curveEaseInOut]
     public var transitionDuration: TimeInterval = 0.4
-    /// Transition velocity base value. Automatically adjusts based on the initial size of the sheet.
-    public var transitionVelocity: CGFloat = 0.8
-    public var transitionOverflowType: TransitionOverflowType = .automatic
     
     /// Default value 500, greater value will require more velocity to dismiss. Lesser values will do opposite.
     public var pullDismissThreshod: CGFloat = 500.0
