@@ -47,13 +47,6 @@ public class SheetViewController: UIViewController {
         }
     }
 
-    public static var allowGestureThroughOverlay: Bool = false
-    public var allowGestureThroughOverlay: Bool = SheetViewController.allowGestureThroughOverlay {
-        didSet {
-            self.overlayTapView.isUserInteractionEnabled = !self.allowGestureThroughOverlay
-        }
-    }
-
     public static var cornerRadius: CGFloat = 12
     public var cornerRadius: CGFloat {
         get { return self.contentViewController.cornerRadius }
@@ -174,7 +167,7 @@ public class SheetViewController: UIViewController {
     private func addOverlayTapView() {
         let overlayTapView = self.overlayTapView
         overlayTapView.backgroundColor = .clear
-        overlayTapView.isUserInteractionEnabled = !self.allowGestureThroughOverlay
+        overlayTapView.isUserInteractionEnabled = true
         self.view.addSubview(overlayTapView)
         Constraints(for: overlayTapView, self.contentViewController.view) {
             $0.top.pinToSuperview()
@@ -369,12 +362,7 @@ public class SheetViewController: UIViewController {
 
 extension SheetViewController: SheetViewDelegate {
     func sheetPoint(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let isInOverlay = self.overlayTapView.bounds.contains(point)
-        if self.allowGestureThroughOverlay, isInOverlay {
-            return false
-        } else {
-            return true
-        }
+      return true
     }
 }
 
