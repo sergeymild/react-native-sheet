@@ -63,13 +63,10 @@ public class SheetContentViewController: UIViewController {
         self.setupContentView()
         self.setupChildContainerView()
         self.setupChildViewController()
-        self.updatePreferredHeight()
         if #available(iOS 13.0, *) {
             self.updateCornerCurve()
         }
         self.updateCornerRadius()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(contentSizeDidChange), name: UIContentSizeCategory.didChangeNotification, object: nil)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -77,12 +74,6 @@ public class SheetContentViewController: UIViewController {
         UIView.performWithoutAnimation {
             self.view.layoutIfNeeded()
         }
-        self.updatePreferredHeight()
-    }
-
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.updatePreferredHeight()
     }
 
     public override func viewDidLayoutSubviews() {
@@ -92,7 +83,6 @@ public class SheetContentViewController: UIViewController {
 
     func updateAfterLayout() {
         self.size = self.childViewController.view.bounds.height
-        //self.updatePreferredHeight()
     }
 
     @available(iOS 13.0, *)
@@ -104,24 +94,6 @@ public class SheetContentViewController: UIViewController {
     private func updateCornerRadius() {
         self.contentWrapperView.layer.cornerRadius = self.cornerRadius
         self.childContainerView.layer.cornerRadius = self.cornerRadius
-    }
-
-    func updatePreferredHeight() {
-        let width = self.view.bounds.width > 0 ? self.view.bounds.width : UIScreen.main.bounds.width
-        let oldPreferredHeight = self.preferredHeight
-        var fittingSize = UIView.layoutFittingCompressedSize;
-        fittingSize.width = width;
-
-        self.contentTopConstraint?.isActive = false
-        UIView.performWithoutAnimation {
-            self.contentView.layoutSubviews()
-        }
-
-        self.preferredHeight = self.contentView.systemLayoutSizeFitting(fittingSize, withHorizontalFittingPriority: .required, verticalFittingPriority: .defaultLow).height
-        self.contentTopConstraint?.isActive = true
-        UIView.performWithoutAnimation {
-            self.contentView.layoutSubviews()
-        }
     }
 
     private func updateChildViewControllerBottomConstraint(adjustment: CGFloat) {
@@ -170,10 +142,6 @@ public class SheetContentViewController: UIViewController {
           view.right.pinToSuperview()
           view.bottom.pinToSuperview()
         }
-    }
-
-    @objc func contentSizeDidChange() {
-        self.updatePreferredHeight()
     }
 }
 

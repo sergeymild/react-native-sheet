@@ -106,7 +106,6 @@ public class SheetViewController: UIViewController {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.contentViewController.updatePreferredHeight()
         self.resize(to: self.currentSize, animated: false)
     }
 

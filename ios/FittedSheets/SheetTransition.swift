@@ -47,7 +47,6 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             UIView.performWithoutAnimation {
                 sheet.view.layoutIfNeeded()
             }
-            sheet.contentViewController.updatePreferredHeight()
             sheet.resize(to: sheet.currentSize, animated: false)
             let contentView = sheet.contentViewController.contentView
             contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
