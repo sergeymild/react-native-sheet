@@ -38,8 +38,6 @@ public struct SheetOptions {
     
     public var horizontalPadding: CGFloat = 0
     public var maxWidth: CGFloat?
-
-    public var isRubberBandEnabled: Bool = false
     
     /// Experimental flag that attempts to shrink the nested presentations more each time a new sheet is presented. This must be set before any sheet is presented.
     public static var shrinkingNestedPresentingViewControllers = false
@@ -50,8 +48,7 @@ public struct SheetOptions {
                 shrinkPresentingViewController: Bool? = nil,
                 useInlineMode: Bool? = nil,
                 horizontalPadding: CGFloat? = nil,
-                maxWidth: CGFloat? = nil,
-                isRubberBandEnabled: Bool? = nil) {
+                maxWidth: CGFloat? = nil) {
         let defaultOptions = SheetOptions.default
         self.presentingViewCornerRadius = presentingViewCornerRadius ?? defaultOptions.presentingViewCornerRadius
         self.useFullScreenMode = useFullScreenMode ?? defaultOptions.useFullScreenMode
@@ -60,7 +57,6 @@ public struct SheetOptions {
         self.horizontalPadding = horizontalPadding ?? defaultOptions.horizontalPadding
         let maxWidth = maxWidth ?? defaultOptions.maxWidth
         self.maxWidth = maxWidth == 0 ? nil : maxWidth
-        self.isRubberBandEnabled = isRubberBandEnabled ?? false
     }
 }
 
