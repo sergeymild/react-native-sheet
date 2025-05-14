@@ -168,7 +168,7 @@ final class HostFittedSheet: UIView {
         maxWidth: self.sheetMaxWidth
       )
     )
-    self._modalViewController?.allowPullingPastMaxHeight = false
+
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
     self._modalViewController?.autoAdjustToKeyboard = false
     self._modalViewController?.dismissOnPull = self.dismissable

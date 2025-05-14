@@ -29,9 +29,7 @@ public struct SheetOptions {
     
     /// Default value 500, greater value will require more velocity to dismiss. Lesser values will do opposite.
     public var pullDismissThreshod: CGFloat = 500.0
-    
-    /// Allow the sheet to become full screen if pulled all the way to the top and not larger than the maximum size specified in sizes. Defaults to false.
-    public var useFullScreenMode = true
+
     public var shrinkPresentingViewController = true
     /// Set true to be able to use the sheet view controller as a subview instead of a modal. Defaults to false.
     public var useInlineMode = false
@@ -43,13 +41,11 @@ public struct SheetOptions {
     
     public init() { }
     public init(presentingViewCornerRadius: CGFloat? = nil,
-                useFullScreenMode: Bool? = nil,
                 shrinkPresentingViewController: Bool? = nil,
                 useInlineMode: Bool? = nil,
                 maxWidth: CGFloat? = nil) {
         let defaultOptions = SheetOptions.default
         self.presentingViewCornerRadius = presentingViewCornerRadius ?? defaultOptions.presentingViewCornerRadius
-        self.useFullScreenMode = useFullScreenMode ?? defaultOptions.useFullScreenMode
         self.shrinkPresentingViewController = shrinkPresentingViewController ?? defaultOptions.shrinkPresentingViewController
         self.useInlineMode = useInlineMode ?? defaultOptions.useInlineMode
         let maxWidth = maxWidth ?? defaultOptions.maxWidth

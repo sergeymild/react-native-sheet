@@ -12,9 +12,6 @@ import CoreGraphics
 public enum SheetSize: Equatable {
     case intrinsic
     case fixed(CGFloat)
-    case fullscreen
-    case percent(Float)
-    case marginFromTop(CGFloat)
 }
 
 #endif // os(iOS) || os(tvOS) || os(watchOS)

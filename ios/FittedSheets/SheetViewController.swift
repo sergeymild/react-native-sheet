@@ -17,11 +17,6 @@ public class SheetViewController: UIViewController {
     /// Automatically grow/move the sheet to accomidate the keyboard. Defaults to false.
     public var autoAdjustToKeyboard = SheetViewController.autoAdjustToKeyboard
 
-	/// Default value for allowPullingPastMaxHeight. Defaults to true.
-	public static var allowPullingPastMaxHeight = true
-    /// Allow pulling past the maximum height and bounce back. Defaults to true.
-    public var allowPullingPastMaxHeight = SheetViewController.allowPullingPastMaxHeight
-
 	/// Default value for allowPullingPastMinHeight. Defaults to true.
 	public static var allowPullingPastMinHeight = true
 	/// Allow pulling below the minimum height and bounce back. Defaults to true.
@@ -279,11 +274,7 @@ public class SheetViewController: UIViewController {
             self.contentViewHeightConstraint = $0.height.set(self.height(for: self.currentSize))
 
             let top: CGFloat
-            if (self.options.useFullScreenMode) {
-                top = 0
-            } else {
-              top = max(12, UIApplication.shared.windows.first(where:  { $0.isKeyWindow })?.safeAreaInsets.top ?? 12)
-            }
+            top = 0
             $0.bottom.pinToSuperview()
             $0.top.pinToSuperview(inset: top, relation: .greaterThanOrEqual).priority = UILayoutPriority(999)
         }
@@ -306,11 +297,7 @@ public class SheetViewController: UIViewController {
 
         let minHeight: CGFloat = self.height(for: self.orderedSizes.first)
         let maxHeight: CGFloat
-        if self.allowPullingPastMaxHeight {
-            maxHeight = self.height(for: .fullscreen) // self.view.bounds.height
-        } else {
-            maxHeight = max(self.height(for: self.orderedSizes.last), self.prePanHeight)
-        }
+        maxHeight = max(self.height(for: self.orderedSizes.last), self.prePanHeight)
 
         var newHeight = max(0, self.prePanHeight + (self.firstPanPoint.y - point.y))
         var offset: CGFloat = 0
@@ -461,25 +448,12 @@ public class SheetViewController: UIViewController {
         guard let size = size else { return 0 }
         let contentHeight: CGFloat
         let fullscreenHeight: CGFloat
-        if self.options.useFullScreenMode {
-            fullscreenHeight = self.view.bounds.height
-        } else {
-          fullscreenHeight = self.view.bounds.height - self.view.safeAreaInsets.top
-        }
+        fullscreenHeight = self.view.bounds.height
         switch (size) {
             case .fixed(let height):
                 contentHeight = height + self.keyboardHeight
-            case .fullscreen:
-                contentHeight = fullscreenHeight
             case .intrinsic:
                 contentHeight = self.contentViewController.preferredHeight + self.keyboardHeight
-            case .percent(let percent):
-                if (percent > 1) {
-                    debugPrint("Size percent should be less than or equal to 1.0, but was set to \(percent))")
-                }
-                contentHeight = (self.view.bounds.height) * CGFloat(percent) + self.keyboardHeight
-            case .marginFromTop(let margin):
-                contentHeight = (self.view.bounds.height) - margin + self.keyboardHeight
         }
         return min(fullscreenHeight, contentHeight)
     }
@@ -655,7 +629,7 @@ extension SheetViewController: UIGestureRecognizerDelegate {
 
         if velocity.y < 0 {
             let containerHeight = height(for: self.currentSize)
-            return height(for: self.orderedSizes.last) > containerHeight && containerHeight < height(for: SheetSize.fullscreen)
+          return height(for: self.orderedSizes.last) > containerHeight && containerHeight < height(for: SheetSize.intrinsic)
         } else {
             return true
         }
