@@ -11,10 +11,8 @@ import UIKit
 
 class SheetView: UIView {
 
-    weak var delegate: SheetViewDelegate?
-
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        return self.delegate?.sheetPoint(inside: point, with: event) ?? true
+        return true
     }
 }
 

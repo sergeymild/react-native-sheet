@@ -17,8 +17,6 @@ public class SheetViewController: UIViewController {
     public var dismissOnPull: Bool = true
     /// Dismisses the sheet by tapping on the background overlay
     public var dismissOnOverlayTap: Bool = true
-    /// If true you can pull using UIControls (so you can grab and drag a button to control the sheet)
-    public var shouldRecognizePanGestureWithUIControls: Bool = true
 
     /// The view controller being presented by the sheet currently
     public var childViewController: UIViewController {
@@ -64,7 +62,6 @@ public class SheetViewController: UIViewController {
     public private(set) var contentViewController: SheetContentViewController
     var overlayView = UIView()
     var overlayTapView = UIView()
-    var overflowView = UIView()
     var overlayTapGesture: UITapGestureRecognizer?
     private var contentViewHeightConstraint: NSLayoutConstraint!
 
@@ -78,19 +75,9 @@ public class SheetViewController: UIViewController {
     private var prePanHeight: CGFloat = 0
     private var isPanning: Bool = false
 
-    public var contentBackgroundColor: UIColor? {
-        get { self.contentViewController.contentBackgroundColor }
-        set { self.contentViewController.contentBackgroundColor = newValue }
-    }
-
     public init(controller: UIViewController, size: CGFloat = 0, options: SheetOptions? = nil) {
         let options = options ?? SheetOptions.default
         self.contentViewController = SheetContentViewController(childViewController: controller, options: options)
-        if #available(iOS 13.0, *) {
-            self.contentViewController.contentBackgroundColor = UIColor.systemBackground
-        } else {
-            self.contentViewController.contentBackgroundColor = UIColor.white
-        }
         self.currentSize = size
         self.options = options
         self.transition = SheetTransition(options: options)
@@ -107,7 +94,7 @@ public class SheetViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-      self.additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+      self.additionalSafeAreaInsets = .zero
 
         self.view.backgroundColor = UIColor.clear
         self.addPanGestureRecognizer()
@@ -283,10 +270,7 @@ public class SheetViewController: UIViewController {
                     return
                 }
 
-
-                var newSize = self.currentSize
-
-                let newContentHeight = self.height(for: newSize)
+                let newContentHeight = self.height(for: self.currentSize)
                 UIView.animate(
                     withDuration: animationDuration,
                     delay: 0,
@@ -311,7 +295,7 @@ public class SheetViewController: UIViewController {
         let contentHeight: CGFloat
         let fullscreenHeight: CGFloat
         fullscreenHeight = self.view.bounds.height
-      contentHeight = size
+        contentHeight = size
         return min(fullscreenHeight, contentHeight)
     }
 
@@ -353,20 +337,8 @@ public class SheetViewController: UIViewController {
     }
 }
 
-extension SheetViewController: SheetViewDelegate {
-    func sheetPoint(inside point: CGPoint, with event: UIEvent?) -> Bool {
-      return true
-    }
-}
-
 extension SheetViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        // Allowing gesture recognition on a UIControl seems to prevent its events from firing properly sometimes
-        if !shouldRecognizePanGestureWithUIControls {
-            if let view = touch.view {
-                return !(view is UIControl)
-            }
-        }
         return true
     }
 

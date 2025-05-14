@@ -39,8 +39,6 @@ public class SheetContentViewController: UIViewController {
         }
     }
 
-    weak var delegate: SheetContentViewDelegate?
-
     public var contentWrapperView = UIView()
     public var contentView = UIView()
     private var contentTopConstraint: NSLayoutConstraint?
@@ -142,8 +140,6 @@ public class SheetContentViewController: UIViewController {
         UIView.performWithoutAnimation {
             self.contentView.layoutSubviews()
         }
-
-        self.delegate?.preferredHeightChanged(oldHeight: oldPreferredHeight, newSize: self.preferredHeight)
     }
 
     private func updateChildViewControllerBottomConstraint(adjustment: CGFloat) {
