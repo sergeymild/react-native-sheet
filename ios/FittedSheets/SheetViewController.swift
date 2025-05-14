@@ -23,13 +23,13 @@ public class SheetViewController: UIViewController {
 	public var allowPullingPastMinHeight = SheetViewController.allowPullingPastMinHeight
 
     /// The sizes that the sheet will attempt to pin to. Defaults to intrinsic only.
-    public var sizes: [SheetSize] = [.intrinsic] {
+    public var sizes: [SheetSize] = [.fixed(0)] {
         didSet {
             self.updateOrderedSizes()
         }
     }
     public var orderedSizes: [SheetSize] = []
-    public private(set) var currentSize: SheetSize = .intrinsic
+  public private(set) var currentSize: SheetSize = .fixed(0)
     /// Allows dismissing of the sheet by pulling down
     public var dismissOnPull: Bool = true
     /// Dismisses the sheet by tapping on the background overlay
@@ -126,7 +126,7 @@ public class SheetViewController: UIViewController {
         set { self.contentViewController.contentBackgroundColor = newValue }
     }
 
-    public init(controller: UIViewController, sizes: [SheetSize] = [.intrinsic], options: SheetOptions? = nil) {
+    public init(controller: UIViewController, sizes: [SheetSize], options: SheetOptions? = nil) {
         let options = options ?? SheetOptions.default
         self.contentViewController = SheetContentViewController(childViewController: controller, options: options)
         if #available(iOS 13.0, *) {
@@ -134,7 +134,7 @@ public class SheetViewController: UIViewController {
         } else {
             self.contentViewController.contentBackgroundColor = UIColor.white
         }
-        self.sizes = sizes.count > 0 ? sizes : [.intrinsic]
+      self.sizes = sizes.count > 0 ? sizes : [.fixed(0)]
         self.options = options
         self.transition = SheetTransition(options: options)
         super.init(nibName: nil, bundle: nil)
@@ -170,7 +170,7 @@ public class SheetViewController: UIViewController {
         self.addContentView()
         self.addOverlayTapView()
         self.registerKeyboardObservers()
-        self.resize(to: self.sizes.first ?? .intrinsic, animated: false)
+      self.resize(to: self.sizes.first ?? .fixed(0), animated: false)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -262,7 +262,6 @@ public class SheetViewController: UIViewController {
         self.addChild(self.contentViewController)
         self.view.addSubview(self.contentViewController.view)
         self.contentViewController.didMove(toParent: self)
-        self.contentViewController.delegate = self
         Constraints(for: self.contentViewController.view) {
             $0.left.pinToSuperview().priority = UILayoutPriority(999)
             $0.left.pinToSuperview(inset: 0, relation: .greaterThanOrEqual)
@@ -452,8 +451,6 @@ public class SheetViewController: UIViewController {
         switch (size) {
             case .fixed(let height):
                 contentHeight = height + self.keyboardHeight
-            case .intrinsic:
-                contentHeight = self.contentViewController.preferredHeight + self.keyboardHeight
         }
         return min(fullscreenHeight, contentHeight)
     }
@@ -629,22 +626,9 @@ extension SheetViewController: UIGestureRecognizerDelegate {
 
         if velocity.y < 0 {
             let containerHeight = height(for: self.currentSize)
-          return height(for: self.orderedSizes.last) > containerHeight && containerHeight < height(for: SheetSize.intrinsic)
+          return height(for: self.orderedSizes.last) > containerHeight
         } else {
             return true
-        }
-    }
-}
-
-extension SheetViewController: SheetContentViewDelegate {
-
-    func preferredHeightChanged(oldHeight: CGFloat, newSize: CGFloat) {
-        if self.sizes.contains(.intrinsic) {
-            self.updateOrderedSizes()
-        }
-        // If our intrinsic size changed and that is what we are sized to currently, use that
-        if self.currentSize == .intrinsic, !self.isPanning {
-            self.resize(to: .intrinsic)
         }
     }
 }

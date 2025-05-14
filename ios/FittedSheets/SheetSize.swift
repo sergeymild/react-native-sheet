@@ -10,7 +10,6 @@
 import CoreGraphics
 
 public enum SheetSize: Equatable {
-    case intrinsic
     case fixed(CGFloat)
 }
 
