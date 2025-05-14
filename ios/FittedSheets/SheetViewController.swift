@@ -22,14 +22,7 @@ public class SheetViewController: UIViewController {
 	/// Allow pulling below the minimum height and bounce back. Defaults to true.
 	public var allowPullingPastMinHeight = SheetViewController.allowPullingPastMinHeight
 
-    /// The sizes that the sheet will attempt to pin to. Defaults to intrinsic only.
-    public var sizes: [SheetSize] = [.fixed(0)] {
-        didSet {
-            self.updateOrderedSizes()
-        }
-    }
-    public var orderedSizes: [SheetSize] = []
-  public private(set) var currentSize: SheetSize = .fixed(0)
+  public private(set) var currentSize: CGFloat = 0
     /// Allows dismissing of the sheet by pulling down
     public var dismissOnPull: Bool = true
     /// Dismisses the sheet by tapping on the background overlay
@@ -101,7 +94,6 @@ public class SheetViewController: UIViewController {
     let transition: SheetTransition
 
     public var didDismiss: ((SheetViewController) -> Void)?
-    public var sizeChanged: ((SheetViewController, SheetSize, CGFloat) -> Void)?
 
     public private(set) var contentViewController: SheetContentViewController
     var overlayView = UIView()
@@ -126,7 +118,7 @@ public class SheetViewController: UIViewController {
         set { self.contentViewController.contentBackgroundColor = newValue }
     }
 
-    public init(controller: UIViewController, sizes: [SheetSize], options: SheetOptions? = nil) {
+    public init(controller: UIViewController, size: CGFloat = 0, options: SheetOptions? = nil) {
         let options = options ?? SheetOptions.default
         self.contentViewController = SheetContentViewController(childViewController: controller, options: options)
         if #available(iOS 13.0, *) {
@@ -134,12 +126,11 @@ public class SheetViewController: UIViewController {
         } else {
             self.contentViewController.contentBackgroundColor = UIColor.white
         }
-      self.sizes = sizes.count > 0 ? sizes : [.fixed(0)]
+        self.currentSize = size
         self.options = options
         self.transition = SheetTransition(options: options)
         super.init(nibName: nil, bundle: nil)
         self.cornerRadius = SheetViewController.cornerRadius
-        self.updateOrderedSizes()
         self.modalPresentationStyle = .custom
         self.transitioningDelegate = self
     }
@@ -160,12 +151,11 @@ public class SheetViewController: UIViewController {
         self.addContentView()
         self.addOverlayTapView()
         self.registerKeyboardObservers()
-      self.resize(to: self.sizes.first ?? .fixed(0), animated: false)
+      self.resize(to: self.currentSize, animated: false)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.updateOrderedSizes()
         self.contentViewController.updatePreferredHeight()
         self.resize(to: self.currentSize, animated: false)
     }
@@ -192,18 +182,9 @@ public class SheetViewController: UIViewController {
     }
 
     /// Change the sizes the sheet should try to pin to
-    public func setSizes(_ sizes: [SheetSize], animated: Bool = true) {
-        guard sizes.count > 0 else { return }
-        self.sizes = sizes
-        self.resize(to: sizes[0], animated: animated)
-    }
-
-    func updateOrderedSizes() {
-        var concreteSizes: [(SheetSize, CGFloat)] = self.sizes.map {
-            return ($0, self.height(for: $0))
-        }
-        concreteSizes.sort { $0.1 < $1.1 }
-        self.orderedSizes = concreteSizes.map({ size, _ in size })
+    public func setSize(_ size: CGFloat, animated: Bool = true) {
+      self.currentSize = size
+        self.resize(to: size, animated: animated)
     }
 
     private func addOverlay() {
@@ -284,9 +265,9 @@ public class SheetViewController: UIViewController {
             self.isPanning = true
         }
 
-        let minHeight: CGFloat = self.height(for: self.orderedSizes.first)
+      let minHeight: CGFloat = currentSize
         let maxHeight: CGFloat
-        maxHeight = max(self.height(for: self.orderedSizes.last), self.prePanHeight)
+        maxHeight = max(currentSize, self.prePanHeight)
 
         var newHeight = max(0, self.prePanHeight + (self.firstPanPoint.y - point.y))
         var offset: CGFloat = 0
@@ -353,29 +334,6 @@ public class SheetViewController: UIViewController {
 
 
                 var newSize = self.currentSize
-                if point.y < 0 {
-                    // We need to move to the next larger one
-                    newSize = self.orderedSizes.last ?? self.currentSize
-                    for size in self.orderedSizes.reversed() {
-                        if finalHeight < self.height(for: size) {
-                            newSize = size
-                        } else {
-                            break
-                        }
-                    }
-                } else {
-                    // We need to move to the next smaller one
-                    newSize = self.orderedSizes.first ?? self.currentSize
-                    for size in self.orderedSizes {
-                        if finalHeight > self.height(for: size) {
-                            newSize = size
-                        } else {
-                            break
-                        }
-                    }
-                }
-                let previousSize = self.currentSize
-                self.currentSize = newSize
 
                 let newContentHeight = self.height(for: newSize)
                 UIView.animate(
@@ -390,9 +348,6 @@ public class SheetViewController: UIViewController {
                     self.view.layoutIfNeeded()
                 }, completion: { complete in
                     self.isPanning = false
-                    if previousSize != newSize {
-                        self.sizeChanged?(self, newSize, newContentHeight)
-                    }
                 })
             case .possible:
                 break
@@ -433,19 +388,15 @@ public class SheetViewController: UIViewController {
         })
     }
 
-    private func height(for size: SheetSize?) -> CGFloat {
-        guard let size = size else { return 0 }
+    private func height(for size: CGFloat) -> CGFloat {
         let contentHeight: CGFloat
         let fullscreenHeight: CGFloat
         fullscreenHeight = self.view.bounds.height
-        switch (size) {
-            case .fixed(let height):
-                contentHeight = height + self.keyboardHeight
-        }
+      contentHeight = size + self.keyboardHeight
         return min(fullscreenHeight, contentHeight)
     }
 
-    public func resize(to size: SheetSize,
+    public func resize(to size: CGFloat,
                        duration: TimeInterval = 0.2,
                        options: UIView.AnimationOptions = [.curveEaseOut],
                        animated: Bool = true,
@@ -468,9 +419,6 @@ public class SheetViewController: UIViewController {
                 constraint.constant = newHeight
                 self.view.layoutIfNeeded()
             }, completion: { _ in
-                if previousSize != size {
-                    self.sizeChanged?(self, size, newHeight)
-                }
                 self.contentViewController.updateAfterLayout()
                 complete?()
             })
@@ -532,7 +480,7 @@ extension SheetViewController: UIGestureRecognizerDelegate {
 
         if velocity.y < 0 {
             let containerHeight = height(for: self.currentSize)
-          return height(for: self.orderedSizes.last) > containerHeight
+          return currentSize > containerHeight
         } else {
             return true
         }

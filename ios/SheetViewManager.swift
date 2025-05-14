@@ -156,13 +156,13 @@ final class HostFittedSheet: UIView {
   func setCalculatedHeight(_ height: NSNumber) {
     debugPrint("😀 setCalculatedHeight", height)
     _sheetSize = RCTConvert.cgFloat(height)
-    _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
+    _modalViewController?.setSize(_sheetSize ?? 0)
   }
   
   private func initializeSheet(_ size: CGSize) {
     self._modalViewController = SheetViewController(
       controller: self.viewController,
-      sizes: [.fixed(size.height)],
+      size: size.height,
       options: .init(
         shrinkPresentingViewController: false,
         maxWidth: self.sheetMaxWidth
