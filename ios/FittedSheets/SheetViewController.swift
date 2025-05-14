@@ -38,32 +38,15 @@ public class SheetViewController: UIViewController {
         return childViewController.supportedInterfaceOrientations
     }
 
-    public static var hasBlurBackground = false
-    public var hasBlurBackground = SheetViewController.hasBlurBackground {
-        didSet {
-            blurView.isHidden = !hasBlurBackground
-            overlayView.backgroundColor = hasBlurBackground ? .clear : self.overlayColor
-        }
-    }
-
     /// The default color of the overlay background
     public static var overlayColor = UIColor(white: 0, alpha: 0.25)
     /// The color of the overlay background
     public var overlayColor = SheetViewController.overlayColor {
         didSet {
-            self.overlayView.backgroundColor = self.hasBlurBackground ? .clear : self.overlayColor
+            self.overlayView.backgroundColor = self.overlayColor
         }
     }
 
-    public static var blurEffect: UIBlurEffect = {
-        return UIBlurEffect(style: .prominent)
-    }()
-
-    public var blurEffect = SheetViewController.blurEffect {
-        didSet {
-            self.blurView.effect = blurEffect
-        }
-    }
     public static var allowGestureThroughOverlay: Bool = false
     public var allowGestureThroughOverlay: Bool = SheetViewController.allowGestureThroughOverlay {
         didSet {
@@ -92,7 +75,6 @@ public class SheetViewController: UIViewController {
 
     public private(set) var contentViewController: SheetContentViewController
     var overlayView = UIView()
-    var blurView = UIVisualEffectView()
     var overlayTapView = UIView()
     var overflowView = UIView()
     var overlayTapGesture: UITapGestureRecognizer?
@@ -142,7 +124,6 @@ public class SheetViewController: UIViewController {
         self.view.backgroundColor = UIColor.clear
         self.addPanGestureRecognizer()
         self.addOverlay()
-        self.addBlurBackground()
         self.addContentView()
         self.addOverlayTapView()
       self.resize(to: self.currentSize, animated: false)
@@ -187,17 +168,7 @@ public class SheetViewController: UIViewController {
             $0.edges(.top, .left, .right, .bottom).pinToSuperview()
         }
         self.overlayView.isUserInteractionEnabled = false
-        self.overlayView.backgroundColor = self.hasBlurBackground ? .clear : self.overlayColor
-    }
-
-    private func addBlurBackground() {
-        self.overlayView.addSubview(self.blurView)
-        blurView.effect = blurEffect
-        Constraints(for: self.blurView) {
-            $0.edges(.top, .left, .right, .bottom).pinToSuperview()
-        }
-        self.blurView.isUserInteractionEnabled = false
-        self.blurView.isHidden = !self.hasBlurBackground
+        self.overlayView.backgroundColor = self.overlayColor
     }
 
     private func addOverlayTapView() {
