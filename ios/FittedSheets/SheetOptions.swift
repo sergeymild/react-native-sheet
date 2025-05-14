@@ -31,8 +31,6 @@ public struct SheetOptions {
     public var pullDismissThreshod: CGFloat = 500.0
 
     public var shrinkPresentingViewController = true
-    /// Set true to be able to use the sheet view controller as a subview instead of a modal. Defaults to false.
-    public var useInlineMode = false
     
     public var maxWidth: CGFloat?
     
@@ -42,12 +40,10 @@ public struct SheetOptions {
     public init() { }
     public init(presentingViewCornerRadius: CGFloat? = nil,
                 shrinkPresentingViewController: Bool? = nil,
-                useInlineMode: Bool? = nil,
                 maxWidth: CGFloat? = nil) {
         let defaultOptions = SheetOptions.default
         self.presentingViewCornerRadius = presentingViewCornerRadius ?? defaultOptions.presentingViewCornerRadius
         self.shrinkPresentingViewController = shrinkPresentingViewController ?? defaultOptions.shrinkPresentingViewController
-        self.useInlineMode = useInlineMode ?? defaultOptions.useInlineMode
         let maxWidth = maxWidth ?? defaultOptions.maxWidth
         self.maxWidth = maxWidth == 0 ? nil : maxWidth
     }

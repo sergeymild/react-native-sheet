@@ -148,16 +148,6 @@ public class SheetViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func loadView() {
-        if self.options.useInlineMode {
-            let sheetView = SheetView()
-            sheetView.delegate = self
-            self.view = sheetView
-        } else {
-            super.loadView()
-        }
-    }
-
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -190,7 +180,7 @@ public class SheetViewController: UIViewController {
             self.transition.restorePresentor(presenter, completion: { _ in
                 self.didDismiss?(self)
             })
-        } else if !self.options.useInlineMode {
+        } else {
             self.didDismiss?(self)
         }
     }
@@ -494,91 +484,7 @@ public class SheetViewController: UIViewController {
     }
 
     public func attemptDismiss(animated: Bool) {
-        if self.options.useInlineMode {
-            if animated {
-                self.animateOut {
-                    self.didDismiss?(self)
-                }
-            } else {
-                self.view.removeFromSuperview()
-                self.removeFromParent()
-                self.didDismiss?(self)
-            }
-        } else {
-            self.dismiss(animated: animated, completion: nil)
-        }
-    }
-
-    /// Recalculates the intrinsic height of the sheet based on the content, and updates the sheet height to match.
-    ///
-    /// **Note:** Only meant for use with `.intrinsic` sheet size
-    public func updateIntrinsicHeight() {
-        contentViewController.updatePreferredHeight()
-    }
-
-    /// Animates the sheet in, but only if presenting using the inline mode
-    public func animateIn(to view: UIView, in parent: UIViewController, size: SheetSize? = nil, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
-
-        self.willMove(toParent: parent)
-        parent.addChild(self)
-        view.addSubview(self.view)
-        self.didMove(toParent: parent)
-
-        self.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.view.topAnchor.constraint(equalTo: view.topAnchor),
-            self.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            self.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            self.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-        self.animateIn(size: size, duration: duration, completion: completion)
-    }
-
-    public func animateIn(size: SheetSize? = nil, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
-        guard self.options.useInlineMode else { return }
-        guard self.view.superview != nil else {
-            print("It appears your sheet is not set as a subview of another view. Make sure to add this view as a subview before trying to animate it in.")
-            return
-        }
-        self.view.superview?.layoutIfNeeded()
-        self.contentViewController.updatePreferredHeight()
-        self.resize(to: size ?? self.sizes.first ?? self.currentSize, animated: false)
-        let contentView = self.contentViewController.view!
-        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
-        self.overlayView.alpha = 0
-        self.updateOrderedSizes()
-
-        UIView.animate(
-            withDuration: duration,
-            animations: {
-                contentView.transform = .identity
-                self.overlayView.alpha = 1
-            },
-            completion: { _ in
-                completion?()
-            }
-        )
-    }
-
-    /// Animates the sheet out, but only if presenting using the inline mode
-    public func animateOut(duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
-        guard self.options.useInlineMode else { return }
-        let contentView = self.contentViewController.view!
-
-        UIView.animate(
-            withDuration: duration,
-            delay: 0,
-            options: self.options.transitionAnimationOptions,
-            animations: {
-                contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
-                self.overlayView.alpha = 0
-            },
-            completion: { _ in
-                self.view.removeFromSuperview()
-                self.removeFromParent()
-                completion?()
-            }
-        )
+      self.dismiss(animated: animated, completion: nil)
     }
 }
 
