@@ -170,7 +170,6 @@ final class HostFittedSheet: UIView {
     )
 
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
-    self._modalViewController?.autoAdjustToKeyboard = false
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = .clear

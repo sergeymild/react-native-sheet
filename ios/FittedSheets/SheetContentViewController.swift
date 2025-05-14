@@ -99,10 +99,6 @@ public class SheetContentViewController: UIViewController {
         //self.updatePreferredHeight()
     }
 
-    func adjustForKeyboard(height: CGFloat) {
-        self.updateChildViewControllerBottomConstraint(adjustment: -height)
-    }
-
     @available(iOS 13.0, *)
     private func updateCornerCurve() {
         self.contentWrapperView.layer.cornerCurve = self.cornerCurve
