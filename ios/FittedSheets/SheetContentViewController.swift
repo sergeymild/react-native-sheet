@@ -54,10 +54,6 @@ public class SheetContentViewController: UIViewController {
         self.childViewController = childViewController
         self.preferredHeight = 0
         super.init(nibName: nil, bundle: nil)
-
-        if options.setIntrinsicHeightOnNavigationControllers, let navigationController = self.childViewController as? UINavigationController {
-            navigationController.delegate = self
-        }
     }
 
     public required init?(coder: NSCoder) {
@@ -134,27 +130,7 @@ public class SheetContentViewController: UIViewController {
         }
     }
 
-    private func updateNavigationControllerHeight() {
-        // UINavigationControllers don't set intrinsic size, this is a workaround to fix that
-        guard self.options.setIntrinsicHeightOnNavigationControllers, let navigationController = self.childViewController as? UINavigationController else { return }
-        self.navigationHeightConstraint?.isActive = false
-        self.contentTopConstraint?.isActive = false
-
-        if let viewController = navigationController.visibleViewController {
-           let size = viewController.view.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0))
-
-            if self.navigationHeightConstraint == nil {
-                self.navigationHeightConstraint = navigationController.view.heightAnchor.constraint(equalToConstant: size.height)
-            } else {
-                self.navigationHeightConstraint?.constant = size.height
-            }
-        }
-        self.navigationHeightConstraint?.isActive = true
-        self.contentTopConstraint?.isActive = true
-    }
-
     func updatePreferredHeight() {
-        self.updateNavigationControllerHeight()
         let width = self.view.bounds.width > 0 ? self.view.bounds.width : UIScreen.main.bounds.width
         let oldPreferredHeight = self.preferredHeight
         var fittingSize = UIView.layoutFittingCompressedSize;
@@ -229,17 +205,6 @@ public class SheetContentViewController: UIViewController {
     }
 
     @objc func contentSizeDidChange() {
-        self.updatePreferredHeight()
-    }
-}
-
-extension SheetContentViewController: UINavigationControllerDelegate {
-    public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        navigationController.view.endEditing(true)
-    }
-
-    public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
-        self.navigationHeightConstraint?.isActive = true
         self.updatePreferredHeight()
     }
 }

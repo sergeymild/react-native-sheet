@@ -20,7 +20,6 @@ public struct SheetOptions {
     }
     
     public var presentingViewCornerRadius: CGFloat = 12
-    public var setIntrinsicHeightOnNavigationControllers = true
 
     public var transitionAnimationOptions: UIView.AnimationOptions = [.curveEaseInOut]
     public var transitionDuration: TimeInterval = 0.4
@@ -47,7 +46,6 @@ public struct SheetOptions {
     
     public init() { }
     public init(presentingViewCornerRadius: CGFloat? = nil,
-                setIntrinsicHeightOnNavigationControllers: Bool? = nil,
                 useFullScreenMode: Bool? = nil,
                 shrinkPresentingViewController: Bool? = nil,
                 useInlineMode: Bool? = nil,
@@ -56,7 +54,6 @@ public struct SheetOptions {
                 isRubberBandEnabled: Bool? = nil) {
         let defaultOptions = SheetOptions.default
         self.presentingViewCornerRadius = presentingViewCornerRadius ?? defaultOptions.presentingViewCornerRadius
-        self.setIntrinsicHeightOnNavigationControllers = setIntrinsicHeightOnNavigationControllers ?? defaultOptions.setIntrinsicHeightOnNavigationControllers
         self.useFullScreenMode = useFullScreenMode ?? defaultOptions.useFullScreenMode
         self.shrinkPresentingViewController = shrinkPresentingViewController ?? defaultOptions.shrinkPresentingViewController
         self.useInlineMode = useInlineMode ?? defaultOptions.useInlineMode
