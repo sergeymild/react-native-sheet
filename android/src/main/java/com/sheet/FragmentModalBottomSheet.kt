@@ -48,6 +48,14 @@ class FragmentModalBottomSheet(
     (dialog as CustomBottomSheetDialog).setNewNestedScrollView(view)
   }
 
+  fun collapse() {
+    (dialog as CustomBottomSheetDialog).collapse()
+  }
+
+  fun expand() {
+    (dialog as CustomBottomSheetDialog).expand()
+  }
+
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
     presentedWindow?.clear()
