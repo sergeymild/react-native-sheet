@@ -43,6 +43,24 @@ export const QueueExample = () => {
               dismissFittedSheet('second');
             }}
           />
+          <Button
+            label="Present3"
+            onPress={() => presentFittedSheet('third')}
+          />
+          <Text style={{ color: 'red' }}>{value}</Text>
+        </View>
+      </FittedSheet>
+
+      <FittedSheet name={'third'}>
+        <View style={styles.contentContainerStyle}>
+          <View style={{ height: 300, backgroundColor: 'red' }} />
+          <Button
+            label="dismiss 3"
+            onPress={() => {
+              setValue('from sheet 3');
+              dismissFittedSheet('third');
+            }}
+          />
         </View>
       </FittedSheet>
     </View>
