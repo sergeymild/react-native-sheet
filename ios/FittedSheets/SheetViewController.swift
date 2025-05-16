@@ -545,14 +545,13 @@ public class SheetViewController: UIViewController {
 
         let newHeight = self.height(for: size)
 
-        guard oldConstraintHeight != newHeight else {
-            return
-        }
+        guard oldConstraintHeight != newHeight else { return }
 
         if animated {
             UIView.animate(withDuration: duration, delay: 0, options: options, animations: { [weak self] in
                 guard let self = self, let constraint = self.contentViewHeightConstraint else { return }
                 constraint.constant = newHeight
+                self.overlayView.alpha = newHeight == 0 ? 0 : 1
                 self.view.layoutIfNeeded()
             }, completion: { _ in
                 if previousSize != size {
@@ -593,50 +592,7 @@ public class SheetViewController: UIViewController {
         contentViewController.updatePreferredHeight()
     }
 
-    /// Animates the sheet in, but only if presenting using the inline mode
-    public func animateIn(to view: UIView, in parent: UIViewController, size: SheetSize? = nil, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
-
-        self.willMove(toParent: parent)
-        parent.addChild(self)
-        view.addSubview(self.view)
-        self.didMove(toParent: parent)
-
-        self.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.view.topAnchor.constraint(equalTo: view.topAnchor),
-            self.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            self.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            self.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-        self.animateIn(size: size, duration: duration, completion: completion)
-    }
-
-    public func animateIn(size: SheetSize? = nil, duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
-        guard self.options.useInlineMode else { return }
-        guard self.view.superview != nil else {
-            print("It appears your sheet is not set as a subview of another view. Make sure to add this view as a subview before trying to animate it in.")
-            return
-        }
-        self.view.superview?.layoutIfNeeded()
-        self.contentViewController.updatePreferredHeight()
-        self.resize(to: size ?? self.sizes.first ?? self.currentSize, animated: false)
-        let contentView = self.contentViewController.view!
-        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
-        self.overlayView.alpha = 0
-        self.updateOrderedSizes()
-
-        UIView.animate(
-            withDuration: duration,
-            animations: {
-                contentView.transform = .identity
-                self.overlayView.alpha = 1
-            },
-            completion: { _ in
-                completion?()
-            }
-        )
-    }
-
+   
     /// Animates the sheet out, but only if presenting using the inline mode
     public func animateOut(duration: TimeInterval = 0.3, completion: (() -> Void)? = nil) {
         guard self.options.useInlineMode else { return }

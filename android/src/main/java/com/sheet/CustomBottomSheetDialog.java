@@ -27,6 +27,14 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
     behavior.setNewNestedScrollView(view);
   }
 
+  public void collapse() {
+    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+  }
+
+  public void expand() {
+    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+  }
+
   public void setSheetBackgroundColor(int sheetBackgroundColor) {
     ViewGroup contentContainer = getContentContainer();
     if (contentContainer == null) return;

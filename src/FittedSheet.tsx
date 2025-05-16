@@ -129,7 +129,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     if (Platform.OS === 'ios') {
       return SheetModule.viewportSize();
     }
-    return Dimensions.get('screen');
+    return Dimensions.get('window');
   }
 
   render() {
@@ -138,7 +138,6 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       this.dimensions.height - this.insets().top - this.insets().bottom
     );
-
     const paramsMaxWidth = this.isLandscape
       ? this.props.params?.maxLandscapeWidth
       : this.props.params?.maxPortraitWidth;
@@ -162,9 +161,10 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         maxHeight,
         maxWidth,
         nativeHeight,
+        isLandscape: this.isLandscape,
         h: Dimensions.get('window').height,
         sb: StatusBar.currentHeight,
-        dim: this.dimensions.width,
+        dimensions: this.dimensions,
       });
     }
     const background = this.props?.params?.backgroundColor;
