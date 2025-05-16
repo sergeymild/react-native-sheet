@@ -44,23 +44,25 @@ interface State {
   data: any | null;
   height?: number;
   passScrollViewReactTag?: string;
+  isLandscape: boolean;
 }
 
 export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
-  private shouldShowBack = false;
   private onHidePassThroughParam?: any;
   private sheetRef = React.createRef<any>();
 
   private dimensions: { width: number; height: number };
-  private isLandscape: boolean;
 
   constructor(props: SheetProps) {
     super(props);
-    this.state = { show: false, data: null };
-
     this.dimensions = this.viewportSize();
-    this.isLandscape = this.dimensions.width > this.dimensions.height;
+
+    this.state = {
+      show: false,
+      data: null,
+      isLandscape: this.dimensions.width > this.dimensions.height,
+    };
   }
 
   show = (data?: any) => {
@@ -88,13 +90,6 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   private onDismiss = () => {
     if (__DEV__) console.log('[FittedSheet.onDismiss]');
-    if (this.shouldShowBack) {
-      this.setState({ show: false, height: undefined }, () =>
-        this.show(this.state.data)
-      );
-      this.shouldShowBack = false;
-      return;
-    }
     this.setState({ show: false, height: undefined });
     const passValue = this.onHidePassThroughParam;
     this.onHidePassThroughParam = undefined;
@@ -108,13 +103,9 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   componentDidMount() {
     if (__DEV__) console.log('[FittedSheet.componentDidMount]', this.insets());
     this.cleanup = Dimensions.addEventListener('change', () => {
-      if (!this.state.show) return;
-      if (this.shouldShowBack) return;
-      this.shouldShowBack = true;
       this.dimensions = this.viewportSize();
-      this.isLandscape = this.dimensions.width > this.dimensions.height;
-
-      this.hide();
+      const isLandscape = this.dimensions.width > this.dimensions.height;
+      this.setState({ isLandscape });
     }).remove;
   }
 
@@ -138,7 +129,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
       this.dimensions.height - this.insets().top - this.insets().bottom
     );
-    const paramsMaxWidth = this.isLandscape
+    const paramsMaxWidth = this.state.isLandscape
       ? this.props.params?.maxLandscapeWidth
       : this.props.params?.maxPortraitWidth;
     let maxWidth = Math.min(
@@ -157,15 +148,22 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     }
 
     if (__DEV__) {
-      console.log('[FittedSheet.render]', {
-        maxHeight,
-        maxWidth,
-        nativeHeight,
-        isLandscape: this.isLandscape,
-        h: Dimensions.get('window').height,
-        sb: StatusBar.currentHeight,
-        dimensions: this.dimensions,
-      });
+      console.log(
+        '[FittedSheet.render]',
+        JSON.stringify(
+          {
+            maxHeight,
+            maxWidth,
+            nativeHeight,
+            isLandscape: this.state.isLandscape,
+            h: Dimensions.get('window').height,
+            sb: StatusBar.currentHeight,
+            dimensions: this.dimensions,
+          },
+          undefined,
+          2
+        )
+      );
     }
     const background = this.props?.params?.backgroundColor;
     return (

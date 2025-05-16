@@ -51,6 +51,14 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
   }
 
+  private fun layout() {
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+      parent.requestLayout()
+    } else {
+      post { parent.requestLayout() }
+    }
+  }
+
   fun setVirtualHeight(h: Float) {
     if (reactView == null) return
     this.sheetMaxHeightSize = h.toDouble()
@@ -59,14 +67,18 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     val newWidth = allowedWidth
     println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.toDP()} :${metrics.displayMetrics.heightPixels.toDP()}")
     ensureLayoutParams()
-    translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
     layoutParams?.height = newHeight
+    translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
     layoutParams?.width = newWidth
-    if (Looper.myLooper() == Looper.getMainLooper()) {
-      parent.requestLayout()
-    } else {
-      post { parent.requestLayout() }
-    }
+    layout()
+  }
+
+  fun updateMaxWidth(value: Double) {
+    sheetMaxWidthSize = value
+    val newWidth = allowedWidth
+    translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
+    layoutParams?.width = newWidth
+    layout()
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {

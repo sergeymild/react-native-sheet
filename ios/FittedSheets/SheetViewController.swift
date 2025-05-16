@@ -12,11 +12,6 @@ import UIKit
 public class SheetViewController: UIViewController {
     public private(set) var options: SheetOptions
 
-    /// Default value for autoAdjustToKeyboard. Defaults to true.
-    public static var autoAdjustToKeyboard = true
-    /// Automatically grow/move the sheet to accomidate the keyboard. Defaults to false.
-    public var autoAdjustToKeyboard = SheetViewController.autoAdjustToKeyboard
-
 	/// Default value for allowPullingPastMaxHeight. Defaults to true.
 	public static var allowPullingPastMaxHeight = true
     /// Allow pulling past the maximum height and bounce back. Defaults to true.
@@ -148,11 +143,12 @@ public class SheetViewController: UIViewController {
     var overflowView = UIView()
     var overlayTapGesture: UITapGestureRecognizer?
     private var contentViewHeightConstraint: NSLayoutConstraint!
+    private var contentViewWidthConstraint: NSLayoutConstraint!
 
     /// The child view controller's scroll view we are watching so we can override the pull down/up to work on the sheet when needed
     private weak var childScrollView: UIScrollView?
 
-    private var keyboardHeight: CGFloat = 0
+
     private var firstPanPoint: CGPoint = CGPoint.zero
     private var panOffset: CGFloat = 0
     private var panGestureRecognizer: InitialTouchPanGestureRecognizer!
@@ -211,7 +207,6 @@ public class SheetViewController: UIViewController {
         self.addBlurBackground()
         self.addContentView()
         self.addOverlayTapView()
-        self.registerKeyboardObservers()
         self.resize(to: self.sizes.first ?? .intrinsic, animated: false)
     }
 
@@ -298,6 +293,10 @@ public class SheetViewController: UIViewController {
         guard self.dismissOnOverlayTap else { return }
         self.attemptDismiss(animated: true)
     }
+  
+  func updateMaxWidth(value: CGFloat) {
+    self.contentViewWidthConstraint.constant = value
+  }
 
     private func addContentView() {
         self.contentViewController.willMove(toParent: self)
@@ -309,7 +308,7 @@ public class SheetViewController: UIViewController {
             $0.left.pinToSuperview().priority = UILayoutPriority(999)
             $0.left.pinToSuperview(inset: self.options.horizontalPadding, relation: .greaterThanOrEqual)
             if let maxWidth = self.options.maxWidth {
-                $0.width.set(maxWidth, relation: .lessThanOrEqual)
+              self.contentViewWidthConstraint = $0.width.set(maxWidth, relation: .equal)
             }
 
             $0.centerX.alignWithSuperview()
@@ -468,38 +467,6 @@ public class SheetViewController: UIViewController {
         }
     }
 
-    private func registerKeyboardObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShown(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDismissed(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-
-    @objc func keyboardShown(_ notification: Notification) {
-        guard let info:[AnyHashable: Any] = notification.userInfo, let keyboardRect:CGRect = (info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-
-        let windowRect = self.view.convert(self.view.bounds, to: nil)
-        let actualHeight = windowRect.maxY - keyboardRect.origin.y
-        self.adjustForKeyboard(height: actualHeight, from: notification)
-    }
-
-    @objc func keyboardDismissed(_ notification: Notification) {
-        self.adjustForKeyboard(height: 0, from: notification)
-    }
-
-    private func adjustForKeyboard(height: CGFloat, from notification: Notification) {
-        guard self.autoAdjustToKeyboard, let info:[AnyHashable: Any] = notification.userInfo else { return }
-        self.keyboardHeight = height
-
-        let duration:TimeInterval = (info[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
-        let animationCurveRawNSN = info[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber
-        let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIView.AnimationOptions.curveEaseInOut.rawValue
-        let animationCurve:UIView.AnimationOptions = UIView.AnimationOptions(rawValue: animationCurveRaw)
-
-        self.contentViewController.adjustForKeyboard(height: self.keyboardHeight)
-        self.resize(to: self.currentSize, duration: duration, options: animationCurve, animated: true, complete: {
-            self.resize(to: self.currentSize)
-        })
-    }
-
     private func height(for size: SheetSize?) -> CGFloat {
         guard let size = size else { return 0 }
         let contentHeight: CGFloat
@@ -511,18 +478,18 @@ public class SheetViewController: UIViewController {
         }
         switch (size) {
             case .fixed(let height):
-                contentHeight = height + self.keyboardHeight
+                contentHeight = height
             case .fullscreen:
                 contentHeight = fullscreenHeight
             case .intrinsic:
-                contentHeight = self.contentViewController.preferredHeight + self.keyboardHeight
+                contentHeight = self.contentViewController.preferredHeight
             case .percent(let percent):
                 if (percent > 1) {
                     debugPrint("Size percent should be less than or equal to 1.0, but was set to \(percent))")
                 }
-                contentHeight = (self.view.bounds.height) * CGFloat(percent) + self.keyboardHeight
+                contentHeight = (self.view.bounds.height) * CGFloat(percent)
             case .marginFromTop(let margin):
-                contentHeight = (self.view.bounds.height) - margin + self.keyboardHeight
+                contentHeight = (self.view.bounds.height) - margin
         }
         return min(fullscreenHeight, contentHeight)
     }
@@ -648,9 +615,6 @@ extension SheetViewController: UIGestureRecognizerDelegate {
 
         let velocity = panGestureRecognizer.velocity(in: panGestureRecognizer.view?.superview)
         guard pointInChildScrollView > 0, pointInChildScrollView < childScrollView.bounds.height else {
-            if keyboardHeight > 0 {
-                childScrollView.endEditing(true)
-            }
             return true
         }
         let topInset = childScrollView.contentInset.top

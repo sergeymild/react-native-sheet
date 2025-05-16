@@ -16,7 +16,10 @@ export const List2Example = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
 
-      <FittedSheet ref={bottomSheetRef} params={{ maxHeight: 600 }}>
+      <FittedSheet
+        ref={bottomSheetRef}
+        params={{ maxHeight: 600, maxLandscapeWidth: 300 }}
+      >
         <View style={styles.contentContainerStyle}>
           <ContactList count={50} />
         </View>

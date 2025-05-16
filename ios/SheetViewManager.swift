@@ -110,6 +110,10 @@ final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
+    
+    if let value = sheetMaxWidthSize {
+      _modalViewController?.updateMaxWidth(value: value)
+    }
   }
   
   init(bridge: RCTBridge) {
@@ -159,6 +163,10 @@ final class HostFittedSheet: UIView {
   @objc
   func setCalculatedHeight(_ height: NSNumber) {
     debugPrint("😀 setCalculatedHeight", height)
+    // prevent show on change orientation for stack
+    if let m = _modalViewController, presentedSheets.contains(m) {
+      return
+    }
     _sheetSize = RCTConvert.cgFloat(height)
     _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
   }
@@ -176,7 +184,6 @@ final class HostFittedSheet: UIView {
     )
     self._modalViewController?.allowPullingPastMaxHeight = false
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
-    self._modalViewController?.autoAdjustToKeyboard = false
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = .clear

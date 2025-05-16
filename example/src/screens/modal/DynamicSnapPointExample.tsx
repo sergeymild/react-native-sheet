@@ -36,7 +36,6 @@ const DynamicSnapPointExample = () => {
       <FittedSheet
         ref={bottomSheetRef}
         params={{
-          maxLandscapeWidth: 400,
           topLeftRightCornerRadius: 20,
         }}
         onSheetDismiss={() => setCount(0)}

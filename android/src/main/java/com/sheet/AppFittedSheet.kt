@@ -44,8 +44,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
       mHostView.sheetMaxHeightSize = value.double("maxHeight", Double.MAX_VALUE).toPxD()
       mHostView.sheetMaxWidthSize = value.double("maxWidth", Double.MAX_VALUE).toPxD()
       mHostView.sheetMinHeightSize = value.double("minHeight", Double.MIN_VALUE).toPxD()
-
       field = value
+      if (this.sheet == null) return
+      mHostView.updateMaxWidth(mHostView.sheetMaxWidthSize)
     }
 
   private val dismissable: Boolean
