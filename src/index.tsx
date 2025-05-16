@@ -7,6 +7,6 @@ import {
   attachScrollViewToFittedSheet,
 } from './PublicSheetView';
 
-export { PublicSheetView as FittedSheet, type FittedSheetRef };
+export { PublicSheetView as FittedSheet, type FittedSheetRef, presentFittedSheet, dismissFittedSheet, attachScrollViewToFittedSheet };
 
 export type { FittedSheetParams };

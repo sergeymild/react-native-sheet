@@ -4,12 +4,12 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
 import { createContactListMockData } from '../../utilities/createMockData';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 const Sim: React.FC = () => {
   const data = useMemo(() => createContactListMockData(100), []);
   const renderItem = useCallback(
-    (item: any, index: any) => (
+    (item: any, index: number) => (
       <ContactItem
         key={`${item.name}.${index}`}
         title={`${index}: ${item.name}`}
@@ -24,7 +24,7 @@ const Sim: React.FC = () => {
 
 export const SimpleExample = () => {
   // refs
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   // callbacks
   const handlePresentPress = useCallback(() => {

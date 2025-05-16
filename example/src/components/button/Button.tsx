@@ -1,5 +1,10 @@
-import React, { memo } from 'react';
-import { ViewStyle, TextStyle, TouchableOpacity, Text } from 'react-native';
+import {
+  type ViewStyle,
+  type TextStyle,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+import { memo } from 'react';
 
 interface ButtonProps {
   label: string;

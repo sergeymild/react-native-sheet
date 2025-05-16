@@ -2,11 +2,11 @@ import React, { useCallback, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Button } from '../../components/button';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 export const DismissPreventExample = () => {
   // refs
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   // callbacks
   const handlePresentPress = useCallback(() => {

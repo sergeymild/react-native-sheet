@@ -6,7 +6,7 @@ import android.os.Build
 import android.view.View
 import android.view.Window
 import android.view.WindowInsetsController
-import com.facebook.react.bridge.ColorPropConverter
+import androidx.core.graphics.toColorInt
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.PixelUtil
 
@@ -31,7 +31,7 @@ fun ReadableMap?.double(value: String, default: Double): Double {
 
 fun ReadableMap.color(value: String, context: Context): Int {
   if (!hasKey(value)) return Color.TRANSPARENT
-  return ColorPropConverter.getColor(getDouble("backgroundColor"), context)
+  return getString("backgroundColor")?.toColorInt() ?: Color.TRANSPARENT
 }
 
 fun Window.setStatusBarStyle(isLight: Boolean) {

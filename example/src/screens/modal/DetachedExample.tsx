@@ -3,12 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactItem } from '../../components/contactItem';
 import { createContactListMockData } from '../../utilities/createMockData';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, FittedSheetRef } from 'react-native-sheet';
 
 export const DetachedExample = () => {
   // refs
 
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
 
   // variables
   const data = useMemo(() => createContactListMockData(2), []);
@@ -19,7 +19,7 @@ export const DetachedExample = () => {
   }, []);
 
   const renderItem = useCallback(
-    (item: any, index: any) => (
+    (item: any, index: number) => (
       <ContactItem
         key={`${item.name}.${index}`}
         title={`${index}: ${item.name}`}

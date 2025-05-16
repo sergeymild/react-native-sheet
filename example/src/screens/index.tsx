@@ -24,11 +24,6 @@ export const screens = [
     getScreen: () => DetachedExample,
   },
   {
-    name: 'Simple',
-    slug: 'Modal/DetachedExample2',
-    getScreen: () => SimpleExample,
-  },
-  {
     name: 'LoaderExample',
     slug: 'Modal/LoaderExample',
     getScreen: () => LoaderExample,

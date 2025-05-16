@@ -2,12 +2,10 @@ package com.sheet
 
 import android.content.Context
 import android.graphics.Color
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStructure
 import android.view.accessibility.AccessibilityEvent
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -32,7 +30,10 @@ internal fun AppFittedSheet.onSheetDismiss() {
   reactEventDispatcher?.dispatchEvent(SheetDismissEvent(surfaceId, id))
 }
 
+private var presentedSheets: MutableList<String> = mutableListOf()
+
 open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
+  private var stacked = true
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
 
@@ -52,8 +53,11 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     return (context as? ReactContext)?.currentActivity as? AppCompatActivity
   }
 
+  private fun findSheet(name: String): FragmentModalBottomSheet? {
+    return getCurrentActivity()?.supportFragmentManager?.findFragmentByTag(name) as? FragmentModalBottomSheet
+  }
   private val sheet: FragmentModalBottomSheet?
-    get() = getCurrentActivity()?.supportFragmentManager?.findFragmentByTag(fragmentTag) as FragmentModalBottomSheet?
+    get() = findSheet(fragmentTag)
 
   override fun setId(id: Int) {
     super.setId(id)
@@ -70,6 +74,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     mHostView.setCornerRadius(topLeftRightCornerRadius)
     mHostView.setBackgroundColor(_backgroundColor)
     if (sheet == null) {
+      if (stacked) {
+        presentedSheets.lastOrNull()?.let {
+          findSheet(it)?.collapse()
+        }
+      }
+
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
         dismissable = dismissable,
@@ -79,9 +89,22 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
         val parent = mHostView.parent as? ViewGroup
         parent?.removeViewAt(0)
         onSheetDismiss()
+        if (stacked) {
+          var lastName = presentedSheets.removeLastOrNull()
+          if (lastName == fragmentTag) {
+            lastName = presentedSheets.lastOrNull()
+          }
+          lastName?.let { findSheet(it)?.expand() }
+          println("👀 Dismiss ${presentedSheets.size}")
+        }
       }
       getCurrentActivity()?.supportFragmentManager?.let {
         fragment.safeShow(it, fragmentTag)
+        if (stacked) {
+          println("👀 Show ${presentedSheets.size} name: $fragmentTag")
+          if (presentedSheets.contains(fragmentTag)) return
+          presentedSheets.add(fragmentTag)
+        }
       }
     }
   }
@@ -90,7 +113,6 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     sheet?.setNewNestedScrollView(view)
   }
 
-  @RequiresApi(Build.VERSION_CODES.M)
   override fun dispatchProvideStructure(structure: ViewStructure) {
     mHostView.dispatchProvideStructure(structure)
   }

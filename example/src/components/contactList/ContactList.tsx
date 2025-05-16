@@ -73,9 +73,8 @@ const ContactListComponent = ({
 
   return (
     <FlatList
-      {...rest}
-      data={data}
       onLayout={onReady}
+      data={data}
       refreshing={false}
       onRefresh={onRefresh}
       keyExtractor={keyExtractor}

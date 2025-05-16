@@ -23,12 +23,13 @@ export const LoaderExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
       <FittedSheet
+        name={'loaderExample'}
         ref={bottomSheetRef}
         params={{ backgroundColor: 'white' }}
         onSheetDismiss={() => setLoading(-1)}
       >
-        {isLoading === -1 &&
-          ((
+        <>{isLoading === -1 &&
+            ((
             <TouchableOpacity
               style={{ height: 50, marginBottom: 50 }}
               onPress={() => {
@@ -39,21 +40,21 @@ export const LoaderExample = () => {
               <Text style={{ color: 'black' }}>Start</Text>
             </TouchableOpacity>
           ) as any)}
-        {isLoading === 0 && (
-          <View
-            accessibilityLabel={'loading'}
-            key={1}
-            style={{
-              width: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 200,
-            }}
-          >
-            <ActivityIndicator />
-          </View>
-        )}
-        {isLoading === 1 && (
+          {isLoading === 0 && (
+            <View
+              accessibilityLabel={'loading'}
+              key={1}
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 200,
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          )}
+          {isLoading === 1 && (
           <ContactList
             count={50}
             onReady={() => {
@@ -62,6 +63,7 @@ export const LoaderExample = () => {
             }}
           />
         )}
+        </>
       </FittedSheet>
     </View>
   );

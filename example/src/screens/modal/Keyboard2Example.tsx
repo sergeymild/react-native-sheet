@@ -4,10 +4,10 @@ import { StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '../../components/button';
 import { ContactList } from '../../components/contactList';
 import { KeyboardSpacer } from '../../components/KeyboardSpacer';
-import { FittedSheet } from 'react-native-sheet';
+import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
 
 export const Keyboard2Example = () => {
-  const bottomSheetRef = useRef<FittedSheet>(null);
+  const bottomSheetRef = useRef<FittedSheetRef>(null);
   const [keyboardHeight, setKH] = useState(0);
   const [count, setCount] = useState(2);
 
@@ -27,6 +27,7 @@ export const Keyboard2Example = () => {
 
       <FittedSheet
         ref={bottomSheetRef}
+        params={{ backgroundColor: 'white' }}
         onSheetDismiss={() => {
           setKH(0);
           setCount(2);
