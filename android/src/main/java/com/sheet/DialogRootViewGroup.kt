@@ -53,9 +53,9 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
 
   private fun layout() {
     if (Looper.myLooper() == Looper.getMainLooper()) {
-      parent.requestLayout()
+      parent?.requestLayout()
     } else {
-      post { parent.requestLayout() }
+      post { parent?.requestLayout() }
     }
   }
 
