@@ -97,7 +97,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   };
 
   private insets(): { top: number; bottom: number } {
-    return SheetModule.getConstants().insets as any;
+    return (SheetModule.getConstants().insets as any) ?? { top: 0, bottom: 0 };
   }
 
   componentDidMount() {
