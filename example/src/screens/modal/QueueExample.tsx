@@ -24,7 +24,11 @@ export const QueueExample = () => {
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
 
-      <FittedSheet name={'first'} onSheetDismiss={() => setValue('empty')}>
+      <FittedSheet
+        name={'first'}
+        onSheetDismiss={() => setValue('empty')}
+        params={{ backgroundColor: 'yellow' }}
+      >
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 300 }}>
             <Button label="Present2" onPress={handlePresentPress2} />
@@ -33,9 +37,9 @@ export const QueueExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'second'}>
+      <FittedSheet name={'second'} params={{ backgroundColor: 'purple' }}>
         <View style={styles.contentContainerStyle}>
-          <View style={{ height: 300, backgroundColor: 'red' }} />
+          <View style={{ height: 200, backgroundColor: 'red' }} />
           <Button
             label="dismiss 2"
             onPress={() => {
@@ -51,9 +55,9 @@ export const QueueExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'third'}>
+      <FittedSheet name={'third'} params={{ backgroundColor: 'orange' }}>
         <View style={styles.contentContainerStyle}>
-          <View style={{ height: 300, backgroundColor: 'red' }} />
+          <View style={{ height: 100, backgroundColor: 'red' }} />
           <Button
             label="dismiss 3"
             onPress={() => {

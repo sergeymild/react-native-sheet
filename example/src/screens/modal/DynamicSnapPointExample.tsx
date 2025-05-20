@@ -37,7 +37,6 @@ export const DynamicSnapPointExample = () => {
       <FittedSheet
         ref={bottomSheetRef}
         params={{
-          maxLandscapeWidth: 500,
           topLeftRightCornerRadius: 20,
           maxPortraitWidth: 350,
         }}
