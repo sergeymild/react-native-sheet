@@ -44,7 +44,7 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
 
   override fun setMaxWidth(view: SheetView, value: Double) {
     println("==========setMaxWidth $value")
-    view.mHostView.sheetMaxWidthSize = value.dpToPx()
+    view.maxWidth = value.dpToPx()
   }
 
   override fun setMaxHeight(view: SheetView, value: Double) {

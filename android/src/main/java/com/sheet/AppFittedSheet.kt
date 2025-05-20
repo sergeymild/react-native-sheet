@@ -43,6 +43,14 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   var _backgroundColor: Int = Color.TRANSPARENT
   var isSystemUILight: Boolean = false
 
+  var maxWidth: Float = 0F
+    set(value) {
+      field = value
+      mHostView.sheetMaxWidthSize = value
+      if (this.sheet == null) return
+      mHostView.updateMaxWidth(mHostView.sheetMaxWidthSize)
+    }
+
   var eventDispatcher: EventDispatcher?
     get() = mHostView.eventDispatcher
     set(eventDispatcher) {

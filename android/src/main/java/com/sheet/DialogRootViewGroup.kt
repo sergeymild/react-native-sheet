@@ -74,7 +74,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     layout()
   }
 
-  fun updateMaxWidth(value: Double) {
+  fun updateMaxWidth(value: Float) {
     sheetMaxWidthSize = value
     val newWidth = allowedWidth
     translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
