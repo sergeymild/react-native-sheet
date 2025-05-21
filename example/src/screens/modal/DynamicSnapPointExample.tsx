@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
-import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
+import { FittedSheetRef, FittedSheet } from 'react-native-sheet';
+import { Portal } from '@gorhom/portal';
 
 export const DynamicSnapPointExample = () => {
   // state
@@ -34,42 +35,46 @@ export const DynamicSnapPointExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
-      <FittedSheet
-        ref={bottomSheetRef}
-        params={{
-          topLeftRightCornerRadius: 20,
-          maxPortraitWidth: 350,
-        }}
-        onSheetDismiss={() => setCount(0)}
-      >
-        <View
-          onLayout={(e) =>
-            console.log(
-              '🍓[DynamicSnapPointExample.lay]',
-              e.nativeEvent.layout.height
-            )
-          }
-          style={{
-            paddingBottom: 34,
-            backgroundColor: 'white',
-            paddingTop: 16,
-            paddingHorizontal: 16,
+      <Portal>
+        <FittedSheet
+          ref={bottomSheetRef}
+          params={{
+            maxHeight: 400,
+            minHeight: 400,
+            topLeftRightCornerRadius: 20,
           }}
+          onSheetDismiss={() => setCount(0)}
         >
-          <Text style={styles.message}>
-            Could this sheet modal resize to its content height ?
-          </Text>
-          <View style={emojiContainerStyle}>
-            <Text style={styles.emoji}>😍</Text>
+          <View
+            onLayout={(e) =>
+              console.log(
+                '🍓[DynamicSnapPointExample.lay]',
+                e.nativeEvent.layout.height
+              )
+            }
+            style={{
+              paddingBottom: 34,
+              backgroundColor: 'white',
+              paddingTop: 16,
+              height: 400,
+              paddingHorizontal: 16,
+            }}
+          >
+            <Text style={styles.message}>
+              Could this sheet modal resize to its content height ?
+            </Text>
+            <View style={emojiContainerStyle}>
+              <Text style={styles.emoji}>😍</Text>
+            </View>
+            <Button
+              label="Yes"
+              onPress={handleIncreaseContentPress}
+              style={{ backgroundColor: 'red' }}
+            />
+            <Button label="Maybe" onPress={handleDecreaseContentPress} />
           </View>
-          <Button
-            label="Yes"
-            onPress={handleIncreaseContentPress}
-            style={{ height: 32, backgroundColor: 'red' }}
-          />
-          <Button label="Maybe" onPress={handleDecreaseContentPress} />
-        </View>
-      </FittedSheet>
+        </FittedSheet>
+      </Portal>
     </View>
   );
 };
@@ -77,7 +82,7 @@ export const DynamicSnapPointExample = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 24,
-    flex: 1,
+    minHeight: 400,
     backgroundColor: 'purple',
   },
   contentContainerStyle: {

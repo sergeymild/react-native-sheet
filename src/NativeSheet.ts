@@ -10,6 +10,7 @@ export interface Spec extends TurboModule {
   };
 
   viewportSize(): { width: Double; height: Double };
+  presentToast: (params: UnsafeObject) => void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Sheet');

@@ -21,11 +21,19 @@ static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_viewportSize(jsi::Runtime
     rt
   );
 }
+static jsi::Value __hostFunction_NativeSheetCxxSpecJSI_presentToast(jsi::Runtime &rt, TurboModule &turboModule, const jsi::Value* args, size_t count) {
+  static_cast<NativeSheetCxxSpecJSI *>(&turboModule)->presentToast(
+    rt,
+    count <= 0 ? throw jsi::JSError(rt, "Expected argument in position 0 to be passed") : args[0].asObject(rt)
+  );
+  return jsi::Value::undefined();
+}
 
 NativeSheetCxxSpecJSI::NativeSheetCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker)
   : TurboModule("Sheet", jsInvoker) {
   methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_getConstants};
   methodMap_["viewportSize"] = MethodMetadata {0, __hostFunction_NativeSheetCxxSpecJSI_viewportSize};
+  methodMap_["presentToast"] = MethodMetadata {1, __hostFunction_NativeSheetCxxSpecJSI_presentToast};
 }
 
 

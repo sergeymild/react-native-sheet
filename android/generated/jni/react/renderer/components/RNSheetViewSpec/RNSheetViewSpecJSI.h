@@ -22,6 +22,7 @@ protected:
 public:
   virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
   virtual jsi::Object viewportSize(jsi::Runtime &rt) = 0;
+  virtual void presentToast(jsi::Runtime &rt, jsi::Object params) = 0;
 
 };
 
@@ -67,6 +68,14 @@ private:
 
       return bridging::callFromJs<jsi::Object>(
           rt, &T::viewportSize, jsInvoker_, instance_);
+    }
+    void presentToast(jsi::Runtime &rt, jsi::Object params) override {
+      static_assert(
+          bridging::getParameterCount(&T::presentToast) == 2,
+          "Expected presentToast(...) to have 2 parameters");
+
+      return bridging::callFromJs<void>(
+          rt, &T::presentToast, jsInvoker_, instance_, std::move(params));
     }
 
   private:

@@ -3,6 +3,7 @@ package com.sheet
 import android.view.ViewGroup
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 
 class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(reactContext) {
@@ -20,5 +21,12 @@ class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(react
 
   override fun viewportSize(): WritableMap {
     return Arguments.createMap()
+  }
+
+  override fun presentToast(params: ReadableMap?) {
+    Toaster.Builder(reactApplicationContext)
+      .setTitle("Some title")
+      .setDuration(5000)
+      .show()
   }
 }

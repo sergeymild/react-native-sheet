@@ -1,4 +1,4 @@
-import type { type FittedSheetParams } from './FittedSheet';
+import type { FittedSheetParams } from './FittedSheet';
 import {
   PublicSheetView,
   type FittedSheetRef,
