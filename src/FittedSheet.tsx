@@ -9,6 +9,7 @@ import {
 
 import She, { Commands } from './SheetViewNativeComponent';
 import SheetModule from './NativeSheet';
+import { Portal } from '@gorhom/portal';
 
 export const _FittedSheet = She;
 
@@ -170,39 +171,41 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     }
     const background = this.props?.params?.backgroundColor;
     return (
-      <_FittedSheet
-        onSheetDismiss={this.onDismiss}
-        ref={this.sheetRef}
-        onStartShouldSetResponder={this._shouldSetResponder}
-        style={{ width: maxWidth, position: 'absolute' }}
-        dismissable={this.props.params?.dismissable ?? true}
-        maxWidth={maxWidth}
-        maxHeight={maxHeight}
-        minHeight={minHeight}
-        topLeftRightCornerRadius={
-          this.props.params?.topLeftRightCornerRadius ?? 20
-        }
-        isSystemUILight={this.props.params?.isSystemUILight ?? true}
-        calculatedHeight={nativeHeight}
-        passScrollViewReactTag={this.state.passScrollViewReactTag}
-      >
-        <View
-          nativeID={'fitted-sheet-root-view'}
-          style={{
-            width: maxWidth,
-            maxHeight,
-            backgroundColor: background,
-          }}
-          onLayout={this.onLayout}
+      <Portal hostName={'SheetHost'}>
+        <_FittedSheet
+          onSheetDismiss={this.onDismiss}
+          ref={this.sheetRef}
+          onStartShouldSetResponder={this._shouldSetResponder}
+          style={{ width: maxWidth, position: 'absolute' }}
+          dismissable={this.props.params?.dismissable ?? true}
+          maxWidth={maxWidth}
+          maxHeight={maxHeight}
+          minHeight={minHeight}
+          topLeftRightCornerRadius={
+            this.props.params?.topLeftRightCornerRadius ?? 20
+          }
+          isSystemUILight={this.props.params?.isSystemUILight ?? true}
+          calculatedHeight={nativeHeight}
+          passScrollViewReactTag={this.state.passScrollViewReactTag}
         >
-          {this.props.children &&
-            typeof this.props.children === 'function' &&
-            this.props.children(this.state.data)}
-          {this.props.children &&
-            typeof this.props.children !== 'function' &&
-            this.props.children}
-        </View>
-      </_FittedSheet>
+          <View
+            nativeID={'fitted-sheet-root-view'}
+            style={{
+              width: maxWidth,
+              maxHeight,
+              backgroundColor: background,
+            }}
+            onLayout={this.onLayout}
+          >
+            {this.props.children &&
+              typeof this.props.children === 'function' &&
+              this.props.children(this.state.data)}
+            {this.props.children &&
+              typeof this.props.children !== 'function' &&
+              this.props.children}
+          </View>
+        </_FittedSheet>
+      </Portal>
     );
   }
 }

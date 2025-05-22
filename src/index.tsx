@@ -1,11 +1,20 @@
-import type { type FittedSheetParams } from './FittedSheet';
+import type { FittedSheetParams } from './FittedSheet';
 import {
-  PublicSheetView,
+  attachScrollViewToFittedSheet,
+  dismissFittedSheet,
   type FittedSheetRef,
   presentFittedSheet,
-  dismissFittedSheet,
-  attachScrollViewToFittedSheet,
+  PublicSheetView,
 } from './PublicSheetView';
+
+import { PortalProvider } from '@gorhom/portal';
+import type { ReactNode } from 'react';
+
+export function SheetProvider(props: { children: ReactNode }) {
+  return (
+    <PortalProvider rootHostName={'SheetHost'}>{props.children}</PortalProvider>
+  );
+}
 
 export {
   PublicSheetView as FittedSheet,

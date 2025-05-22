@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/button';
 import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
+import { Portal } from '@gorhom/portal';
 
 export const DynamicSnapPointExample = () => {
   // state
@@ -34,11 +35,11 @@ export const DynamicSnapPointExample = () => {
   return (
     <View style={styles.container}>
       <Button label="Present" onPress={handlePresentPress} />
+      {/*<Portal hostName={'SheetHost'}>*/}
       <FittedSheet
         ref={bottomSheetRef}
         params={{
           topLeftRightCornerRadius: 20,
-          maxPortraitWidth: 350,
         }}
         onSheetDismiss={() => setCount(0)}
       >
@@ -70,6 +71,7 @@ export const DynamicSnapPointExample = () => {
           <Button label="Maybe" onPress={handleDecreaseContentPress} />
         </View>
       </FittedSheet>
+      {/*</Portal>*/}
     </View>
   );
 };

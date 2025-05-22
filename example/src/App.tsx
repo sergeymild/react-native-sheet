@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SheetProvider } from 'react-native-sheet';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { screens } from './screens';
@@ -34,14 +35,16 @@ const Buttons = () => {
 export default function App() {
   return (
     <View style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name={'Buttons'} component={Buttons} />
-          {screens.map((s) => (
-            <Stack.Screen {...s} component={s.getScreen()} key={s.slug} />
-          ))}
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SheetProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name={'Buttons'} component={Buttons} />
+            {screens.map((s) => (
+              <Stack.Screen {...s} component={s.getScreen()} key={s.slug} />
+            ))}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SheetProvider>
     </View>
   );
 }
