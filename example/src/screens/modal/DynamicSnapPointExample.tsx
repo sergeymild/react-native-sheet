@@ -52,7 +52,6 @@ export const DynamicSnapPointExample = () => {
           }
           style={{
             paddingBottom: 34,
-            backgroundColor: 'white',
             paddingTop: 16,
             paddingHorizontal: 16,
           }}
@@ -80,12 +79,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: 'white',
   },
   contentContainerStyle: {
     paddingTop: 12,
     paddingHorizontal: 24,
-    backgroundColor: 'white',
   },
   message: {
     fontSize: 24,

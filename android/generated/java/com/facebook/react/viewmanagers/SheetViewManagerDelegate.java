@@ -11,6 +11,7 @@ package com.facebook.react.viewmanagers;
 
 import android.view.View;
 import androidx.annotation.Nullable;
+import com.facebook.react.bridge.ColorPropConverter;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.BaseViewManager;
 import com.facebook.react.uimanager.BaseViewManagerDelegate;
@@ -46,6 +47,9 @@ public class SheetViewManagerDelegate<T extends View, U extends BaseViewManager<
         break;
       case "passScrollViewReactTag":
         mViewManager.setPassScrollViewReactTag(view, value == null ? null : (String) value);
+        break;
+      case "sheetBackgroundColor":
+        mViewManager.setSheetBackgroundColor(view, ColorPropConverter.getColor(value, view.getContext()));
         break;
       default:
         super.setProperty(view, propName, value);

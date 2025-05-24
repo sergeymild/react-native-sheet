@@ -1,5 +1,6 @@
 package com.sheet
 
+import android.graphics.Color
 import com.behavior.BottomSheetBehavior
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
@@ -72,6 +73,10 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
     value ?: return
     val v = BottomSheetBehavior.findView(view) ?: return
     view.setNewNestedScrollView(v)
+  }
+
+  override fun setSheetBackgroundColor(view: SheetView, value: Int?) {
+    println("-0-0-0-0- $value")
   }
 
   override fun setCalculatedHeight(view: SheetView, value: Double) {

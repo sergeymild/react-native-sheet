@@ -26,7 +26,8 @@ SheetViewProps::SheetViewProps(
     calculatedHeight(convertRawProp(context, rawProps, "calculatedHeight", sourceProps.calculatedHeight, {0.0})),
     topLeftRightCornerRadius(convertRawProp(context, rawProps, "topLeftRightCornerRadius", sourceProps.topLeftRightCornerRadius, {0.0})),
     isSystemUILight(convertRawProp(context, rawProps, "isSystemUILight", sourceProps.isSystemUILight, {false})),
-    passScrollViewReactTag(convertRawProp(context, rawProps, "passScrollViewReactTag", sourceProps.passScrollViewReactTag, {}))
+    passScrollViewReactTag(convertRawProp(context, rawProps, "passScrollViewReactTag", sourceProps.passScrollViewReactTag, {})),
+    sheetBackgroundColor(convertRawProp(context, rawProps, "sheetBackgroundColor", sourceProps.sheetBackgroundColor, {}))
       {}
 
 } // namespace facebook::react

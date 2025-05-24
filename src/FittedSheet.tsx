@@ -5,6 +5,7 @@ import {
   Platform,
   StatusBar,
   View,
+  processColor,
 } from 'react-native';
 
 import She, { Commands } from './SheetViewNativeComponent';
@@ -169,7 +170,8 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         )
       );
     }
-    const background = this.props?.params?.backgroundColor;
+    // const background = this.props?.params?.backgroundColor;
+    const background = 'orange';
     return (
       <Portal hostName={'SheetHost'}>
         <_FittedSheet
@@ -180,6 +182,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
           dismissable={this.props.params?.dismissable ?? true}
           maxWidth={maxWidth}
           maxHeight={maxHeight}
+          sheetBackgroundColor={background}
           minHeight={minHeight}
           topLeftRightCornerRadius={
             this.props.params?.topLeftRightCornerRadius ?? 20

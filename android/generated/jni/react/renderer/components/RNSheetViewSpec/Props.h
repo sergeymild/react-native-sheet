@@ -11,6 +11,7 @@
 
 #include <react/renderer/components/view/ViewProps.h>
 #include <react/renderer/core/PropsParserContext.h>
+#include <react/renderer/graphics/Color.h>
 
 namespace facebook::react {
 
@@ -29,6 +30,7 @@ class SheetViewProps final : public ViewProps {
   double topLeftRightCornerRadius{0.0};
   bool isSystemUILight{false};
   std::string passScrollViewReactTag{};
+  SharedColor sheetBackgroundColor{};
 };
 
 } // namespace facebook::react

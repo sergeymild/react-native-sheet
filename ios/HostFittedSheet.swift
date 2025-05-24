@@ -25,6 +25,7 @@ public final class HostFittedSheet: UIView {
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
   private var stacked = true
+  private var _backgroundColor: UIColor = .clear
 
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
@@ -46,6 +47,12 @@ public final class HostFittedSheet: UIView {
   public func setPassScrollViewReactTag() {
     debugPrint("😀 setPassScrollViewReactTag")
     tryAttachScrollView()
+  }
+  
+  @objc
+  public func setSheetBackgroundColor(_ color: UIColor?) {
+    _backgroundColor = color ?? .clear
+    _modalViewController?.contentBackgroundColor = _backgroundColor
   }
 
   @objc
@@ -132,7 +139,7 @@ public final class HostFittedSheet: UIView {
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
-    self._modalViewController?.contentBackgroundColor = .clear
+    self._modalViewController?.contentBackgroundColor = _backgroundColor
   }
 
   private func tryAttachScrollView() {

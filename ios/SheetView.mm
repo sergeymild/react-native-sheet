@@ -71,6 +71,9 @@ using namespace facebook::react;
       @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
     }];
   }
+
+  auto color = RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor);
+  [_view2 setSheetBackgroundColor:color];
   
   if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
     [_view2 setPassScrollViewReactTag];
