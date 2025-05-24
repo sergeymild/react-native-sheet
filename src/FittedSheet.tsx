@@ -170,8 +170,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         )
       );
     }
-    // const background = this.props?.params?.backgroundColor;
-    const background = 'orange';
+    const background = this.props?.params?.backgroundColor;
     return (
       <Portal hostName={'SheetHost'}>
         <_FittedSheet

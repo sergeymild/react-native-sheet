@@ -76,7 +76,7 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
   }
 
   override fun setSheetBackgroundColor(view: SheetView, value: Int?) {
-    println("-0-0-0-0- $value")
+    view._backgroundColor = value ?: Color.TRANSPARENT
   }
 
   override fun setCalculatedHeight(view: SheetView, value: Double) {
