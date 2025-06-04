@@ -4,6 +4,8 @@ import {
   type FittedSheetRef,
   presentFittedSheet,
   dismissFittedSheet,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
   attachScrollViewToFittedSheet,
 } from './PublicSheetView';
 
@@ -12,6 +14,8 @@ export {
   type FittedSheetRef,
   presentFittedSheet,
   dismissFittedSheet,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
   attachScrollViewToFittedSheet,
   type FittedSheetParams,
 };
