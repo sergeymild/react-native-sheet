@@ -15,8 +15,10 @@ class FragmentModalBottomSheet(
   private val modalView: ViewGroup,
   private val dismissable: Boolean,
   private val isSystemUILight: Boolean,
-  private val onDismiss: () -> Unit
+  private val onDismiss: (dismissAll: Boolean) -> Unit
 ) : BottomSheetDialogFragment() {
+
+  var dismissAll = false
 
   companion object {
     var presentedWindow: WeakReference<Window>? = null
@@ -60,6 +62,6 @@ class FragmentModalBottomSheet(
     super.onDismiss(dialog)
     presentedWindow?.clear()
     presentedWindow = null
-    onDismiss()
+    onDismiss(dismissAll)
   }
 }

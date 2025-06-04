@@ -67,4 +67,12 @@ public abstract class NativeSheetSpec extends ReactContextBaseJavaModule impleme
   @ReactMethod(isBlockingSynchronousMethod = true)
   @DoNotStrip
   public abstract WritableMap viewportSize();
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void dismissAll();
+
+  @ReactMethod
+  @DoNotStrip
+  public abstract void dismissPresented();
 }

@@ -62,6 +62,8 @@ namespace JS {
 @protocol NativeSheetSpec <RCTBridgeModule, RCTTurboModule>
 
 - (NSDictionary *)viewportSize;
+- (void)dismissAll;
+- (void)dismissPresented;
 - (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)constantsToExport;
 - (facebook::react::ModuleConstants<JS::NativeSheet::Constants::Builder>)getConstants;
 

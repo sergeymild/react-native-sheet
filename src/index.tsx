@@ -1,9 +1,11 @@
-import type { type FittedSheetParams } from './FittedSheet';
+import type { FittedSheetParams } from './FittedSheet';
 import {
   PublicSheetView,
   type FittedSheetRef,
   presentFittedSheet,
   dismissFittedSheet,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
   attachScrollViewToFittedSheet,
 } from './PublicSheetView';
 
@@ -12,6 +14,8 @@ export {
   type FittedSheetRef,
   presentFittedSheet,
   dismissFittedSheet,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
   attachScrollViewToFittedSheet,
   type FittedSheetParams,
 };
