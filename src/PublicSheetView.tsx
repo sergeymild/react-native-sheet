@@ -28,6 +28,11 @@ export function dismissFittedSheet(name: string): boolean {
   return true;
 }
 
+export function dismissFittedSheetsAll(): boolean {
+  PrivateFittedSheet.dismissAll();
+  return true;
+}
+
 type Props = SheetProps & { name?: string };
 export type FittedSheetRef = Pick<
   PrivateFittedSheet,

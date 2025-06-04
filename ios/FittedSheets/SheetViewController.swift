@@ -11,6 +11,8 @@ import UIKit
 
 public class SheetViewController: UIViewController {
     public private(set) var options: SheetOptions
+  public var dismissAll = false
+  
 
 	/// Default value for allowPullingPastMaxHeight. Defaults to true.
 	public static var allowPullingPastMaxHeight = true
@@ -133,7 +135,7 @@ public class SheetViewController: UIViewController {
 
     let transition: SheetTransition
 
-    public var didDismiss: ((SheetViewController) -> Void)?
+  public var didDismiss: ((SheetViewController, Bool) -> Void)?
     public var sizeChanged: ((SheetViewController, SheetSize, CGFloat) -> Void)?
 
     public private(set) var contentViewController: SheetContentViewController
@@ -225,10 +227,10 @@ public class SheetViewController: UIViewController {
         super.viewDidDisappear(animated)
         if let presenter = self.transition.presenter, self.options.shrinkPresentingViewController {
             self.transition.restorePresentor(presenter, completion: { _ in
-                self.didDismiss?(self)
+              self.didDismiss?(self, self.dismissAll)
             })
         } else if !self.options.useInlineMode {
-            self.didDismiss?(self)
+            self.didDismiss?(self, dismissAll)
         }
     }
 
@@ -540,12 +542,12 @@ public class SheetViewController: UIViewController {
         if self.options.useInlineMode {
             if animated {
                 self.animateOut {
-                    self.didDismiss?(self)
+                  self.didDismiss?(self, self.dismissAll)
                 }
             } else {
                 self.view.removeFromSuperview()
                 self.removeFromParent()
-                self.didDismiss?(self)
+                self.didDismiss?(self, dismissAll)
             }
         } else {
             self.dismiss(animated: animated, completion: nil)

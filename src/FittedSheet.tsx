@@ -88,6 +88,10 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     SheetModule.dismiss(tag);
   };
 
+  static dismissAll = () => {
+    SheetModule.dismissAll();
+  };
+
   private onDismiss = () => {
     if (__DEV__) console.log('[FittedSheet.onDismiss]');
     this.setState({ show: false, height: undefined });

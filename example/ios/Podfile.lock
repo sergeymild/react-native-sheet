@@ -960,7 +960,7 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.11.0):
     - React-Core
-  - react-native-sheet (2.0.3):
+  - react-native-sheet (2.0.6):
     - React-Core
   - React-nativeconfig (0.74.5)
   - React-NativeModulesApple (0.74.5):
@@ -1462,7 +1462,7 @@ SPEC CHECKSUMS:
   react-native-pager-view: 58210f39c4e7dd857c9f1dd1c30e17f6733e428b
   react-native-safe-area: c1eb76b81c59117dd7854194cd37d1845c9786c6
   react-native-safe-area-context: ca0ebcd9798c5a45863c608c961d4f3f984b6ed2
-  react-native-sheet: 364f186a716c9eee8152c8cede75cd9e3d1a2616
+  react-native-sheet: 2c91bbd5ea514a64a4649a92310322015f88d2c9
   React-nativeconfig: ba9a2e54e2f0882cf7882698825052793ed4c851
   React-NativeModulesApple: 84aaad2b0e546d7b839837ca537f6e72804a4cad
   React-perflogger: ed4e0c65781521e0424f2e5e40b40cc7879d737e
