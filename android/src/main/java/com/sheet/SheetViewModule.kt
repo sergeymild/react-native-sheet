@@ -2,6 +2,7 @@ package com.sheet
 
 import android.util.Log
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -49,6 +50,20 @@ class SheetViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     reactApplicationContext.runOnUiQueueThread {
       val view = findSheetView(viewTag)
       view?.dismiss()
+    }
+  }
+
+  @ReactMethod
+  fun dismissAll() {
+    reactApplicationContext.runOnUiQueueThread {
+      reactApplicationContext.currentActivity?.let { AppFittedSheet.dismissAll(it as AppCompatActivity) }
+    }
+  }
+
+  @ReactMethod
+  fun dismissPresented() {
+    reactApplicationContext.runOnUiQueueThread {
+      reactApplicationContext.currentActivity?.let { AppFittedSheet.dismissPresented(it as AppCompatActivity) }
     }
   }
 }

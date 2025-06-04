@@ -9,6 +9,7 @@ import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
 import { DismissAllExample } from './modal/DismissAllExample';
+import { DismissPresentedExample } from './modal/DismissPresentedExample';
 
 export const screens = [
   {
@@ -20,6 +21,11 @@ export const screens = [
     name: 'Dismiss all',
     slug: 'Modal/DismissAllExample',
     getScreen: () => DismissAllExample,
+  },
+  {
+    name: 'Dismiss presented',
+    slug: 'Modal/DismissPresentedExample',
+    getScreen: () => DismissPresentedExample,
   },
   {
     name: 'Detached',

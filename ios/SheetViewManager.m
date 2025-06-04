@@ -11,6 +11,7 @@ RCT_EXPORT_VIEW_PROPERTY(calculatedHeight, NSNumber)
 
 RCT_EXTERN_METHOD(dismiss:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(dismissAll)
+RCT_EXTERN_METHOD(dismissPresented)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(viewportSize)
 
 @end

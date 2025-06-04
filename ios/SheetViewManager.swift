@@ -50,6 +50,16 @@ class SheetViewManager: RCTViewManager {
   }
   
   @objc
+  final func dismissPresented() {
+    RCTExecuteOnMainQueue {
+      let presented = RCTPresentedViewController()
+      if let presented = presented as? SheetViewController {
+        presented.dismiss(animated: true)
+      }
+    }
+  }
+  
+  @objc
   func viewportSize() -> [String: CGFloat] {
     let size = viewPort()
     return ["width": size.width, "height": size.height]

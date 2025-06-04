@@ -65,6 +65,7 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   private fun findSheet(name: String): FragmentModalBottomSheet? {
     return getCurrentActivity()?.supportFragmentManager?.findFragmentByTag(name) as? FragmentModalBottomSheet
   }
+
   private val sheet: FragmentModalBottomSheet?
     get() = findSheet(fragmentTag)
 
@@ -86,11 +87,25 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         modalView = mHostView,
         dismissable = dismissable,
         isSystemUILight = isSystemUILight
-      ) {
+      ) { dismissAll ->
         println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup
         parent?.removeViewAt(0)
         onSheetDismiss()
+        if (dismissAll) {
+          println("😁 dismissingSilently ${presentedSheets.size}")
+          if (stacked) {
+            var lastName = presentedSheets.removeLastOrNull()
+            if (lastName == fragmentTag) lastName = presentedSheets.lastOrNull()
+            if (lastName != null) {
+              findSheet(lastName)?.let {
+                it.dismissAll = true
+                it.dismissAllowingStateLoss()
+              }
+            }
+          }
+          return@FragmentModalBottomSheet
+        }
         if (stacked) {
           var lastName = presentedSheets.removeLastOrNull()
           if (lastName == fragmentTag) {
@@ -173,4 +188,21 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   override fun onHostDestroy() { onDropInstance() }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
+
+  companion object {
+    fun dismissAll(activity: AppCompatActivity) {
+      val fragment = activity.supportFragmentManager.fragments.lastOrNull()
+      if (fragment is FragmentModalBottomSheet) {
+        fragment.dismissAll = true
+        fragment.dismissAllowingStateLoss()
+      }
+    }
+
+    fun dismissPresented(activity: AppCompatActivity) {
+      val fragment = activity.supportFragmentManager.fragments.lastOrNull()
+      if (fragment is FragmentModalBottomSheet) {
+        fragment.dismissAllowingStateLoss()
+      }
+    }
+  }
 }

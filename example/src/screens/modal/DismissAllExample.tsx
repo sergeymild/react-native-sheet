@@ -38,7 +38,7 @@ export const DismissAllExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'second'} params={{ backgroundColor: 'purple' }}>
+      <FittedSheet name={'second'} params={{ backgroundColor: '#f0f0f0' }}>
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 200, backgroundColor: 'red' }} />
           <Button
@@ -56,7 +56,7 @@ export const DismissAllExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'third'} params={{ backgroundColor: 'orange' }}>
+      <FittedSheet name={'third'} params={{ backgroundColor: '#f1f1f1' }}>
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 100, backgroundColor: 'red' }} />
           <Button
