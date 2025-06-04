@@ -1,5 +1,4 @@
 import { LoaderExample } from './modal/LoaderExample';
-import { SimpleExample } from './modal/SimpleExample';
 import ListExample from './modal/ListExample';
 import { List2Example } from './modal/List2Example';
 import KeyboardExample from './modal/KeyboardExample';
@@ -9,6 +8,8 @@ import { QueueExample } from './modal/QueueExample';
 import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
+import { DismissAllExample } from './modal/DismissAllExample';
+import { DismissPresentedExample } from './modal/DismissPresentedExample';
 import { Keyboard3Example } from './modal/Keyboard3Example';
 import { NamedExample } from './modal/NamedExample';
 
@@ -17,6 +18,16 @@ export const screens = [
     name: 'Dynamic Snap Point',
     slug: 'Modal/DynamicSnapPointExample',
     getScreen: () => DynamicSnapPointExample,
+  },
+  {
+    name: 'Dismiss all',
+    slug: 'Modal/DismissAllExample',
+    getScreen: () => DismissAllExample,
+  },
+  {
+    name: 'Dismiss presented',
+    slug: 'Modal/DismissPresentedExample',
+    getScreen: () => DismissPresentedExample,
   },
   {
     name: 'Detached',

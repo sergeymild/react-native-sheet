@@ -10,6 +10,10 @@
 import UIKit
 
 public class SheetContentViewController: UIViewController {
+  
+  deinit {
+    debugPrint("SheetContentViewController.deinit")
+  }
 
     public private(set) var childViewController: UIViewController
 

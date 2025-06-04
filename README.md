@@ -13,7 +13,14 @@ Native implementation of Bottom sheet
 ## Usage
 
 ```typescript
-import {FittedSheet, attachScrollViewToFittedSheet, FittedSheetRef, presentFittedSheet} from 'react-native-sheet';
+import {
+    FittedSheet, 
+    attachScrollViewToFittedSheet,
+    FittedSheetRef,
+    presentFittedSheet,
+    dismissFittedSheetsAll,
+    dismissFittedPresented,
+} from 'react-native-sheet';
 import { ScrollView, TouchableOpacity } from 'react-native';
 
 
@@ -49,6 +56,17 @@ const App: React.FC = () => {
             presentFittedSheet("textSheet")
         }}
         children={<Text children="Show sheet</"/>}
+      />
+      
+      <TouchableOpacity 
+        onPress={() => {
+            // dismiss presented and all in queue sheets without animation
+            dismissFittedSheetsAll()
+            
+            // dismiss top presented sheet
+            dismissFittedPresented()
+        }}
+        children={<Text children="Dismiss sheet</"/>}
       />
 
 

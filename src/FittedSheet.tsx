@@ -88,6 +88,14 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     Commands.dismissSheet(this.sheetRef.current);
   };
 
+  static dismissAll = () => {
+    SheetModule.dismissAll();
+  };
+
+  static dismissPresented = () => {
+    SheetModule.dismissPresented();
+  };
+
   // @ts-ignore
   private onDismiss = () => {
     if (__DEV__) console.log('[FittedSheet.onDismiss]');

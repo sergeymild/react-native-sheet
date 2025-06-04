@@ -22,6 +22,8 @@ protected:
 public:
   virtual jsi::Object getConstants(jsi::Runtime &rt) = 0;
   virtual jsi::Object viewportSize(jsi::Runtime &rt) = 0;
+  virtual void dismissAll(jsi::Runtime &rt) = 0;
+  virtual void dismissPresented(jsi::Runtime &rt) = 0;
 
 };
 
@@ -67,6 +69,22 @@ private:
 
       return bridging::callFromJs<jsi::Object>(
           rt, &T::viewportSize, jsInvoker_, instance_);
+    }
+    void dismissAll(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::dismissAll) == 1,
+          "Expected dismissAll(...) to have 1 parameters");
+
+      return bridging::callFromJs<void>(
+          rt, &T::dismissAll, jsInvoker_, instance_);
+    }
+    void dismissPresented(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::dismissPresented) == 1,
+          "Expected dismissPresented(...) to have 1 parameters");
+
+      return bridging::callFromJs<void>(
+          rt, &T::dismissPresented, jsInvoker_, instance_);
     }
 
   private:

@@ -5,6 +5,8 @@ import {
   type FittedSheetRef,
   presentFittedSheet,
   PublicSheetView,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
 } from './PublicSheetView';
 
 import { PortalProvider } from '@gorhom/portal';
@@ -21,6 +23,8 @@ export {
   type FittedSheetRef,
   presentFittedSheet,
   dismissFittedSheet,
+  dismissFittedSheetsAll,
+  dismissFittedPresented,
   attachScrollViewToFittedSheet,
   type FittedSheetParams,
 };

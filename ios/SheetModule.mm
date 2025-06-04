@@ -41,6 +41,25 @@ RCT_EXPORT_MODULE(Sheet)
   NSLog(@"😀 dismissModule %d", [[NSNumber alloc] initWithInt:tag].intValue);
 }
 
+- (void)dismissAll {
+  RCTExecuteOnMainQueue(^{
+    UIViewController *presented = RCTPresentedViewController();
+    if ([presented isKindOfClass:SheetViewController.class]) {
+      ((SheetViewController*)presented).dismissAll = true;
+      [((SheetViewController*)presented) dismissViewControllerAnimated:false completion:nil];
+    }
+  });
+}
+
+- (void)dismissPresented {
+  RCTExecuteOnMainQueue(^{
+    UIViewController *presented = RCTPresentedViewController();
+    if ([presented isKindOfClass:SheetViewController.class]) {
+      [((SheetViewController*)presented) dismissViewControllerAnimated:true completion:nil];
+    }
+  });
+}
+
 - (std::shared_ptr<TurboModule>)getTurboModule:(const ObjCTurboModule::InitParams &)params {
   return std::make_shared<NativeSheetSpecJSI>(params);
 }

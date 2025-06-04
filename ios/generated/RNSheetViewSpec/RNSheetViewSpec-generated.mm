@@ -30,6 +30,14 @@ namespace facebook::react {
       return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, ObjectKind, "viewportSize", @selector(viewportSize), args, count);
     }
 
+    static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_dismissAll(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
+      return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, VoidKind, "dismissAll", @selector(dismissAll), args, count);
+    }
+
+    static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_dismissPresented(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
+      return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, VoidKind, "dismissPresented", @selector(dismissPresented), args, count);
+    }
+
     static facebook::jsi::Value __hostFunction_NativeSheetSpecJSI_getConstants(facebook::jsi::Runtime& rt, TurboModule &turboModule, const facebook::jsi::Value* args, size_t count) {
       return static_cast<ObjCTurboModule&>(turboModule).invokeObjCMethod(rt, ObjectKind, "getConstants", @selector(getConstants), args, count);
     }
@@ -38,6 +46,12 @@ namespace facebook::react {
     : ObjCTurboModule(params) {
       
         methodMap_["viewportSize"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_viewportSize};
+        
+        
+        methodMap_["dismissAll"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_dismissAll};
+        
+        
+        methodMap_["dismissPresented"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_dismissPresented};
         
         
         methodMap_["getConstants"] = MethodMetadata {0, __hostFunction_NativeSheetSpecJSI_getConstants};

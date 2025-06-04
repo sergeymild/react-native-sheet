@@ -24,7 +24,7 @@ public final class HostFittedSheet: UIView {
   public var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
-  private var stacked = true
+  private var stacked = false
   private var _backgroundColor: UIColor = .clear
 
   private var sheetMaxWidth: CGFloat {
@@ -32,16 +32,16 @@ public final class HostFittedSheet: UIView {
   }
 
   private var _alertWindow: UIWindow?
-  private var presentViewController: UIViewController = {
-//    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
-//    let controller = UIViewController()
-//    _alertWindow?.rootViewController = controller
-//    _alertWindow?.windowLevel = UIWindow.Level.alert
-//    _alertWindow?.isHidden = false
-//    _alertWindow?.makeKeyAndVisible()
-//    return controller
-    return RCTPresentedViewController()!
-  }()
+  private func createVC() -> UIViewController {
+    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
+    let controller = UIViewController()
+    _alertWindow?.rootViewController = controller
+    _alertWindow?.windowLevel = UIWindow.Level.alert
+    _alertWindow?.isHidden = false
+    _alertWindow?.makeKeyAndVisible()
+    return controller
+  }
+  private var presentViewController: UIViewController?
 
   @objc
   public func setPassScrollViewReactTag() {
@@ -61,7 +61,7 @@ public final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
-    
+
     if let value = sheetMaxWidthSize {
       _modalViewController?.updateMaxWidth(value: value)
     }
@@ -135,6 +135,7 @@ public final class HostFittedSheet: UIView {
         maxWidth: self.sheetMaxWidth
       )
     )
+
     self._modalViewController?.allowPullingPastMaxHeight = false
     self._modalViewController?.dismissOnOverlayTap = self.dismissable
     self._modalViewController?.dismissOnPull = self.dismissable
@@ -158,6 +159,7 @@ public final class HostFittedSheet: UIView {
     }
 
     if (!_isPresented) {
+      presentViewController = createVC()
       // sheet already presented
       if stacked {
         if let controller = presentViewController as? SheetViewController {
@@ -172,16 +174,24 @@ public final class HostFittedSheet: UIView {
 
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
-      debugPrint("😀 tryToPresent", size)
+      debugPrint("😀 HostFittedSheet.tryToPresent", self.presentViewController)
       RCTExecuteOnMainQueue { [weak self] in
         guard let self else { return }
 
         self.initializeSheet(size)
-        self.presentViewController.present(self._modalViewController!, animated: true)
-        self._modalViewController?.didDismiss = { [weak self] _ in
+        self.presentViewController?.present(self._modalViewController!, animated: true)
+        self._modalViewController?.didDismiss = { [weak self] old, silent in
           guard let self else { return }
-          debugPrint("😀 _modalViewController.didDismiss", self, presentedSheets)
+          debugPrint("😀 _modalViewController.didDismiss", presentedSheets.count, RCTPresentedViewController())
           onSheetDismiss?()
+          if old.dismissAll == true {
+            debugPrint("😀 _modalViewController.dismissingSilently")
+            if stacked, let popped = presentedSheets.popLast() {
+              popped.dismissAll = true
+              popped.dismiss(animated: false)
+            }
+            return
+          }
           if stacked, let popped = presentedSheets.popLast() {
             popped.setSizes(lastPresentedSheetSizes.popLast() ?? [])
           }
@@ -205,17 +215,20 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func destroy() {
-    debugPrint("😀 destroy")
+    debugPrint("😀 HostFittedSheet.destroy")
     _isPresented = false
 
     let cleanup = { [weak self] in
-      guard let self = self else { return }
-      debugPrint("😀 cleanup")
-      self._modalViewController = nil
+      guard let self else { return }
+      debugPrint("😀 HostFittedSheet.cleanup")
+      self.viewController.removeFromParent()
+      self.viewController.view.removeFromSuperview()
       self._reactSubview?.removeFromSuperview()
       if let v = self._reactSubview {
         self._touchHandler?.detach(from: v)
       }
+      self.presentViewController = nil
+      self._modalViewController = nil
       self._touchHandler = nil
       self._sheetSize = nil
       self.sheetMaxWidthSize = nil
@@ -224,16 +237,17 @@ public final class HostFittedSheet: UIView {
     }
 
     if self._modalViewController?.isBeingDismissed != true {
-      debugPrint("😀 dismissViewController")
+      debugPrint("😀 _modalViewController?.isBeingDismissed")
       self._modalViewController?.dismiss(animated: true, completion: cleanup)
     } else {
+      debugPrint("😀 _modalViewController.cleanup")
       cleanup()
     }
 
   }
 
   deinit {
-    debugPrint("😀 deinit")
+    debugPrint("😀 HostFittedSheet.deinit")
   }
 
 }

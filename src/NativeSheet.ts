@@ -10,6 +10,8 @@ export interface Spec extends TurboModule {
   };
 
   viewportSize(): { width: Double; height: Double };
+  dismissAll(): void;
+  dismissPresented(): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Sheet');
