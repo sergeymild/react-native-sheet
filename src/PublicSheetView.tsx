@@ -28,11 +28,6 @@ export function dismissFittedSheet(name: string): boolean {
   return true;
 }
 
-export function dismissFittedSheetsAll(): boolean {
-  PrivateFittedSheet.dismissAll();
-  return true;
-}
-
 export function dismissFittedPresented(): boolean {
   PrivateFittedSheet.dismissPresented();
   return true;

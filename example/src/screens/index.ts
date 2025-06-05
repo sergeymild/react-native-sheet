@@ -8,19 +8,14 @@ import { QueueExample } from './modal/QueueExample';
 import { DismissPreventExample } from './modal/DismissPreventExample';
 import DetachedExample from './modal/DetachedExample';
 import DynamicSnapPointExample from './modal/DynamicSnapPointExample';
-import { DismissAllExample } from './modal/DismissAllExample';
 import { DismissPresentedExample } from './modal/DismissPresentedExample';
+import { NotQueueExample } from './modal/NotQueueExample';
 
 export const screens = [
   {
     name: 'Dynamic Snap Point',
     slug: 'Modal/DynamicSnapPointExample',
     getScreen: () => DynamicSnapPointExample,
-  },
-  {
-    name: 'Dismiss all',
-    slug: 'Modal/DismissAllExample',
-    getScreen: () => DismissAllExample,
   },
   {
     name: 'Dismiss presented',
@@ -66,6 +61,11 @@ export const screens = [
     name: 'QueueExample',
     slug: 'Modal/QueueExample',
     getScreen: () => QueueExample,
+  },
+  {
+    name: 'NotQueueExample',
+    slug: 'Modal/NotQueueExample',
+    getScreen: () => NotQueueExample,
   },
   {
     name: 'DismissPreventExample',

@@ -18,7 +18,6 @@ import {
     attachScrollViewToFittedSheet,
     FittedSheetRef,
     presentFittedSheet,
-    dismissFittedSheetsAll,
     dismissFittedPresented,
 } from 'react-native-sheet';
 import { ScrollView, TouchableOpacity } from 'react-native';
@@ -60,9 +59,6 @@ const App: React.FC = () => {
       
       <TouchableOpacity 
         onPress={() => {
-            // dismiss presented and all in queue sheets without animation
-            dismissFittedSheetsAll()
-            
             // dismiss top presented sheet
             dismissFittedPresented()
         }}

@@ -5,11 +5,10 @@ import { Button } from '../../components/button';
 import { FittedSheet } from 'react-native-sheet';
 import {
   dismissFittedSheet,
-  dismissFittedSheetsAll,
   presentFittedSheet,
 } from '../../../../src/PublicSheetView';
 
-export const DismissAllExample = () => {
+export const NotQueueExample = () => {
   const [value, setValue] = useState('empty');
 
   // callbacks
@@ -56,13 +55,14 @@ export const DismissAllExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'third'} params={{ backgroundColor: '#f1f1f1' }}>
+      <FittedSheet name={'third'} params={{ backgroundColor: '#f0f0f0' }}>
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 100, backgroundColor: 'red' }} />
           <Button
-            label="dismiss all"
+            label="dismiss 3"
             onPress={() => {
-              dismissFittedSheetsAll();
+              setValue('from sheet 3');
+              dismissFittedSheet('third');
             }}
           />
         </View>

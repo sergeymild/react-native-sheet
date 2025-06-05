@@ -10,9 +10,15 @@ import Foundation
 import UIKit
 import React
 
-let FITTED_SHEET_SCROLL_VIEW = "fittedSheetScrollView"
-var presentedSheets: [SheetViewController] = []
-var lastPresentedSheetSizes: [[SheetSize]] = []
+private func presentedViewController() -> UIViewController? {
+  if let windowScene = UIApplication.shared.connectedScenes
+      .compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive }),
+     let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+    return window.rootViewController?.presentedViewController
+  }
+  return nil
+}
 
 @objc(SheetViewManager)
 class SheetViewManager: RCTViewManager {
@@ -39,23 +45,9 @@ class SheetViewManager: RCTViewManager {
   }
   
   @objc
-  final func dismissAll() {
-    RCTExecuteOnMainQueue {
-      let presented = RCTPresentedViewController()
-      if let presented = presented as? SheetViewController {
-        presented.dismissAll = true
-        presented.dismiss(animated: false)
-      }
-    }
-  }
-  
-  @objc
   final func dismissPresented() {
     RCTExecuteOnMainQueue {
-      let presented = RCTPresentedViewController()
-      if let presented = presented as? SheetViewController {
-        presented.dismiss(animated: true)
-      }
+      presentedViewController()?.dismiss(animated: true)
     }
   }
   
@@ -101,23 +93,23 @@ final class HostFittedSheet: UIView {
   private var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
-  private var stacked = true
+  private var stacked = false
   
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
   }
   
   private var _alertWindow: UIWindow?
-  private var presentViewController: UIViewController = {
-//    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
-//    let controller = UIViewController()
-//    _alertWindow?.rootViewController = controller
-//    _alertWindow?.windowLevel = UIWindow.Level.alert
-//    _alertWindow?.isHidden = false
-//    _alertWindow?.makeKeyAndVisible()
-//    return controller
-    return RCTPresentedViewController()!
-  }()
+  private func createVC() -> UIViewController {
+    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
+    let controller = UIViewController()
+    _alertWindow?.rootViewController = controller
+    _alertWindow?.windowLevel = UIWindow.Level.alert
+    _alertWindow?.isHidden = false
+    _alertWindow?.makeKeyAndVisible()
+    return controller
+  }
+  private var presentViewController: UIViewController?
   
   @objc
   func setPassScrollViewReactTag(_ tag: NSNumber) {
@@ -131,6 +123,7 @@ final class HostFittedSheet: UIView {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
+    stacked = RCTConvert.bool(params["stacked"])
     
     if let value = sheetMaxWidthSize {
       _modalViewController?.updateMaxWidth(value: value)
@@ -185,9 +178,7 @@ final class HostFittedSheet: UIView {
   func setCalculatedHeight(_ height: NSNumber) {
     debugPrint("😀 setCalculatedHeight", height)
     // prevent show on change orientation for stack
-    if let m = _modalViewController, presentedSheets.contains(m) {
-      return
-    }
+    //if let m = _modalViewController { return }
     _sheetSize = RCTConvert.cgFloat(height)
     _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
   }
@@ -227,17 +218,10 @@ final class HostFittedSheet: UIView {
     }
     
     if (!_isPresented) {
-      // sheet already presented
-      if stacked {
-        if let controller = presentViewController as? SheetViewController {
-          if !presentedSheets.contains(controller) {
-            lastPresentedSheetSizes.append(controller.sizes)
-            presentedSheets.append(controller)
-          }
-          
-          controller.setSizes([.fixed(0)])
-        }
+      if !stacked {
+        presentedViewController()?.dismiss(animated: true)
       }
+      presentViewController = createVC()
       
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
@@ -246,23 +230,11 @@ final class HostFittedSheet: UIView {
         guard let self else { return }
         
         self.initializeSheet(size)
-        self.presentViewController.present(self._modalViewController!, animated: true)
+        self.presentViewController?.present(self._modalViewController!, animated: true)
         self._modalViewController?.didDismiss = { [weak self] old, silent in
           guard let self else { return }
           debugPrint("😀 _modalViewController.didDismiss", old, silent)
           onSheetDismiss?([:])
-          if old.dismissAll == true {
-            debugPrint("😀 _modalViewController.dismissingSilently")
-            if stacked, let popped = presentedSheets.popLast() {
-              popped.dismissAll = true
-              popped.dismiss(animated: false)
-            }
-            return
-          }
-          if stacked, let popped = presentedSheets.popLast() {
-            popped.setSizes(lastPresentedSheetSizes.popLast() ?? [])
-          }
-          debugPrint("______", presentedSheets)
         }
         
         // some delay to wait rn render
@@ -295,6 +267,7 @@ final class HostFittedSheet: UIView {
       self.sheetMaxWidthSize = nil
       self._reactSubview = nil
       self._alertWindow = nil
+      self.presentViewController = nil
     }
     
     if self._modalViewController?.isBeingDismissed != true {

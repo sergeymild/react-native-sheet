@@ -54,13 +54,6 @@ class SheetViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
   }
 
   @ReactMethod
-  fun dismissAll() {
-    reactApplicationContext.runOnUiQueueThread {
-      reactApplicationContext.currentActivity?.let { AppFittedSheet.dismissAll(it as AppCompatActivity) }
-    }
-  }
-
-  @ReactMethod
   fun dismissPresented() {
     reactApplicationContext.runOnUiQueueThread {
       reactApplicationContext.currentActivity?.let { AppFittedSheet.dismissPresented(it as AppCompatActivity) }

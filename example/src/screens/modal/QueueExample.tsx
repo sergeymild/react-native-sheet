@@ -27,6 +27,7 @@ export const QueueExample = () => {
       <FittedSheet
         name={'first'}
         onSheetDismiss={() => setValue('empty')}
+        stacked
         params={{ backgroundColor: 'yellow' }}
       >
         <View style={styles.contentContainerStyle}>
@@ -37,7 +38,11 @@ export const QueueExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'second'} params={{ backgroundColor: 'purple' }}>
+      <FittedSheet
+        name={'second'}
+        params={{ backgroundColor: 'purple' }}
+        stacked
+      >
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 200, backgroundColor: 'red' }} />
           <Button
@@ -55,7 +60,11 @@ export const QueueExample = () => {
         </View>
       </FittedSheet>
 
-      <FittedSheet name={'third'} params={{ backgroundColor: 'orange' }}>
+      <FittedSheet
+        name={'third'}
+        params={{ backgroundColor: 'orange' }}
+        stacked
+      >
         <View style={styles.contentContainerStyle}>
           <View style={{ height: 100, backgroundColor: 'red' }} />
           <Button

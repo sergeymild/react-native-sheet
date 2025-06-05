@@ -22,6 +22,7 @@ export interface FittedSheetParams {
   readonly minHeight?: number;
   readonly topLeftRightCornerRadius?: number;
   readonly backgroundColor?: string;
+  stacked?: boolean;
   /**
    * Android only
    */
@@ -35,6 +36,7 @@ type Children =
 
 export interface SheetProps {
   readonly params?: FittedSheetParams;
+  readonly stacked?: boolean;
   readonly onSheetDismiss?: (passThroughParam?: any) => void;
   readonly children?: Children;
 }
@@ -86,10 +88,6 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     const tag = findNodeHandle(this.sheetRef.current);
     if (!tag) return;
     SheetModule.dismiss(tag);
-  };
-
-  static dismissAll = () => {
-    SheetModule.dismissAll();
   };
 
   static dismissPresented = () => {
@@ -185,9 +183,10 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
           this.props.params
             ? {
                 ...this.props.params,
+                stacked: this.props.stacked,
                 maxWidth,
               }
-            : undefined
+            : { maxWidth, stacked: this.props.stacked }
         }
       >
         <View

@@ -32,10 +32,7 @@ internal fun AppFittedSheet.onSheetDismiss() {
     .receiveEvent(id, "onSheetDismiss", Arguments.createMap())
 }
 
-private var presentedSheets: MutableList<String> = mutableListOf()
-
 class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
-  private var stacked = true
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
 
@@ -57,6 +54,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     get() = params?.color("backgroundColor", context) ?: Color.TRANSPARENT
   private val isSystemUILight: Boolean
     get() = params?.bool("isSystemUILight", false) ?: false
+  private val stacked: Boolean
+    get() = params?.bool("stacked", false) ?: false
 
   private fun getCurrentActivity(): AppCompatActivity? {
     return (context as? ReactContext)?.currentActivity as? AppCompatActivity
@@ -77,10 +76,8 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
     mHostView.setCornerRadius(topLeftRightCornerRadius)
     mHostView.setBackgroundColor(backgroundColor)
     if (sheet == null) {
-      if (stacked) {
-        presentedSheets.lastOrNull()?.let {
-          findSheet(it)?.collapse()
-        }
+      if (!stacked) {
+        getCurrentActivity()?.let(::dismissPresented)
       }
 
       val fragment = FragmentModalBottomSheet(
@@ -92,36 +89,9 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
         val parent = mHostView.parent as? ViewGroup
         parent?.removeViewAt(0)
         onSheetDismiss()
-        if (dismissAll) {
-          println("😁 dismissingSilently ${presentedSheets.size}")
-          if (stacked) {
-            var lastName = presentedSheets.removeLastOrNull()
-            if (lastName == fragmentTag) lastName = presentedSheets.lastOrNull()
-            if (lastName != null) {
-              findSheet(lastName)?.let {
-                it.dismissAll = true
-                it.dismissAllowingStateLoss()
-              }
-            }
-          }
-          return@FragmentModalBottomSheet
-        }
-        if (stacked) {
-          var lastName = presentedSheets.removeLastOrNull()
-          if (lastName == fragmentTag) {
-            lastName = presentedSheets.lastOrNull()
-          }
-          lastName?.let { findSheet(it)?.expand() }
-          println("👀 Dismiss ${presentedSheets.size}")
-        }
       }
       getCurrentActivity()?.supportFragmentManager?.let {
         fragment.safeShow(it, fragmentTag)
-        if (stacked) {
-          println("👀 Show ${presentedSheets.size} name: $fragmentTag")
-          if (presentedSheets.contains(fragmentTag)) return
-          presentedSheets.add(fragmentTag)
-        }
       }
     }
   }
@@ -190,14 +160,6 @@ class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListe
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
 
   companion object {
-    fun dismissAll(activity: AppCompatActivity) {
-      val fragment = activity.supportFragmentManager.fragments.lastOrNull()
-      if (fragment is FragmentModalBottomSheet) {
-        fragment.dismissAll = true
-        fragment.dismissAllowingStateLoss()
-      }
-    }
-
     fun dismissPresented(activity: AppCompatActivity) {
       val fragment = activity.supportFragmentManager.fragments.lastOrNull()
       if (fragment is FragmentModalBottomSheet) {
