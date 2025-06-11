@@ -10,12 +10,12 @@ import Foundation
 import UIKit
 import React
 
-private func presentedViewController() -> UIViewController? {
+private func presentedViewController() -> SheetViewController? {
   if let windowScene = UIApplication.shared.connectedScenes
       .compactMap({ $0 as? UIWindowScene })
       .first(where: { $0.activationState == .foregroundActive }),
      let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
-    return window.rootViewController?.presentedViewController
+    return window.rootViewController?.presentedViewController as? SheetViewController
   }
   return nil
 }
@@ -25,16 +25,16 @@ class SheetViewManager: RCTViewManager {
   override static func requiresMainQueueSetup() -> Bool {
     return true
   }
-  
+
   override func view() -> UIView! {
     let v = HostFittedSheet(bridge: bridge)
     return v
   }
-  
+
   private func getSheetView(withTag tag: NSNumber) -> HostFittedSheet {
     return bridge.uiManager.view(forReactTag: tag) as! HostFittedSheet
   }
-  
+
   @objc
   final func dismiss(_ node: NSNumber) {
     RCTExecuteOnMainQueue {
@@ -43,20 +43,20 @@ class SheetViewManager: RCTViewManager {
       debugPrint("😀dismiss")
     }
   }
-  
+
   @objc
   final func dismissPresented() {
     RCTExecuteOnMainQueue {
       presentedViewController()?.dismiss(animated: true)
     }
   }
-  
+
   @objc
   func viewportSize() -> [String: CGFloat] {
     let size = viewPort()
     return ["width": size.width, "height": size.height]
   }
-  
+
   override func constantsToExport() -> [AnyHashable : Any]! {
     var constants: [AnyHashable : Any] = [:]
     constants["insets"] = [
@@ -65,7 +65,7 @@ class SheetViewManager: RCTViewManager {
     ]
     return constants
   }
-  
+
   deinit {
     debugPrint("😀 deinit view manager")
   }
@@ -78,6 +78,8 @@ func viewPort() -> CGSize {
   }
   return size
 }
+
+private class MarkerViewController: UIViewController {}
 
 final class HostFittedSheet: UIView {
   private(set) var _modalViewController: SheetViewController?
@@ -94,11 +96,11 @@ final class HostFittedSheet: UIView {
   private var dismissable = true
   private var topLeftRightCornerRadius: CGFloat?
   private var stacked = false
-  
+
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
   }
-  
+
   private var _alertWindow: UIWindow?
   private func createVC() -> UIViewController {
     _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
@@ -110,13 +112,13 @@ final class HostFittedSheet: UIView {
     return controller
   }
   private var presentViewController: UIViewController?
-  
+
   @objc
   func setPassScrollViewReactTag(_ tag: NSNumber) {
     debugPrint("😀 setPassScrollViewReactTag")
     tryAttachScrollView()
   }
-  
+
   @objc
   func setFittedSheetParams(_ params: NSDictionary) {
     debugPrint("😀 setFittedSheetParams", params)
@@ -124,22 +126,22 @@ final class HostFittedSheet: UIView {
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
     stacked = RCTConvert.bool(params["stacked"])
-    
+
     if let value = sheetMaxWidthSize {
       _modalViewController?.updateMaxWidth(value: value)
     }
   }
-  
+
   init(bridge: RCTBridge) {
     self._bridge = bridge
     super.init(frame: .zero)
     _touchHandler = RCTTouchHandler(bridge: bridge)
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
     debugPrint("😀 insertReactSubview")
     super.insertReactSubview(subview, at: atIndex)
@@ -147,22 +149,22 @@ final class HostFittedSheet: UIView {
     viewController.view.insertSubview(subview, at: 0)
     _reactSubview = subview
   }
-  
+
   override func removeReactSubview(_ subview: UIView!) {
     debugPrint("😀 removeReactSubview")
     super.removeReactSubview(subview)
     _touchHandler?.detach(from: subview)
     _reactSubview = nil
   }
-  
+
   // need to leave it empty
   override func didUpdateReactSubviews() {}
-  
+
   override func didMoveToWindow() {
     super.didMoveToWindow()
     tryToPresent()
   }
-  
+
   override func didMoveToSuperview() {
     super.didMoveToSuperview()
     debugPrint("😀 didMoveToSuperview _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
@@ -172,7 +174,7 @@ final class HostFittedSheet: UIView {
       tryToPresent()
     }
   }
-  
+
   // MARK: calculatedSize
   @objc
   func setCalculatedHeight(_ height: NSNumber) {
@@ -182,7 +184,7 @@ final class HostFittedSheet: UIView {
     _sheetSize = RCTConvert.cgFloat(height)
     _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
   }
-  
+
   private func initializeSheet(_ size: CGSize) {
     self._modalViewController = SheetViewController(
       controller: self.viewController,
@@ -201,7 +203,7 @@ final class HostFittedSheet: UIView {
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = .clear
   }
-  
+
   private func tryAttachScrollView() {
     guard let controller = _modalViewController else { return }
     debugPrint("😀 tryAttachScrollView")
@@ -211,24 +213,24 @@ final class HostFittedSheet: UIView {
       controller.handleScrollView(v)
     }
   }
-  
+
   private func tryToPresent() {
     if (!self.isUserInteractionEnabled && self.superview?.reactSubviews().contains(self) != nil) {
       return;
     }
-    
+
     if (!_isPresented) {
       if !stacked {
         presentedViewController()?.dismiss(animated: true)
       }
-      presentViewController = createVC()
-      
+
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
       debugPrint("😀 HostFittedSheet.tryToPresent", size)
       RCTExecuteOnMainQueue { [weak self] in
         guard let self else { return }
-        
+        self.presentViewController = createVC()
+
         self.initializeSheet(size)
         self.presentViewController?.present(self._modalViewController!, animated: true)
         self._modalViewController?.didDismiss = { [weak self] old, silent in
@@ -236,7 +238,7 @@ final class HostFittedSheet: UIView {
           debugPrint("😀 _modalViewController.didDismiss", old, silent)
           onSheetDismiss?([:])
         }
-        
+
         // some delay to wait rn render
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
           guard let self else { return }
@@ -246,11 +248,11 @@ final class HostFittedSheet: UIView {
       }
     }
   }
-  
+
   func destroy() {
     debugPrint("😀 HostFittedSheet.destroy")
     _isPresented = false
-    
+
     let cleanup = { [weak self] in
       guard let self = self else { return }
       debugPrint("😀 HostFittedSheet.cleanup")
@@ -269,20 +271,20 @@ final class HostFittedSheet: UIView {
       self._alertWindow = nil
       self.presentViewController = nil
     }
-    
+
     if self._modalViewController?.isBeingDismissed != true {
       debugPrint("😀 HostFittedSheet.dismissViewController")
       self._modalViewController?.dismiss(animated: true, completion: cleanup)
     } else {
       cleanup()
     }
-    
+
   }
-  
+
   deinit {
     debugPrint("😀 HostFittedSheet.deinit")
   }
-  
+
 }
 
 
