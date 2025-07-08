@@ -1780,7 +1780,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - Sheet (6.1.12):
+  - Sheet (6.1.13):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2039,11 +2039,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
-  DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
+  DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
   FBLazyVector: abbac80c6f89e71a8c55c7e92ec015c8a9496753
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
-  glog: eb93e2f488219332457c3c4eafd2738ddc7e80b8
+  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: c32f2e405098bc1ebe30630a051ddce6f21d3c2e
   RCT-Folly: e78785aa9ba2ed998ea4151e314036f6c49e6d82
   RCTDeprecation: 0ada4fb1e5c5637bff940dc40b94e2d3bf96b0ab
@@ -2109,7 +2109,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 025b1e9baf2a32b7466b00c20dd5b1b8c6388d07
   ReactCommon: ff9f7add7560c9f15cf6e9d0320f9ad45b696062
   RNScreens: a25b818417609cbd805474dffd2d28b229704cfc
-  Sheet: dfd5390268bbb5aa17af0b9051eb454b7e203d9d
+  Sheet: 338fa28d4b211e7b2ffc94189a2ab0eac0e8ec2e
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 0f6757ba6d7d652f42bba3423f925dbf23d51aab
 
