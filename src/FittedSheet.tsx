@@ -140,7 +140,10 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
       : this.props.params?.maxPortraitWidth;
     let maxWidth = Math.min(
       paramsMaxWidth ?? Number.MAX_VALUE,
-      this.dimensions.width
+      // max width as width
+      this.dimensions.width > this.dimensions.height
+        ? this.dimensions.height * 1.2
+        : this.dimensions.width
     );
     let minHeight = this.props.params?.minHeight;
     if (this.props.params?.applyMaxHeightToMinHeight) {
