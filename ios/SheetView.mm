@@ -7,7 +7,12 @@
 #import <React/RCTConversions.h>
 
 #import "RCTFabricComponentsPlugins.h"
+
+#if __has_include("Sheet-Swift.h")
+#import "Sheet-Swift.h"
+#else
 #import <Sheet/Sheet-Swift.h>
+#endif
 
 using namespace facebook::react;
 
@@ -37,12 +42,12 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const SheetViewProps>();
     _props = defaultProps;
-    
+
     _view = [[UIView alloc] init];
     _view2 = [[HostFittedSheet alloc] init];
-    
-    
-    
+
+
+
     __weak SheetView *weakSelf = self;
     _view2.onSheetDismiss = ^{
       NSLog(@"😀  ---- onSheetDismiss");
@@ -51,10 +56,10 @@ using namespace facebook::react;
         eventEmitter->onSheetDismiss({});
       }
     };
-    
+
     self.contentView = _view2;
   }
-  
+
   return self;
 }
 
@@ -63,7 +68,7 @@ using namespace facebook::react;
   NSLog(@"😀 updateProps");
   const auto &oldViewProps = *std::static_pointer_cast<SheetViewProps const>(_props);
   const auto &newViewProps = *std::static_pointer_cast<SheetViewProps const>(props);
-  
+
   if (oldViewProps.maxWidth != newViewProps.maxWidth || oldViewProps.dismissable != newViewProps.dismissable || oldViewProps.topLeftRightCornerRadius != newViewProps.topLeftRightCornerRadius) {
     [_view2 setFittedSheetParams:@{
       @"maxWidth": @(newViewProps.maxWidth),
@@ -74,16 +79,16 @@ using namespace facebook::react;
 
   auto color = RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor);
   [_view2 setSheetBackgroundColor:color];
-  
+
   if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
     [_view2 setPassScrollViewReactTag];
   }
-  
-  
+
+
   NSLog(@"----- %f", newViewProps.calculatedHeight);
   [_view2 setCalculatedHeight:newViewProps.calculatedHeight];
-  
-  
+
+
   [super updateProps:props oldProps:oldProps];
 }
 
