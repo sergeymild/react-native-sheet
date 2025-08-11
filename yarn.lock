@@ -11396,9 +11396,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"react-native-sheet@workspace:.":
+"react-native-sheet2@workspace:.":
   version: 0.0.0-use.local
-  resolution: "react-native-sheet@workspace:."
+  resolution: "react-native-sheet2@workspace:."
   dependencies:
     "@commitlint/config-conventional": ^19.6.0
     "@eslint/compat": ^1.2.7
