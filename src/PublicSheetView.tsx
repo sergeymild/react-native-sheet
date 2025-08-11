@@ -6,7 +6,6 @@ import React, {
   useRef,
 } from 'react';
 import { PrivateFittedSheet, type SheetProps } from './FittedSheet';
-import { Portal } from '@gorhom/portal';
 
 const handles: {
   [name: string]: React.RefObject<PrivateFittedSheet | null>;

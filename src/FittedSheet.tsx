@@ -5,14 +5,13 @@ import {
   Platform,
   StatusBar,
   View,
-  processColor,
 } from 'react-native';
 
 import She, { Commands } from './SheetViewNativeComponent';
 import SheetModule from './NativeSheet';
 import { Portal } from '@gorhom/portal';
 
-export const _FittedSheet = She;
+const _FittedSheet = She;
 
 export interface FittedSheetParams {
   readonly applyMaxHeightToMinHeight?: boolean;
