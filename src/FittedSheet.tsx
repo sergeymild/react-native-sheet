@@ -47,15 +47,18 @@ interface State {
   isLandscape: boolean;
 }
 
+let index = 0;
 export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   private cleanup?: () => void;
   private onHidePassThroughParam?: any;
   private sheetRef = React.createRef<any>();
+  private uniqueId = 0;
 
   private dimensions: { width: number; height: number };
 
   constructor(props: SheetProps) {
     super(props);
+    this.uniqueId = ++index;
     this.dimensions = this.viewportSize();
 
     this.state = {
@@ -65,25 +68,30 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     };
   }
 
+  private log = (key: string, message: any | undefined = undefined) => {
+    if (!__DEV__) return;
+    if (message) console.log(`${this.uniqueId} - FittedSheet.${key}`, message);
+    else console.log(`${this.uniqueId} - FittedSheet.${key}`);
+  };
+
   show = (data?: any) => {
     this.setState({ show: true, data });
   };
 
   onLayout = (e: LayoutChangeEvent) => {
-    if (__DEV__)
-      console.log('[FittedSheet.onLayout]', e.nativeEvent.layout.height);
+    this.log('onLayout', e.nativeEvent.layout.height);
     this.setState({ height: e.nativeEvent.layout.height });
   };
 
   attachScrollViewToSheet = () => {
-    console.log('[FittedSheet.attachScrollViewToSheet]');
+    this.log(`attachScrollViewToSheet`);
     this.setState({ passScrollViewReactTag: Date.now().toString() });
   };
 
   hide = (passThroughParam?: any) => {
     if (!this.state.show) return;
     this.onHidePassThroughParam = passThroughParam;
-    console.log('[FittedSheet.hide]', Commands.dismissSheet);
+    this.log('hide', Commands.dismissSheet);
     Commands.dismissSheet(this.sheetRef.current);
   };
 
@@ -97,7 +105,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   // @ts-ignore
   private onDismiss = () => {
-    if (__DEV__) console.log('[FittedSheet.onDismiss]');
+    this.log('onDismiss');
     this.setState({ show: false, height: undefined });
     const passValue = this.onHidePassThroughParam;
     this.onHidePassThroughParam = undefined;
@@ -109,7 +117,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentDidMount() {
-    if (__DEV__) console.log('[FittedSheet.componentDidMount]', this.insets());
+    this.log('componentDidMount');
     this.cleanup = Dimensions.addEventListener('change', () => {
       this.dimensions = this.viewportSize();
       const isLandscape = this.dimensions.width > this.dimensions.height;
@@ -118,7 +126,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   componentWillUnmount() {
-    if (__DEV__) console.log('[FittedSheet.componentWillUnmount]');
+    this.log('componentWillUnmount');
     this.hide();
     this.cleanup?.();
     this.cleanup = undefined;
@@ -160,28 +168,28 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     }
 
     if (__DEV__) {
-      console.log(
-        '[FittedSheet.render]',
-        JSON.stringify(
-          {
-            maxHeight,
-            maxWidth,
-            nativeHeight,
-            isLandscape: this.state.isLandscape,
-            h: Dimensions.get('window').height,
-            sb: StatusBar.currentHeight,
-            dimensions: this.dimensions,
-          },
-          undefined,
-          2
-        )
+      const logJson = JSON.stringify(
+        {
+          maxHeight,
+          maxWidth,
+          nativeHeight,
+          isLandscape: this.state.isLandscape,
+          h: Dimensions.get('window').height,
+          sb: StatusBar.currentHeight,
+          dimensions: this.dimensions,
+        },
+        undefined,
+        2
       );
+      this.log('render');
     }
     const background = this.props?.params?.backgroundColor;
     return (
       <Portal hostName={'SheetHost'}>
         <_FittedSheet
+          key={this.uniqueId.toString()}
           onSheetDismiss={this.onDismiss}
+          uniqueId={this.uniqueId.toString()}
           ref={this.sheetRef}
           onStartShouldSetResponder={this._shouldSetResponder}
           style={{ width: maxWidth, position: 'absolute' }}

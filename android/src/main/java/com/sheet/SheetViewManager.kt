@@ -38,6 +38,10 @@ class SheetViewManager(reactContext: ReactApplicationContext) : ViewGroupManager
     view.dismiss()
   }
 
+  override fun setUniqueId(view: SheetView, value: String?) {
+
+  }
+
   override fun setDismissable(view: SheetView, value: Boolean) {
     println("==========setDismissable $value")
     view.dismissable = value

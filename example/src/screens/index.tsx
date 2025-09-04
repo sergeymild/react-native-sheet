@@ -12,6 +12,7 @@ import { DismissAllExample } from './modal/DismissAllExample';
 import { DismissPresentedExample } from './modal/DismissPresentedExample';
 import { Keyboard3Example } from './modal/Keyboard3Example';
 import { NamedExample } from './modal/NamedExample';
+import { MultipleExample } from './modal/MultipleExample';
 
 export const screens = [
   {
@@ -78,6 +79,11 @@ export const screens = [
     name: 'QueueExample',
     slug: 'Modal/QueueExample',
     getScreen: () => QueueExample,
+  },
+  {
+    name: 'MultipleExample',
+    slug: 'Modal/MultipleExample',
+    getScreen: () => MultipleExample,
   },
   {
     name: 'DismissPreventExample',

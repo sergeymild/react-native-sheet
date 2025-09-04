@@ -27,6 +27,7 @@ SheetViewProps::SheetViewProps(
     topLeftRightCornerRadius(convertRawProp(context, rawProps, "topLeftRightCornerRadius", sourceProps.topLeftRightCornerRadius, {0.0})),
     isSystemUILight(convertRawProp(context, rawProps, "isSystemUILight", sourceProps.isSystemUILight, {false})),
     passScrollViewReactTag(convertRawProp(context, rawProps, "passScrollViewReactTag", sourceProps.passScrollViewReactTag, {})),
+    uniqueId(convertRawProp(context, rawProps, "uniqueId", sourceProps.uniqueId, {})),
     sheetBackgroundColor(convertRawProp(context, rawProps, "sheetBackgroundColor", sourceProps.sheetBackgroundColor, {}))
       {}
 

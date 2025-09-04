@@ -48,6 +48,9 @@ public class SheetViewManagerDelegate<T extends View, U extends BaseViewManager<
       case "passScrollViewReactTag":
         mViewManager.setPassScrollViewReactTag(view, value == null ? null : (String) value);
         break;
+      case "uniqueId":
+        mViewManager.setUniqueId(view, value == null ? null : (String) value);
+        break;
       case "sheetBackgroundColor":
         mViewManager.setSheetBackgroundColor(view, ColorPropConverter.getColor(value, view.getContext()));
         break;

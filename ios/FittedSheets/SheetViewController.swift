@@ -232,7 +232,7 @@ public class SheetViewController: UIViewController {
               self.didDismiss?(self, self.dismissAll)
             })
         } else if !self.options.useInlineMode {
-          debugPrint(parent, view, view.superview)
+          //debugPrint(parent, view, view.superview)
             self.didDismiss?(self, dismissAll)
         }
     }

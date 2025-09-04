@@ -15,6 +15,7 @@ interface NativeProps extends ViewProps {
   topLeftRightCornerRadius?: Double;
   isSystemUILight: boolean;
   passScrollViewReactTag?: string;
+  uniqueId: string;
   sheetBackgroundColor?: ColorValue;
   onSheetDismiss: DirectEventHandler<null>;
 }

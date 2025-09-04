@@ -1780,7 +1780,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - Sheet (6.1.16):
+  - Sheet (6.1.19):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2109,7 +2109,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 025b1e9baf2a32b7466b00c20dd5b1b8c6388d07
   ReactCommon: ff9f7add7560c9f15cf6e9d0320f9ad45b696062
   RNScreens: a25b818417609cbd805474dffd2d28b229704cfc
-  Sheet: 3bdc7937c7261045563bc96b08fa8dcf5df58a36
+  Sheet: 2d4b9c167d07fc3c95c5f983590113f22d40de31
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 0f6757ba6d7d652f42bba3423f925dbf23d51aab
 

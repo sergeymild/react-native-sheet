@@ -22,6 +22,7 @@ public interface SheetViewManagerInterface<T extends View> extends ViewManagerWi
   void setTopLeftRightCornerRadius(T view, double value);
   void setIsSystemUILight(T view, boolean value);
   void setPassScrollViewReactTag(T view, @Nullable String value);
+  void setUniqueId(T view, @Nullable String value);
   void setSheetBackgroundColor(T view, @Nullable Integer value);
   void dismissSheet(T view);
 }

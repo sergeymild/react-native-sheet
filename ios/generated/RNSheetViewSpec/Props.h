@@ -30,6 +30,7 @@ class SheetViewProps final : public ViewProps {
   double topLeftRightCornerRadius{0.0};
   bool isSystemUILight{false};
   std::string passScrollViewReactTag{};
+  std::string uniqueId{};
   SharedColor sheetBackgroundColor{};
 };
 

@@ -26,6 +26,8 @@ public final class HostFittedSheet: UIView {
   private var topLeftRightCornerRadius: CGFloat?
   private var stacked = false
   private var _backgroundColor: UIColor = .clear
+  @objc
+  public var uniqueId: String = ""
 
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
@@ -45,7 +47,7 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func setPassScrollViewReactTag() {
-    debugPrint("😀 setPassScrollViewReactTag")
+    debugPrint("\(uniqueId) HostFittedSheet.setPassScrollViewReactTag")
     tryAttachScrollView()
   }
   
@@ -57,7 +59,7 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func setFittedSheetParams(_ params: NSDictionary) {
-    debugPrint("😀 setFittedSheetParams", params)
+    debugPrint("\(uniqueId) HostFittedSheetsetFittedSheetParams", params)
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
@@ -76,7 +78,7 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-    debugPrint("😀 insertReactSubview", subview.tag as Any)
+    debugPrint("\(uniqueId) HostFittedSheet.insertReactSubview", subview.tag as Any)
     //super.insertReactSubview(subview, at: atIndex)
     _touchHandler = RCTSurfaceTouchHandler()
     _touchHandler?.attach(to: subview)
@@ -85,7 +87,7 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
-    debugPrint("😀 removeReactSubview", subview.tag as Any)
+    debugPrint("\(uniqueId) HostFittedSheet.removeReactSubview", subview.tag as Any)
     //super.removeReactSubview(subview)
     _touchHandler?.detach(from: subview)
     _reactSubview?.removeFromSuperview()
@@ -103,7 +105,7 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func finalizeUpdates() {
-    debugPrint("😀 finalizeUpdates _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
+    debugPrint("\(uniqueId) HostFittedSheet.finalizeUpdates _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
     if _isPresented && superview == nil {
       destroy()
     } else {
@@ -114,7 +116,7 @@ public final class HostFittedSheet: UIView {
   // MARK: calculatedSize
   @objc
   public func setCalculatedHeight(_ height: CGFloat) {
-    debugPrint("😀 setCalculatedHeight", height)
+    debugPrint("\(uniqueId) HostFittedSheet.setCalculatedHeight", height)
     // prevent show on change orientation for stack
     if let m = _modalViewController, presentedSheets.contains(m) {
       return
@@ -124,7 +126,7 @@ public final class HostFittedSheet: UIView {
   }
 
   private func initializeSheet(_ size: CGSize) {
-    debugPrint("😀 initializeSheet", size)
+    debugPrint("\(uniqueId) HostFittedSheet.initializeSheet", size)
     self._modalViewController = SheetViewController(
       controller: self.viewController,
       sizes: [.fixed(size.height)],
@@ -145,10 +147,10 @@ public final class HostFittedSheet: UIView {
 
   private func tryAttachScrollView() {
     guard let controller = _modalViewController else { return }
-    debugPrint("😀 tryAttachScrollView")
+    debugPrint("\(uniqueId) HostFittedSheet.tryAttachScrollView")
     let scrollView = self._reactSubview?.find(deepIndex: 0)
     if let v = scrollView {
-      debugPrint("😀 tryAttachScrollView.found")
+      debugPrint("\(uniqueId) HostFittedSheet.tryAttachScrollView.found")
       controller.handleScrollView(v)
     }
   }
@@ -174,7 +176,7 @@ public final class HostFittedSheet: UIView {
 
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
-      debugPrint("😀 HostFittedSheet.tryToPresent", self.presentViewController)
+      debugPrint("\(uniqueId) HostFittedSheet.tryToPresent", self.presentViewController)
       RCTExecuteOnMainQueue { [weak self] in
         guard let self else { return }
 
@@ -182,10 +184,10 @@ public final class HostFittedSheet: UIView {
         self.presentViewController?.present(self._modalViewController!, animated: true)
         self._modalViewController?.didDismiss = { [weak self] old, silent in
           guard let self else { return }
-          debugPrint("😀 _modalViewController.didDismiss", presentedSheets.count, RCTPresentedViewController())
+          debugPrint("\(uniqueId) HostFittedSheet._modalViewController.didDismiss", presentedSheets.count, RCTPresentedViewController())
           onSheetDismiss?()
           if old.dismissAll == true {
-            debugPrint("😀 _modalViewController.dismissingSilently")
+            debugPrint("\(uniqueId) HostFittedSheet._modalViewController.dismissingSilently")
             if stacked, let popped = presentedSheets.popLast() {
               popped.dismissAll = true
               popped.dismiss(animated: false)
@@ -215,12 +217,12 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func destroy() {
-    debugPrint("😀 HostFittedSheet.destroy")
+    debugPrint("\(uniqueId) HostFittedSheet.destroy")
     _isPresented = false
 
     let cleanup = { [weak self] in
       guard let self else { return }
-      debugPrint("😀 HostFittedSheet.cleanup")
+      debugPrint("\(uniqueId) HostFittedSheet.cleanup")
       self.viewController.removeFromParent()
       self.viewController.view.removeFromSuperview()
       self._reactSubview?.removeFromSuperview()
@@ -237,17 +239,17 @@ public final class HostFittedSheet: UIView {
     }
 
     if self._modalViewController?.isBeingDismissed != true {
-      debugPrint("😀 _modalViewController?.isBeingDismissed")
+      debugPrint("\(uniqueId) HostFittedSheet._modalViewController?.isBeingDismissed")
       self._modalViewController?.dismiss(animated: true, completion: cleanup)
     } else {
-      debugPrint("😀 _modalViewController.cleanup")
+      debugPrint("\(uniqueId) HostFittedSheet._modalViewController.cleanup")
       cleanup()
     }
 
   }
 
   deinit {
-    debugPrint("😀 HostFittedSheet.deinit")
+    debugPrint("\(uniqueId) HostFittedSheet.HostFittedSheet.deinit")
   }
 
 }
