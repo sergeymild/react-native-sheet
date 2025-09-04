@@ -69,7 +69,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
   }
 
   private log = (key: string, message: any | undefined = undefined) => {
-    if (!__DEV__) return;
+    if (true) return;
     if (message) console.log(`${this.uniqueId} - FittedSheet.${key}`, message);
     else console.log(`${this.uniqueId} - FittedSheet.${key}`);
   };
