@@ -68,9 +68,10 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     };
   }
 
-  private log = (_key: string, _message: any | undefined = undefined) => {
-    // if (_message) console.log(`${this.uniqueId} - FittedSheet.${_key}`, _message);
-    // else console.log(`${this.uniqueId} - FittedSheet.${_key}`);
+  private log = (key: string, message: any | undefined = undefined) => {
+    //if (true) return;
+    if (message) console.log(`${this.uniqueId} - FittedSheet.${key}`, message);
+    else console.log(`${this.uniqueId} - FittedSheet.${key}`);
   };
 
   show = (data?: any) => {
@@ -180,7 +181,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         undefined,
         2
       );
-      this.log('render', logJson);
+      this.log('render');
     }
     const background = this.props?.params?.backgroundColor;
     return (

@@ -46,20 +46,6 @@ using namespace facebook::react;
     _view = [[UIView alloc] init];
     _view2 = [[HostFittedSheet alloc] init];
 
-
-
-    __weak SheetView *weakSelf = self;
-    _view2.onSheetDismiss = ^{
-      __strong SheetView *strongSelf = weakSelf;
-      if (!strongSelf) return; // объект уже уничтожен, выходим
-      
-      NSLog(@"%@ SheetView.onSheetDismiss", strongSelf->_view2.uniqueId);
-      auto eventEmitter = [strongSelf modalEventEmitter];
-      if (eventEmitter) {
-        eventEmitter->onSheetDismiss({});
-      }
-    };
-
     self.contentView = _view2;
   }
 
@@ -70,7 +56,7 @@ using namespace facebook::react;
 {
   const auto &oldViewProps = *std::static_pointer_cast<SheetViewProps const>(_props);
   const auto &newViewProps = *std::static_pointer_cast<SheetViewProps const>(props);
-  
+
   [_view2 setUniqueId:[[NSString alloc]initWithUTF8String:newViewProps.uniqueId.c_str()]];
   NSLog(@"%@ SheetView.updateProps", _view2.uniqueId);
 
@@ -100,6 +86,18 @@ using namespace facebook::react;
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
   NSLog(@"%@ SheetView.mountChildComponentView", _view2.uniqueId);
   [_view2 insertReactSubview:childComponentView atIndex:index];
+
+  __weak SheetView *weakSelf = self;
+  _view2.onSheetDismiss = ^{
+    __strong SheetView *strongSelf = weakSelf;
+    if (!strongSelf) return; // объект уже уничтожен, выходим
+
+    NSLog(@"%@ SheetView.onSheetDismiss", strongSelf->_view2.uniqueId);
+    auto eventEmitter = [strongSelf modalEventEmitter];
+    if (eventEmitter) {
+      eventEmitter->onSheetDismiss({});
+    }
+  };
 }
 
 - (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
@@ -111,6 +109,7 @@ using namespace facebook::react;
   NSLog(@"%@ SheetView.prepareForRecycle", _view2.uniqueId);
   [super prepareForRecycle];
   [_view2 destroy];
+  _view2.onSheetDismiss = nil;
 }
 
 - (void)finalizeUpdates:(RNComponentViewUpdateMask)updateMask {

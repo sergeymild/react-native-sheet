@@ -35,7 +35,12 @@ public final class HostFittedSheet: UIView {
 
   private var _alertWindow: UIWindow?
   private func createVC() -> UIViewController {
-    _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
+    if let scene = RCTKeyWindow()?.windowScene {
+      _alertWindow = UIWindow(windowScene: scene)
+    } else {
+      _alertWindow = UIWindow(frame: .init(origin: .zero, size: viewPort()))
+    }
+
     let controller = UIViewController()
     _alertWindow?.rootViewController = controller
     _alertWindow?.windowLevel = UIWindow.Level.alert
@@ -50,7 +55,7 @@ public final class HostFittedSheet: UIView {
     debugPrint("\(uniqueId) HostFittedSheet.setPassScrollViewReactTag")
     tryAttachScrollView()
   }
-  
+
   @objc
   public func setSheetBackgroundColor(_ color: UIColor?) {
     _backgroundColor = color ?? .clear
@@ -184,7 +189,7 @@ public final class HostFittedSheet: UIView {
         self.presentViewController?.present(self._modalViewController!, animated: true)
         self._modalViewController?.didDismiss = { [weak self] old, silent in
           guard let self else { return }
-          debugPrint("\(uniqueId) HostFittedSheet._modalViewController.didDismiss", presentedSheets.count, RCTPresentedViewController())
+          debugPrint("\(uniqueId) HostFittedSheet._modalViewController.didDismiss")
           onSheetDismiss?()
           if old.dismissAll == true {
             debugPrint("\(uniqueId) HostFittedSheet._modalViewController.dismissingSilently")
@@ -197,7 +202,6 @@ public final class HostFittedSheet: UIView {
           if stacked, let popped = presentedSheets.popLast() {
             popped.setSizes(lastPresentedSheetSizes.popLast() ?? [])
           }
-          debugPrint("______", presentedSheets)
         }
 
         // some delay to wait rn render
@@ -223,6 +227,7 @@ public final class HostFittedSheet: UIView {
     let cleanup = { [weak self] in
       guard let self else { return }
       debugPrint("\(uniqueId) HostFittedSheet.cleanup")
+      self._modalViewController?.didDismiss = nil
       self.viewController.removeFromParent()
       self.viewController.view.removeFromSuperview()
       self._reactSubview?.removeFromSuperview()
@@ -235,6 +240,8 @@ public final class HostFittedSheet: UIView {
       self._sheetSize = nil
       self.sheetMaxWidthSize = nil
       self._reactSubview = nil
+      self._alertWindow?.isHidden = true
+      self._alertWindow?.windowScene = nil
       self._alertWindow = nil
     }
 
