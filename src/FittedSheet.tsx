@@ -4,7 +4,9 @@ import {
   type LayoutChangeEvent,
   Platform,
   StatusBar,
+  type StyleProp,
   View,
+  type ViewStyle,
 } from 'react-native';
 
 import She, { Commands } from './SheetViewNativeComponent';
@@ -14,18 +16,18 @@ import { Portal } from '@gorhom/portal';
 const _FittedSheet = She;
 
 export interface FittedSheetParams {
-  readonly applyMaxHeightToMinHeight?: boolean;
-  readonly dismissable?: boolean;
-  readonly maxPortraitWidth?: number;
-  readonly maxLandscapeWidth?: number;
-  readonly maxHeight?: number;
-  readonly minHeight?: number;
-  readonly topLeftRightCornerRadius?: number;
-  readonly backgroundColor?: string;
+  applyMaxHeightToMinHeight?: boolean;
+  dismissable?: boolean;
+  maxPortraitWidth?: number;
+  maxLandscapeWidth?: number;
+  maxHeight?: number;
+  minHeight?: number;
+  topLeftRightCornerRadius?: number;
+  backgroundColor?: string;
   /**
    * Android only
    */
-  readonly isSystemUILight?: boolean;
+  isSystemUILight?: boolean;
 }
 
 type Children =
@@ -34,9 +36,10 @@ type Children =
   | React.ReactElement[];
 
 export interface SheetProps {
-  readonly params?: FittedSheetParams;
-  readonly onSheetDismiss?: (passThroughParam?: any) => void;
-  readonly children?: Children;
+  params?: FittedSheetParams;
+  onSheetDismiss?: (passThroughParam?: any) => void;
+  children?: Children;
+  rootViewStyle?: StyleProp<ViewStyle>;
 }
 
 interface State {
@@ -168,6 +171,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     }
 
     if (__DEV__) {
+      //@ts-ignore
       const logJson = JSON.stringify(
         {
           maxHeight,
@@ -207,12 +211,15 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         >
           <View
             nativeID={'fitted-sheet-root-view'}
-            style={{
-              width: maxWidth,
-              maxHeight,
-              backgroundColor: background,
-            }}
             onLayout={this.onLayout}
+            style={[
+              {
+                width: maxWidth,
+                maxHeight,
+                backgroundColor: background,
+              },
+              this.props.rootViewStyle,
+            ]}
           >
             {this.props.children &&
               typeof this.props.children === 'function' &&
