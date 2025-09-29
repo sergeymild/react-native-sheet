@@ -1,17 +1,17 @@
 #import "SheetView.h"
+#import <react/renderer/components/SheetViewSpec/ComponentDescriptors.h>
+#import <react/renderer/components/SheetViewSpec/EventEmitters.h>
+#import <react/renderer/components/SheetViewSpec/Props.h>
+#import <react/renderer/components/SheetViewSpec/RCTComponentViewHelpers.h>
 
-#import <Sheet/ComponentDescriptors.h>
-#import <Sheet/EventEmitters.h>
-#import <Sheet/Props.h>
-#import <Sheet/RCTComponentViewHelpers.h>
 #import <React/RCTConversions.h>
 
 #import "RCTFabricComponentsPlugins.h"
 
-#if __has_include("Sheet-Swift.h")
-#import "Sheet-Swift.h"
+#if __has_include("Sheet2-Swift.h")
+#import "Sheet2-Swift.h"
 #else
-#import <Sheet/Sheet-Swift.h>
+#import <Sheet2/Sheet2-Swift.h>
 #endif
 
 using namespace facebook::react;
@@ -128,6 +128,5 @@ using namespace facebook::react;
 Class<RCTComponentViewProtocol> SheetViewCls(void) {
   return SheetView.class;
 }
-
 
 @end

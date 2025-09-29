@@ -1,8 +1,9 @@
-#import <Sheet/RNSheetViewSpec.h>
-#if __has_include("Sheet-Swift.h")
-#import "Sheet-Swift.h"
+
+#import <ReactCodegen/SheetViewSpec/SheetViewSpec.h>
+#if __has_include("Sheet2-Swift.h")
+#import "Sheet2-Swift.h"
 #else
-#import <Sheet/Sheet-Swift.h>
+#import <Sheet2/Sheet2-Swift.h>
 #endif
 
 @interface SheetModule : NSObject <NativeSheetSpec>

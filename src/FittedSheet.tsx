@@ -95,6 +95,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
     if (!this.state.show) return;
     this.onHidePassThroughParam = passThroughParam;
     this.log('hide', Commands.dismissSheet);
+    //@ts-ignore
     Commands.dismissSheet(this.sheetRef.current);
   };
 

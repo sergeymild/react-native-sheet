@@ -2,6 +2,7 @@ import { type TurboModule, TurboModuleRegistry } from 'react-native';
 import type {
   Double,
   UnsafeObject,
+  //@ts-ignore
 } from 'react-native/Libraries/Types/CodegenTypes';
 
 export interface Spec extends TurboModule {

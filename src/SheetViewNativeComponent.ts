@@ -1,10 +1,16 @@
-import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import type { ColorValue, HostComponent, ViewProps } from 'react-native';
+import {
+  type ColorValue,
+  type HostComponent,
+  type ViewProps,
+  codegenNativeComponent,
+  codegenNativeCommands,
+} from 'react-native';
 import type {
   DirectEventHandler,
   Double,
+  //@ts-ignore
 } from 'react-native/Libraries/Types/CodegenTypes';
-import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import React from 'react';
 
 interface NativeProps extends ViewProps {
   dismissable: boolean;
