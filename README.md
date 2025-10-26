@@ -1,5 +1,5 @@
 # react-native-sheet
-
+![React Native Bottom Sheet](./preview.gif)
 A high-performance, native bottom sheet component for React Native with auto-sizing, keyboard handling, and Fabric architecture support.
 
 ## Features
@@ -406,9 +406,6 @@ Make sure your app is wrapped with `SheetProvider`:
 
 ### Content not resizing
 Ensure your content has proper height constraints or use `flexGrow` instead of `flex: 1`.
-
-### Keyboard issues
-Try calling `attachScrollViewToSheet()` on your sheet ref after mounting.
 
 ## Example App
 
