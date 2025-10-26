@@ -1,6 +1,6 @@
 # react-native-sheet
 ![React Native Bottom Sheet](./preview.gif)
-A high-performance, native bottom sheet component for React Native with auto-sizing, keyboard handling, and Fabric architecture support.
+A high-performance, native bottom sheet component for React Native with auto-sizing and Fabric architecture support.
 
 ## Features
 
@@ -202,34 +202,6 @@ export const MultipleExample = () => {
 };
 ```
 
-### With Keyboard
-
-```tsx
-import { FittedSheet } from 'react-native-sheet';
-import { TextInput, View } from 'react-native';
-
-export const KeyboardExample = () => {
-  const sheetRef = useRef<FittedSheetRef>(null);
-
-  return (
-    <FittedSheet ref={sheetRef}>
-      <View style={{ padding: 20 }}>
-        <TextInput
-          placeholder="Type something..."
-          style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            padding: 10,
-            marginBottom: 20
-          }}
-        />
-        <Text>Content below input</Text>
-      </View>
-    </FittedSheet>
-  );
-};
-```
-
 ## API Reference
 
 ### FittedSheet Props
@@ -386,7 +358,6 @@ export const ScrollExample = () => {
 ### Android
 - Uses Material BottomSheetDialog
 - Supports status bar styling via `isSystemUILight` param
-- Handles keyboard resize automatically
 
 ## Requirements
 
@@ -427,7 +398,6 @@ The example app includes demonstrations of:
 - Named sheets
 - Data passing
 - Multiple sheets
-- Keyboard handling
 - Dynamic content
 - ScrollView integration
 - Queue management
