@@ -10,6 +10,7 @@ A high-performance, native bottom sheet component for React Native with auto-siz
 - **Data Passing** - Pass data to sheets and receive values on dismiss
 - **Multiple Sheets** - Support for stacked sheets with named identifiers
 - **Dual APIs** - Both imperative and declarative approaches
+- **Global Sheet API** - Show sheets without pre-declaring components
 - **Customizable** - Control corner radius, colors, sizing constraints
 - **Dismissal Control** - Optional prevention of outside tap dismissal
 - **ScrollView Integration** - Special handling for scrollable content
@@ -100,6 +101,79 @@ export const NamedExample = () => {
     </>
   );
 };
+```
+
+### Global Sheet (Imperative API without Component Declaration)
+
+For scenarios where you need to show a sheet without pre-declaring a `FittedSheet` component, you can use the global sheet API:
+
+```tsx
+import { presentGlobalFittedSheet } from 'react-native-sheet';
+import { View, Text, Button } from 'react-native';
+
+export const GlobalSimpleUsage = () => {
+  return (
+    <View style={{ flex: 1, padding: 24 }}>
+      <Button
+        title="Present"
+        onPress={() => {
+          presentGlobalFittedSheet({
+            onDismiss: () => {
+              console.log('Sheet dismissed');
+            },
+            sheetProps: {
+              params: {
+                backgroundColor: 'white',
+                topLeftRightCornerRadius: 10,
+              },
+              rootViewStyle: {
+                paddingBottom: 56,
+              },
+            },
+            children: (
+              <View style={{ flexGrow: 1 }}>
+                <Text>Text in sheet</Text>
+              </View>
+            ),
+          });
+        }}
+      />
+    </View>
+  );
+};
+```
+
+**Setup**: To enable the global sheet, add the `addGlobalSheetView` prop to `SheetProvider`:
+
+```tsx
+import { SheetProvider } from 'react-native-sheet';
+
+export default function App() {
+  return (
+    <SheetProvider addGlobalSheetView>
+      <YourApp />
+    </SheetProvider>
+  );
+}
+```
+
+You can also provide default sheet properties that will be used for all global sheets:
+
+```tsx
+<SheetProvider
+  addGlobalSheetView
+  globalSheetProps={{
+    params: {
+      backgroundColor: '#f5f5f5',
+      topLeftRightCornerRadius: 16,
+    },
+    rootViewStyle: {
+      padding: 16,
+    },
+  }}
+>
+  <YourApp />
+</SheetProvider>
 ```
 
 ### Passing Data
@@ -255,7 +329,22 @@ dismissFittedPresented(): void
 
 // Attach scrollview to a named sheet
 attachScrollViewToFittedSheet(name: string): void
+
+// Show a global sheet without pre-declaring a component
+presentGlobalFittedSheet(params: {
+  onDismiss?: () => void;
+  sheetProps?: SheetProps;
+  children: ReactElement | ReactElement[];
+}): void
 ```
+
+### SheetProvider Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | - | Your app content |
+| `addGlobalSheetView` | `boolean` | `false` | Enable global sheet API |
+| `globalSheetProps` | `Omit<SheetProps, 'children' \| 'onSheetDismiss'>` | `undefined` | Default props for global sheets |
 
 ## Advanced Examples
 
@@ -396,6 +485,7 @@ yarn example android
 The example app includes demonstrations of:
 - Basic usage
 - Named sheets
+- Global sheet API
 - Data passing
 - Multiple sheets
 - Dynamic content

@@ -13,6 +13,7 @@ import { DismissPresentedExample } from './modal/DismissPresentedExample';
 import { Keyboard3Example } from './modal/Keyboard3Example';
 import { NamedExample } from './modal/NamedExample';
 import { MultipleExample } from './modal/MultipleExample';
+import { GlobalSimpleUsage } from './modal/GlobalSimpleUsage';
 
 export const screens = [
   {
@@ -89,5 +90,10 @@ export const screens = [
     name: 'DismissPreventExample',
     slug: 'Modal/DismissPreventExample',
     getScreen: () => DismissPreventExample,
+  },
+  {
+    name: 'GlobalSimpleUsage',
+    slug: 'Modal/GlobalSimpleUsage',
+    getScreen: () => GlobalSimpleUsage,
   },
 ];

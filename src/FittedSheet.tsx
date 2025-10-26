@@ -30,7 +30,7 @@ export interface FittedSheetParams {
   isSystemUILight?: boolean;
 }
 
-type Children =
+type FittedSheetChildren =
   | ((data: any) => React.ReactElement)
   | React.ReactElement
   | React.ReactElement[];
@@ -38,8 +38,8 @@ type Children =
 export interface SheetProps {
   params?: FittedSheetParams;
   onSheetDismiss?: (passThroughParam?: any) => void;
-  children?: Children;
-  rootViewStyle?: StyleProp<ViewStyle>;
+  children?: FittedSheetChildren;
+  rootViewStyle?: StyleProp<Omit<ViewStyle, 'flex' | 'flexGrow' | 'position'>>;
 }
 
 interface State {

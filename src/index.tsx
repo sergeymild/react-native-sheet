@@ -1,4 +1,4 @@
-import type { FittedSheetParams } from './FittedSheet';
+import type { FittedSheetParams, SheetProps } from './FittedSheet';
 import {
   attachScrollViewToFittedSheet,
   dismissFittedSheet,
@@ -12,10 +12,20 @@ import SheetModule from './NativeSheet';
 
 import { PortalProvider } from '@gorhom/portal';
 import type { ReactNode } from 'react';
+import { GlobalSheetView, presentGlobalFittedSheet } from './GlobalSheetView';
 
-export function SheetProvider(props: { children: ReactNode }) {
+export function SheetProvider(props: {
+  children: ReactNode;
+  addGlobalSheetView?: boolean;
+  globalSheetProps?: Omit<SheetProps, 'children' | 'onSheetDismiss'>;
+}) {
   return (
-    <PortalProvider rootHostName={'SheetHost'}>{props.children}</PortalProvider>
+    <PortalProvider rootHostName={'SheetHost'}>
+      {props.children}
+      {!!props.addGlobalSheetView && (
+        <GlobalSheetView props={props.globalSheetProps} />
+      )}
+    </PortalProvider>
   );
 }
 
@@ -31,5 +41,6 @@ export {
   dismissFittedSheetsAll,
   dismissFittedPresented,
   attachScrollViewToFittedSheet,
+  presentGlobalFittedSheet,
   type FittedSheetParams,
 };

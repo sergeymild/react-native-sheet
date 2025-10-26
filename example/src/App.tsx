@@ -21,6 +21,7 @@ const Buttons = () => {
           <TouchableOpacity
             key={index}
             onPress={() => {
+              //@ts-ignore
               nav.navigate(screen.name);
             }}
           >
@@ -35,7 +36,7 @@ const Buttons = () => {
 export default function App() {
   return (
     <View style={styles.container}>
-      <SheetProvider>
+      <SheetProvider addGlobalSheetView>
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen name={'Buttons'} component={Buttons} />
