@@ -13,6 +13,34 @@ import {
   attachScrollViewToGlobalFittedSheet,
 } from 'react-native-sheet';
 
+// Component with dynamic data and state
+const DynamicDataSheet: React.FC = () => {
+  const [count, setCount] = React.useState(0);
+  const [text, setText] = React.useState('Initial text');
+
+  return (
+    <View style={styles.dataSheetContent}>
+      <Text style={styles.sheetTitle}>Dynamic Data</Text>
+      <Text style={styles.dataText}>Count: {count}</Text>
+      <Button label="Increment" onPress={() => setCount(count + 1)} />
+      <View style={styles.spacer} />
+      <Text style={styles.dataText}>Text: {text}</Text>
+      <Button
+        label="Change Text"
+        onPress={() => setText(`Updated at ${Date.now()}`)}
+      />
+      <View style={styles.spacer} />
+      <Button
+        label="Close"
+        onPress={() => {
+          console.log('Final state:', { count, text });
+          dismissGlobalFittedSheet('dynamicDataSheet');
+        }}
+      />
+    </View>
+  );
+};
+
 // Component with dynamic ScrollView loading
 const DynamicScrollViewSheet: React.FC<{ sheetName: string }> = ({
   sheetName,
@@ -337,6 +365,121 @@ export const GlobalSimpleUsage: React.FC = () => {
         }}
       />
 
+      <Text style={styles.sectionTitle}>Data Passing Tests:</Text>
+
+      <Button
+        label="Sheet with Data (via Props)"
+        onPress={() => {
+          console.log('\n=== TEST: Sheet with Data ===');
+          const userId = 123;
+          const userName = 'John Doe';
+
+          presentGlobalFittedSheet({
+            name: 'dataSheet',
+            onDismiss: () => {
+              console.log('[GlobalSimpleUsage.onDismiss] dataSheet closed');
+            },
+            sheetProps: {
+              params: {
+                backgroundColor: 'white',
+                topLeftRightCornerRadius: 10,
+              },
+              rootViewStyle: {
+                paddingBottom: 56,
+              },
+            },
+            children: (
+              <View style={{ padding: 20 }}>
+                <Text style={styles.sheetTitle}>User Profile</Text>
+                <Text style={{ fontSize: 16, marginBottom: 10 }}>
+                  ID: {userId}
+                </Text>
+                <Text style={{ fontSize: 16, marginBottom: 20 }}>
+                  Name: {userName}
+                </Text>
+                <Button
+                  label="Close"
+                  onPress={() => dismissGlobalFittedSheet('dataSheet')}
+                />
+              </View>
+            ),
+          });
+        }}
+      />
+
+      <Button
+        label="Sheet with Result Callback"
+        onPress={() => {
+          console.log('\n=== TEST: Sheet with Result ===');
+          let sheetResult: any = null;
+
+          presentGlobalFittedSheet({
+            name: 'resultSheet',
+            onDismiss: () => {
+              console.log(
+                '[GlobalSimpleUsage.onDismiss] resultSheet closed with result:',
+                sheetResult
+              );
+              // You can handle the result here
+              if (sheetResult?.action === 'confirm') {
+                console.log('User confirmed!');
+              } else if (sheetResult?.action === 'cancel') {
+                console.log('User cancelled!');
+              }
+            },
+            sheetProps: {
+              params: {
+                backgroundColor: 'white',
+                topLeftRightCornerRadius: 10,
+              },
+            },
+            children: (
+              <View style={{ padding: 20 }}>
+                <Text style={styles.sheetTitle}>Confirm Action</Text>
+                <Text style={{ marginBottom: 20 }}>
+                  Do you want to proceed with this action?
+                </Text>
+                <Button
+                  label="Confirm"
+                  onPress={() => {
+                    sheetResult = { action: 'confirm', timestamp: Date.now() };
+                    dismissGlobalFittedSheet('resultSheet');
+                  }}
+                />
+                <Button
+                  label="Cancel"
+                  onPress={() => {
+                    sheetResult = { action: 'cancel' };
+                    dismissGlobalFittedSheet('resultSheet');
+                  }}
+                />
+              </View>
+            ),
+          });
+        }}
+      />
+
+      <Button
+        label="Dynamic Data Sheet (with useState)"
+        onPress={() => {
+          console.log('\n=== TEST: Dynamic Data Sheet ===');
+
+          presentGlobalFittedSheet({
+            name: 'dynamicDataSheet',
+            onDismiss: () => {
+              console.log('[GlobalSimpleUsage.onDismiss] dynamicDataSheet');
+            },
+            sheetProps: {
+              params: {
+                backgroundColor: 'white',
+                topLeftRightCornerRadius: 10,
+              },
+            },
+            children: <DynamicDataSheet />,
+          });
+        }}
+      />
+
       <Text style={styles.sectionTitle}>ScrollView Tests:</Text>
 
       <Button
@@ -427,5 +570,15 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+  },
+  dataSheetContent: {
+    padding: 20,
+  },
+  dataText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  spacer: {
+    height: 10,
   },
 });

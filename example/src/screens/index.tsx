@@ -14,6 +14,7 @@ import { Keyboard3Example } from './modal/Keyboard3Example';
 import { NamedExample } from './modal/NamedExample';
 import { MultipleExample } from './modal/MultipleExample';
 import { GlobalSimpleUsage } from './modal/GlobalSimpleUsage';
+import { DataPassingUsage } from './modal/DataPassingUsage';
 
 export const screens = [
   {
@@ -95,5 +96,10 @@ export const screens = [
     name: 'GlobalSimpleUsage',
     slug: 'Modal/GlobalSimpleUsage',
     getScreen: () => GlobalSimpleUsage,
+  },
+  {
+    name: 'DataPassingUsage',
+    slug: 'Modal/DataPassingUsage',
+    getScreen: () => DataPassingUsage,
   },
 ];

@@ -108,16 +108,20 @@ export const NamedExample = () => {
 For scenarios where you need to show a sheet without pre-declaring a `FittedSheet` component, you can use the global sheet API:
 
 ```tsx
-import { presentGlobalFittedSheet } from 'react-native-sheet';
+import {
+  presentGlobalFittedSheet,
+  dismissGlobalFittedSheet
+} from 'react-native-sheet';
 import { View, Text, Button } from 'react-native';
 
 export const GlobalSimpleUsage = () => {
   return (
     <View style={{ flex: 1, padding: 24 }}>
       <Button
-        title="Present"
+        title="Present Global Sheet"
         onPress={() => {
           presentGlobalFittedSheet({
+            name: 'myGlobalSheet',
             onDismiss: () => {
               console.log('Sheet dismissed');
             },
@@ -131,12 +135,22 @@ export const GlobalSimpleUsage = () => {
               },
             },
             children: (
-              <View style={{ flexGrow: 1 }}>
-                <Text>Text in sheet</Text>
+              <View style={{ flexGrow: 1, padding: 20 }}>
+                <Text>Global Sheet Content</Text>
+                <Button
+                  title="Dismiss"
+                  onPress={() => dismissGlobalFittedSheet('myGlobalSheet')}
+                />
               </View>
             ),
           });
         }}
+      />
+
+      {/* Dismiss from outside */}
+      <Button
+        title="Dismiss Global Sheet"
+        onPress={() => dismissGlobalFittedSheet('myGlobalSheet')}
       />
     </View>
   );
@@ -176,7 +190,199 @@ You can also provide default sheet properties that will be used for all global s
 </SheetProvider>
 ```
 
-### Passing Data
+#### Advanced Global Sheet Usage
+
+**Multiple Global Sheets:**
+
+You can present multiple global sheets simultaneously by using unique names:
+
+```tsx
+import {
+  presentGlobalFittedSheet,
+  dismissGlobalFittedSheet
+} from 'react-native-sheet';
+
+// Present first sheet
+presentGlobalFittedSheet({
+  name: 'sheet1',
+  sheetProps: {
+    params: { backgroundColor: 'white' }
+  },
+  children: (
+    <View style={{ padding: 20 }}>
+      <Text>First Sheet</Text>
+      <Button
+        title="Open Second Sheet"
+        onPress={() => {
+          presentGlobalFittedSheet({
+            name: 'sheet2',
+            sheetProps: {
+              params: { backgroundColor: 'lightblue' }
+            },
+            children: (
+              <View style={{ padding: 20 }}>
+                <Text>Second Sheet</Text>
+                <Button
+                  title="Dismiss This"
+                  onPress={() => dismissGlobalFittedSheet('sheet2')}
+                />
+                <Button
+                  title="Dismiss First Sheet"
+                  onPress={() => dismissGlobalFittedSheet('sheet1')}
+                />
+              </View>
+            ),
+          });
+        }}
+      />
+    </View>
+  ),
+});
+```
+
+**Dynamic ScrollView in Global Sheet:**
+
+When your sheet content loads asynchronously and includes a ScrollView, you need to attach the scrollview after it renders:
+
+```tsx
+import {
+  presentGlobalFittedSheet,
+  attachScrollViewToGlobalFittedSheet
+} from 'react-native-sheet';
+import { useEffect, useState } from 'react';
+import { ScrollView, ActivityIndicator } from 'react-native';
+
+const DynamicContent = ({ sheetName }) => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    // Simulate async data loading
+    setTimeout(() => {
+      setData(Array.from({ length: 20 }, (_, i) => i + 1));
+      setLoading(false);
+
+      // Attach ScrollView after it appears
+      setTimeout(() => {
+        attachScrollViewToGlobalFittedSheet(sheetName);
+      }, 100);
+    }, 2000);
+  }, [sheetName]);
+
+  if (loading) {
+    return (
+      <View style={{ padding: 40 }}>
+        <ActivityIndicator size="large" />
+        <Text>Loading data...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={{ padding: 20 }}>
+      <Text>Scrollable Content</Text>
+      {data.map(item => (
+        <View key={item} style={{ padding: 16 }}>
+          <Text>Item {item}</Text>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
+
+// Present the sheet
+presentGlobalFittedSheet({
+  name: 'dynamicSheet',
+  sheetProps: {
+    params: {
+      backgroundColor: 'white',
+      topLeftRightCornerRadius: 10,
+    },
+  },
+  children: <DynamicContent sheetName="dynamicSheet" />,
+});
+```
+
+**Dismissing Multiple Sheets:**
+
+```tsx
+// Dismiss all global sheets at once
+dismissGlobalFittedSheet('sheet1');
+dismissGlobalFittedSheet('sheet2');
+dismissGlobalFittedSheet('sheet3');
+```
+
+**Passing Data to Global Sheets:**
+
+Since global sheets don't support the `show(data)` / `hide(returnValue)` pattern, you can pass data using these approaches:
+
+```tsx
+// 1. Pass data via closure/variables
+const userId = 123;
+const userName = 'John Doe';
+
+presentGlobalFittedSheet({
+  name: 'userProfile',
+  children: (
+    <View style={{ padding: 20 }}>
+      <Text>User ID: {userId}</Text>
+      <Text>Name: {userName}</Text>
+    </View>
+  ),
+});
+
+// 2. Return data via closure in onDismiss callback
+let result = null;
+
+presentGlobalFittedSheet({
+  name: 'confirmDialog',
+  onDismiss: () => {
+    // Handle the result here
+    if (result?.confirmed) {
+      console.log('User confirmed!');
+    }
+  },
+  children: (
+    <View style={{ padding: 20 }}>
+      <Button
+        title="Confirm"
+        onPress={() => {
+          result = { confirmed: true };
+          dismissGlobalFittedSheet('confirmDialog');
+        }}
+      />
+    </View>
+  ),
+});
+
+// 3. Use a component with useState for dynamic data
+const FormSheet = () => {
+  const [name, setName] = useState('');
+  return (
+    <View style={{ padding: 20 }}>
+      <TextInput value={name} onChangeText={setName} />
+      <Button
+        title="Submit"
+        onPress={() => {
+          console.log('Submitted:', name);
+          dismissGlobalFittedSheet('formSheet');
+        }}
+      />
+    </View>
+  );
+};
+
+presentGlobalFittedSheet({
+  name: 'formSheet',
+  children: <FormSheet />,
+});
+```
+
+### Passing Data (FittedSheet with Ref)
+
+For `FittedSheet` components with refs, you can pass data using the `show(data)` method and receive return values via `hide(returnValue)`:
+
+> **Note**: This pattern only works with `FittedSheet` components that have a ref. For Global Sheets, see the "Passing Data to Global Sheets" section above.
 
 ```tsx
 import { FittedSheet, type FittedSheetRef } from 'react-native-sheet';
@@ -330,12 +536,19 @@ dismissFittedPresented(): void
 // Attach scrollview to a named sheet
 attachScrollViewToFittedSheet(name: string): void
 
-// Show a global sheet without pre-declaring a component
+// Global Sheet API - Show a sheet without pre-declaring a component
 presentGlobalFittedSheet(params: {
+  name: string;
   onDismiss?: () => void;
   sheetProps?: SheetProps;
   children: ReactElement | ReactElement[];
 }): void
+
+// Dismiss a specific global sheet by name
+dismissGlobalFittedSheet(name: string): void
+
+// Attach scrollview to a global sheet by name (for dynamic ScrollView content)
+attachScrollViewToGlobalFittedSheet(name: string): boolean
 ```
 
 ### SheetProvider Props
@@ -466,6 +679,29 @@ Make sure your app is wrapped with `SheetProvider`:
 
 ### Content not resizing
 Ensure your content has proper height constraints or use `flexGrow` instead of `flex: 1`.
+
+### Global sheet not working
+Make sure you've enabled global sheets in `SheetProvider`:
+```tsx
+<SheetProvider addGlobalSheetView>
+  <YourApp />
+</SheetProvider>
+```
+
+### ScrollView not working in global sheet
+If you're loading ScrollView content asynchronously, you need to attach it after the content renders:
+```tsx
+attachScrollViewToGlobalFittedSheet('sheetName');
+```
+This should be called after your ScrollView component has mounted (typically in a `useEffect` hook after data loading completes).
+
+### How to pass data to global sheets?
+Global sheets don't support the `show(data)` / `hide(returnValue)` pattern like FittedSheet with refs. Instead, use closures, variables, or component state:
+- **Pass data in**: Use closure variables or props in the children component
+- **Return data**: Use a closure variable and set it before calling `dismissGlobalFittedSheet`, then handle it in `onDismiss` callback
+- **Dynamic data**: Use a component with `useState` as children
+
+See the "Passing Data to Global Sheets" section in the documentation for examples.
 
 ## Example App
 
