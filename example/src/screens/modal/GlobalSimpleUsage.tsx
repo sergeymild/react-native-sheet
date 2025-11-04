@@ -11,11 +11,12 @@ export const GlobalSimpleUsage: React.FC = () => {
   return (
     <View style={styles.container}>
       <Button
-        label="Present"
+        label="Present Global Sheet 1"
         onPress={() => {
           presentGlobalFittedSheet?.({
+            name: 'globalSheet1',
             onDismiss: () => {
-              console.log('[GlobalSimpleUsage.onDismiss]');
+              console.log('[GlobalSimpleUsage.onDismiss] globalSheet1');
             },
             sheetProps: {
               params: {
@@ -28,26 +29,66 @@ export const GlobalSimpleUsage: React.FC = () => {
             },
             children: (
               <View style={{ flexGrow: 1 }}>
-                <Text children={'Text in sheet'} />
-                <TouchableOpacity
-                  onPress={() => presentFittedSheet('secondSheet')}
-                >
-                  <Text children={'Present another one'} />
-                </TouchableOpacity>
+                <Text children={'Text in sheet 1'} />
+                <Button
+                  label="Present Global Sheet 2"
+                  onPress={() => {
+                    presentGlobalFittedSheet?.({
+                      name: 'globalSheet2',
+                      onDismiss: () => {
+                        console.log(
+                          '[GlobalSimpleUsage.onDismiss] globalSheet2'
+                        );
+                      },
+                      sheetProps: {
+                        params: {
+                          backgroundColor: 'lightblue',
+                          topLeftRightCornerRadius: 10,
+                        },
+                        rootViewStyle: {
+                          paddingBottom: 56,
+                        },
+                      },
+                      children: (
+                        <View style={{ flexGrow: 1 }}>
+                          <Text children={'Text in sheet 2'} />
+                          <Button
+                            label="Present Global Sheet 3"
+                            onPress={() => {
+                              presentGlobalFittedSheet?.({
+                                name: 'globalSheet3',
+                                onDismiss: () => {
+                                  console.log(
+                                    '[GlobalSimpleUsage.onDismiss] globalSheet3'
+                                  );
+                                },
+                                sheetProps: {
+                                  params: {
+                                    backgroundColor: 'lightgreen',
+                                    topLeftRightCornerRadius: 10,
+                                  },
+                                  rootViewStyle: {
+                                    paddingBottom: 56,
+                                  },
+                                },
+                                children: (
+                                  <View style={{ flexGrow: 1 }}>
+                                    <Text children={'Text in sheet 3'} />
+                                  </View>
+                                ),
+                              });
+                            }}
+                          />
+                        </View>
+                      ),
+                    });
+                  }}
+                />
               </View>
             ),
           });
         }}
       />
-
-      <FittedSheet
-        name={'secondSheet'}
-        params={{ minHeight: 300, backgroundColor: 'yellow' }}
-      >
-        <View style={{ flexGrow: 1 }}>
-          <Text children={'Second Sheet on top of global'} />
-        </View>
-      </FittedSheet>
     </View>
   );
 };
