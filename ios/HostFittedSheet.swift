@@ -76,10 +76,20 @@ public final class HostFittedSheet: UIView {
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
+    debugPrint("\(uniqueId) HostFittedSheet.init")
   }
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  public override func removeFromSuperview() {
+    debugPrint("\(uniqueId) HostFittedSheet.removeFromSuperview, _isPresented: \(_isPresented)")
+    super.removeFromSuperview()
+    if _isPresented {
+      debugPrint("\(uniqueId) HostFittedSheet.removeFromSuperview - calling destroy")
+      destroy()
+    }
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
@@ -221,38 +231,73 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func destroy() {
-    debugPrint("\(uniqueId) HostFittedSheet.destroy")
+    debugPrint("\(uniqueId) HostFittedSheet.destroy - _isPresented: \(_isPresented), modalVC: \(_modalViewController != nil)")
+
+    if !_isPresented && _modalViewController == nil {
+      debugPrint("\(uniqueId) HostFittedSheet.destroy - already destroyed, skipping")
+      return
+    }
+
     _isPresented = false
 
+    // Remove from global array if present
+    if let modalVC = _modalViewController, let index = presentedSheets.firstIndex(of: modalVC) {
+      debugPrint("\(uniqueId) HostFittedSheet.destroy - removing from presentedSheets at index \(index)")
+      presentedSheets.remove(at: index)
+      if lastPresentedSheetSizes.count > index {
+        lastPresentedSheetSizes.remove(at: index)
+      }
+    }
+
     let cleanup = { [weak self] in
-      guard let self else { return }
-      debugPrint("\(uniqueId) HostFittedSheet.cleanup")
+      guard let self else {
+        debugPrint("HostFittedSheet.cleanup - self is nil (already deallocated)")
+        return
+      }
+      debugPrint("\(self.uniqueId) HostFittedSheet.cleanup - starting")
+
+      // Clear dismiss callback first to prevent retain cycles
       self._modalViewController?.didDismiss = nil
-      self.viewController.removeFromParent()
-      self.viewController.view.removeFromSuperview()
+      self.onSheetDismiss = nil
+
+      // Remove view hierarchy
       self._reactSubview?.removeFromSuperview()
       if let v = self._reactSubview {
         self._touchHandler?.detach(from: v)
       }
+      self.viewController.view.removeFromSuperview()
+      self.viewController.removeFromParent()
+
+      // Clear window - make sure to resign key window status
+      if let alertWindow = self._alertWindow {
+        alertWindow.isHidden = true
+        alertWindow.windowScene = nil
+        alertWindow.rootViewController = nil
+        // Make sure main window becomes key again
+        if let mainWindow = RCTKeyWindow() {
+          mainWindow.makeKeyAndVisible()
+        }
+      }
+
+      // Nil out all references
       self.presentViewController = nil
       self._modalViewController = nil
       self._touchHandler = nil
       self._sheetSize = nil
       self.sheetMaxWidthSize = nil
       self._reactSubview = nil
-      self._alertWindow?.isHidden = true
-      self._alertWindow?.windowScene = nil
       self._alertWindow = nil
+
+      debugPrint("\(self.uniqueId) HostFittedSheet.cleanup - completed")
     }
 
-    if self._modalViewController?.isBeingDismissed != true {
-      debugPrint("\(uniqueId) HostFittedSheet._modalViewController?.isBeingDismissed")
-      self._modalViewController?.dismiss(animated: true, completion: cleanup)
+    if let modalVC = self._modalViewController, modalVC.isBeingDismissed != true && modalVC.isBeingPresented != true {
+      debugPrint("\(uniqueId) HostFittedSheet.destroy - dismissing with animation")
+      modalVC.dismiss(animated: true, completion: cleanup)
     } else {
-      debugPrint("\(uniqueId) HostFittedSheet._modalViewController.cleanup")
+      debugPrint("\(uniqueId) HostFittedSheet.destroy - calling cleanup directly")
       cleanup()
     }
-
   }
 
   deinit {

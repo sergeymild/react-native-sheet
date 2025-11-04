@@ -106,10 +106,28 @@ using namespace facebook::react;
 }
 
 - (void)prepareForRecycle {
-  NSLog(@"%@ SheetView.prepareForRecycle", _view2.uniqueId);
-  [super prepareForRecycle];
+  NSLog(@"%@ SheetView.prepareForRecycle - before destroy", _view2.uniqueId);
   [_view2 destroy];
   _view2.onSheetDismiss = nil;
+
+  // Remove old HostFittedSheet from hierarchy
+  [_view2 removeFromSuperview];
+
+  NSLog(@"%@ SheetView.prepareForRecycle - creating new HostFittedSheet", _view2.uniqueId);
+  // Create new HostFittedSheet instance for next use
+  _view2 = [[HostFittedSheet alloc] init];
+  self.contentView = _view2;
+
+  NSLog(@"%@ SheetView.prepareForRecycle - calling super", _view2.uniqueId);
+  [super prepareForRecycle];
+  NSLog(@"%@ SheetView.prepareForRecycle - completed", _view2.uniqueId);
+}
+
+- (void)dealloc {
+  NSLog(@"%@ SheetView.dealloc", _view2.uniqueId);
+  [_view2 destroy];
+  _view2.onSheetDismiss = nil;
+  _view2 = nil;
 }
 
 - (void)finalizeUpdates:(RNComponentViewUpdateMask)updateMask {

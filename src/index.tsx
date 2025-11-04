@@ -16,6 +16,7 @@ import {
   GlobalSheetView,
   presentGlobalFittedSheet,
   dismissGlobalFittedSheet,
+  attachScrollViewToGlobalFittedSheet,
 } from './GlobalSheetView';
 
 export function SheetProvider(props: {
@@ -47,5 +48,6 @@ export {
   attachScrollViewToFittedSheet,
   presentGlobalFittedSheet,
   dismissGlobalFittedSheet,
+  attachScrollViewToGlobalFittedSheet,
   type FittedSheetParams,
 };
