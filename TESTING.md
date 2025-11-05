@@ -15,8 +15,8 @@ This document provides an overview of the testing infrastructure for the `react-
                           ↓
 ┌─────────────────────────────────────────────────────────┐
 │  E2E Tests (Detox)                                      │
-│  ✅ 4 tests covering native functionality               │
-│  ✅ Tests real device behavior                          │
+│  ✅ 7/14 tests passing (50%)                            │
+│  ✅ Tests real native behavior                          │
 │  🐌 Slower (~minutes)                                   │
 │  📁 Location: e2e/                                      │
 └─────────────────────────────────────────────────────────┘
@@ -117,25 +117,42 @@ yarn test -u
 - Native animations
 - Gesture handling (swipe to dismiss)
 - Scroll view integration
-- Backdrop interactions
+- Data passing
+- Multiple sheet types (basic, global, named)
+- Custom styling and constraints
 
 ✅ **User Interactions**
 - Tap actions
 - Swipe gestures
 - Scrolling
-- Keyboard interactions (coming soon)
+- Open/close cycles
 
 ### Test Files
 
-| File | Tests | Description |
-|------|-------|-------------|
-| `sheet.test.ts` | 4 | Basic sheet operations |
+| File | Tests | Passing | Description |
+|------|-------|---------|-------------|
+| `sheet.test.ts` | 4 | 4/4 ✅ | Basic sheet operations |
+| `comprehensive-sheet.test.ts` | 10 | 3/10 ⚠️ | Advanced functionality |
+| **Total** | **14** | **7/14 (50%)** | |
 
-**Current Tests:**
-1. Open and close with button
-2. Swipe to dismiss
-3. Scroll in sheet content
-4. Multiple open/close cycles
+**Passing Tests:**
+1. ✅ Open and close with button
+2. ✅ Swipe to dismiss
+3. ✅ Scroll in sheet content
+4. ✅ Multiple open/close cycles
+5. ✅ Data passing to sheets
+6. ✅ Backdrop dismiss by swiping
+7. ✅ Rapid multiple operations
+
+**Work in Progress:**
+- ⚠️ Non-dismissable sheets
+- ⚠️ Global sheets API
+- ⚠️ Named sheets API
+- ⚠️ Custom styling
+- ⚠️ Min/max height constraints
+- ⚠️ Rapid operations with different types
+
+*Note: Some tests require UI scroll improvements for off-screen elements.*
 
 ### Test Screen
 

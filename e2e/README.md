@@ -264,12 +264,30 @@ jobs:
 
 ## Current Test Coverage
 
+### Basic Tests (`sheet.test.ts`) - All Passing ✅
 | Test | Status | Description |
 |------|--------|-------------|
 | Open/Close with button | ✅ | Tests programmatic show/hide |
 | Swipe to dismiss | ✅ | Tests native gesture |
 | Scroll in sheet | ✅ | Tests ScrollView integration |
 | Multiple operations | ✅ | Tests stability |
+
+### Comprehensive Tests (`comprehensive-sheet.test.ts`) - 3/10 Passing
+| Test | Status | Description |
+|------|--------|-------------|
+| Data passing | ✅ | Tests data passing to sheets |
+| Backdrop dismiss | ✅ | Tests dismiss by swiping down |
+| Multiple open/close cycles | ✅ | Tests stability with repeated operations |
+| Non-dismissable sheets | ⚠️ | WIP - Requires UI scroll improvements |
+| Global sheets API | ⚠️ | WIP - Requires UI scroll improvements |
+| Named sheets API | ⚠️ | WIP - Requires UI scroll improvements |
+| Custom styling | ⚠️ | WIP - Requires UI scroll improvements |
+| Min/max height | ⚠️ | WIP - Requires UI scroll improvements |
+| Rapid operations | ⚠️ | WIP - Requires UI scroll improvements |
+
+**Total: 7/14 tests passing (50%)**
+
+**Note:** Some tests require UI improvements for scrolling to elements that are off-screen. These tests are functional but need refinement for consistent execution.
 
 ## Next Steps
 
