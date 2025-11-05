@@ -375,30 +375,47 @@ export default function E2ETestScreen() {
       {/* Max Height Sheet */}
       <FittedSheet
         ref={maxHeightSheetRef}
-        params={{ maxHeight: 300, backgroundColor: 'white' }}
+        params={{ maxHeight: 400, backgroundColor: 'white' }}
       >
-        <View style={styles.sheetContent} testID="max-height-sheet-content">
-          <Text style={styles.sheetTitle} testID="max-height-sheet-title">
-            Max Height Sheet
-          </Text>
-          <Text style={styles.sheetText}>
-            This sheet has a maximum height of 300px
-          </Text>
+        <View
+          style={styles.maxHeightSheetContent}
+          testID="max-height-sheet-content"
+        >
+          <View>
+            <Text style={styles.sheetTitle} testID="max-height-sheet-title">
+              Max Height Sheet with ScrollView
+            </Text>
+            <Text style={styles.sheetText}>
+              ScrollView должен уменьшиться, чтобы показать кнопку снизу
+            </Text>
+          </View>
 
-          <ScrollView style={styles.scrollContent}>
-            {Array.from({ length: 40 }, (_, i) => (
-              <Text key={i} style={styles.listItem}>
-                Long content item {i + 1}
-              </Text>
-            ))}
-          </ScrollView>
+          <View style={styles.scrollViewContainer}>
+            <ScrollView
+              style={styles.scrollContentLimited}
+              nestedScrollEnabled={true}
+              testID="max-height-scroll-view"
+            >
+              {Array.from({ length: 140 }, (_, i) => (
+                <Text
+                  key={i}
+                  style={styles.listItem}
+                  testID={`max-height-item-${i + 1}`}
+                >
+                  Long content item {i + 1}
+                </Text>
+              ))}
+            </ScrollView>
+          </View>
 
           <TouchableOpacity
             testID="close-max-height-sheet-button"
             style={[styles.button, styles.closeButton]}
             onPress={() => maxHeightSheetRef.current?.hide()}
           >
-            <Text style={styles.buttonText}>Close Sheet</Text>
+            <Text style={styles.buttonText}>
+              Close Sheet (должна быть видна)
+            </Text>
           </TouchableOpacity>
         </View>
       </FittedSheet>
@@ -538,6 +555,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sheetContent: {
+    padding: 20,
+  },
+  maxHeightSheetContent: {
     padding: 40,
   },
   sheetTitle: {
@@ -561,6 +581,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     marginTop: 20,
     maxHeight: 200,
+  },
+  scrollViewContainer: {
+    marginTop: 20,
+    flexShrink: 1,
+  },
+  scrollContentLimited: {
+    flexGrow: 0,
+    flexShrink: 1,
   },
   listItem: {
     padding: 12,
