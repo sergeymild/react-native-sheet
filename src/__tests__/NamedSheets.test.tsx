@@ -12,7 +12,7 @@ import {
 } from '../index';
 
 describe('Named Sheets (Simplified)', () => {
-  const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  const TestWrapper = ({ children }: { children?: React.ReactNode }) => (
     <SheetProvider>{children}</SheetProvider>
   );
 

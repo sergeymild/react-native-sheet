@@ -10,7 +10,7 @@ describe('FittedSheet', () => {
 
   describe('Basic Functionality', () => {
     it('should render without crashing', () => {
-      const { getByText } = render(
+      render(
         <TestWrapper>
           <FittedSheet>
             <View>
@@ -103,10 +103,7 @@ describe('FittedSheet', () => {
 
         return (
           <TestWrapper>
-            <FittedSheet
-              ref={sheetRef}
-              params={{ backgroundColor: 'red' }}
-            >
+            <FittedSheet ref={sheetRef} params={{ backgroundColor: 'red' }}>
               <View>
                 <Text>Colored Sheet</Text>
               </View>
@@ -298,10 +295,7 @@ describe('FittedSheet', () => {
 
         return (
           <TestWrapper>
-            <FittedSheet
-              ref={sheetRef}
-              rootViewStyle={{ padding: 20 }}
-            >
+            <FittedSheet ref={sheetRef} rootViewStyle={{ padding: 20 }}>
               <View>
                 <Text>Styled Sheet</Text>
               </View>
