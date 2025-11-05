@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState, Fragment } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,8 @@ export default function E2ETestScreen() {
   const styledSheetRef = useRef<FittedSheetRef>(null);
   const minHeightSheetRef = useRef<FittedSheetRef>(null);
   const maxHeightSheetRef = useRef<FittedSheetRef>(null);
+  const scrollViewWrappedRef = useRef<FittedSheetRef>(null);
+  const scrollFragmentWrappedRef = useRef<FittedSheetRef>(null);
   const [receivedData, setReceivedData] = useState<string>('');
 
   const openGlobalSheet = () => {
@@ -61,7 +63,7 @@ export default function E2ETestScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} testID="e2e-main-scroll">
       <Text style={styles.title}>E2E Test Screen</Text>
       <Text style={styles.subtitle}>
         This screen is used for Detox E2E testing
@@ -165,6 +167,38 @@ export default function E2ETestScreen() {
           onPress={() => maxHeightSheetRef.current?.show()}
         >
           <Text style={styles.buttonText}>Open Max Height Sheet</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* ScrollView Wrapped in View */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>ScrollView in View (Проблемный)</Text>
+        <Text style={styles.warningText}>
+          ⚠️ ScrollView обернутый в View может неправильно определять высоту
+        </Text>
+        <TouchableOpacity
+          testID="open-scrollview-wrapped-button"
+          style={styles.button}
+          onPress={() => scrollViewWrappedRef.current?.show()}
+        >
+          <Text style={styles.buttonText}>Open ScrollView in View</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* ScrollView Wrapped in Fragment */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>
+          ScrollView in Fragment (Правильный)
+        </Text>
+        <Text style={styles.successText}>
+          ✅ ScrollView обернутый в Fragment правильно работает
+        </Text>
+        <TouchableOpacity
+          testID="open-scrollfragment-wrapped-button"
+          style={styles.button}
+          onPress={() => scrollFragmentWrappedRef.current?.show()}
+        >
+          <Text style={styles.buttonText}>Open ScrollView in Fragment</Text>
         </TouchableOpacity>
       </View>
 
@@ -339,7 +373,10 @@ export default function E2ETestScreen() {
       </FittedSheet>
 
       {/* Max Height Sheet */}
-      <FittedSheet ref={maxHeightSheetRef} params={{ maxHeight: 300 }}>
+      <FittedSheet
+        ref={maxHeightSheetRef}
+        params={{ maxHeight: 300, backgroundColor: 'white' }}
+      >
         <View style={styles.sheetContent} testID="max-height-sheet-content">
           <Text style={styles.sheetTitle} testID="max-height-sheet-title">
             Max Height Sheet
@@ -349,7 +386,7 @@ export default function E2ETestScreen() {
           </Text>
 
           <ScrollView style={styles.scrollContent}>
-            {Array.from({ length: 30 }, (_, i) => (
+            {Array.from({ length: 40 }, (_, i) => (
               <Text key={i} style={styles.listItem}>
                 Long content item {i + 1}
               </Text>
@@ -364,6 +401,101 @@ export default function E2ETestScreen() {
             <Text style={styles.buttonText}>Close Sheet</Text>
           </TouchableOpacity>
         </View>
+      </FittedSheet>
+
+      {/* ScrollView Wrapped in View (Problematic) */}
+      <FittedSheet
+        ref={scrollViewWrappedRef}
+        params={{ backgroundColor: 'white' }}
+      >
+        <View testID="scrollview-wrapped-content">
+          <View style={styles.sheetContent}>
+            <Text style={styles.sheetTitle} testID="scrollview-wrapped-title">
+              ScrollView in View
+            </Text>
+            <Text style={styles.sheetText}>
+              This demonstrates the problem: ScrollView wrapped in View
+            </Text>
+            <Text style={styles.warningText}>
+              ⚠️ Bottom items may not be visible due to height calculation
+              issues
+            </Text>
+
+            <TouchableOpacity
+              testID="close-scrollview-wrapped-button"
+              style={[styles.button, styles.closeButton]}
+              onPress={() => scrollViewWrappedRef.current?.hide()}
+            >
+              <Text style={styles.buttonText}>Close Sheet</Text>
+            </TouchableOpacity>
+
+            <View>
+              <ScrollView
+                style={styles.scrollContent}
+                testID="scrollview-wrapped-scroll"
+              >
+                {Array.from({ length: 50 }, (_, i) => (
+                  <Text
+                    key={i}
+                    style={styles.listItem}
+                    testID={`wrapped-item-${i}`}
+                  >
+                    Wrapped Item {i + 1}
+                  </Text>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+        </View>
+      </FittedSheet>
+
+      {/* ScrollView Wrapped in Fragment (Correct) */}
+      <FittedSheet
+        ref={scrollFragmentWrappedRef}
+        params={{ backgroundColor: 'white' }}
+      >
+        <Fragment>
+          <View
+            style={styles.sheetContent}
+            testID="scrollfragment-wrapped-content"
+          >
+            <Text
+              style={styles.sheetTitle}
+              testID="scrollfragment-wrapped-title"
+            >
+              ScrollView in Fragment
+            </Text>
+            <Text style={styles.sheetText}>
+              This demonstrates the solution: ScrollView wrapped in Fragment
+            </Text>
+            <Text style={styles.successText}>
+              ✅ All bottom items should be accessible
+            </Text>
+
+            <TouchableOpacity
+              testID="close-scrollfragment-wrapped-button"
+              style={[styles.button, styles.closeButton]}
+              onPress={() => scrollFragmentWrappedRef.current?.hide()}
+            >
+              <Text style={styles.buttonText}>Close Sheet</Text>
+            </TouchableOpacity>
+
+            <ScrollView
+              style={styles.scrollContent}
+              testID="scrollfragment-wrapped-scroll"
+            >
+              {Array.from({ length: 50 }, (_, i) => (
+                <Text
+                  key={i}
+                  style={styles.listItem}
+                  testID={`fragment-item-${i}`}
+                >
+                  Fragment Item {i + 1}
+                </Text>
+              ))}
+            </ScrollView>
+          </View>
+        </Fragment>
       </FittedSheet>
     </ScrollView>
   );
@@ -406,7 +538,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sheetContent: {
-    padding: 20,
+    padding: 40,
   },
   sheetTitle: {
     fontSize: 20,
@@ -442,5 +574,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 14,
     color: '#333',
+  },
+  warningText: {
+    fontSize: 14,
+    color: '#FF9500',
+    marginBottom: 12,
+    fontStyle: 'italic',
+  },
+  successText: {
+    fontSize: 14,
+    color: '#34C759',
+    marginBottom: 12,
+    fontStyle: 'italic',
   },
 });
