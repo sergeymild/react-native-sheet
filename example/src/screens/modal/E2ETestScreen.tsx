@@ -23,6 +23,7 @@ export default function E2ETestScreen() {
   const maxHeightSheetRef = useRef<FittedSheetRef>(null);
   const scrollViewWrappedRef = useRef<FittedSheetRef>(null);
   const scrollFragmentWrappedRef = useRef<FittedSheetRef>(null);
+  const dynamicContentRef = useRef<FittedSheetRef>(null);
   const [receivedData, setReceivedData] = useState<string>('');
 
   const openGlobalSheet = () => {
@@ -202,8 +203,23 @@ export default function E2ETestScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Dynamic Content Loading */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Dynamic Content Loading</Text>
+        <Text style={styles.successText}>
+          ✅ Контент загружается динамически, высота пересчитывается
+        </Text>
+        <TouchableOpacity
+          testID="open-dynamic-content-button"
+          style={styles.button}
+          onPress={() => dynamicContentRef.current?.show()}
+        >
+          <Text style={styles.buttonText}>Open Dynamic Loading Sheet</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Basic Sheet */}
-      <FittedSheet ref={basicSheetRef}>
+      <FittedSheet ref={basicSheetRef} params={{ backgroundColor: 'white' }}>
         {(data: any) => (
           <View style={styles.sheetContent} testID="basic-sheet-content">
             <Text style={styles.sheetTitle} testID="basic-sheet-title">
@@ -252,6 +268,13 @@ export default function E2ETestScreen() {
                 </Text>
               ))}
             </ScrollView>
+            <TouchableOpacity
+              testID="close-basic-sheet-button"
+              style={[styles.button, styles.closeButton]}
+              onPress={() => basicSheetRef.current?.hide()}
+            >
+              <Text style={styles.buttonText}>Close Sheet</Text>
+            </TouchableOpacity>
           </View>
         )}
       </FittedSheet>
@@ -386,13 +409,13 @@ export default function E2ETestScreen() {
               Max Height Sheet with ScrollView
             </Text>
             <Text style={styles.sheetText}>
-              ScrollView должен уменьшиться, чтобы показать кнопку снизу
+              ScrollView БЕЗ явного maxHeight - высота рассчитывается
+              автоматически
             </Text>
           </View>
 
           <View style={styles.scrollViewContainer}>
             <ScrollView
-              style={styles.scrollContentLimited}
               nestedScrollEnabled={true}
               testID="max-height-scroll-view"
             >
@@ -514,7 +537,72 @@ export default function E2ETestScreen() {
           </View>
         </Fragment>
       </FittedSheet>
+
+      {/* Dynamic Content Loading */}
+      <FittedSheet
+        ref={dynamicContentRef}
+        params={{ backgroundColor: 'green', maxHeight: 600 }}
+      >
+        <DynamicContentSheet sheetRef={dynamicContentRef} />
+      </FittedSheet>
     </ScrollView>
+  );
+}
+
+function DynamicContentSheet({
+  sheetRef,
+}: {
+  sheetRef: React.RefObject<FittedSheetRef | null>;
+}) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View
+        style={[styles.sheetContent, styles.loadingContainer]}
+        testID="dynamic-loading-state"
+      >
+        <Text style={styles.sheetTitle}>Loading...</Text>
+        <Text style={styles.sheetText}>Please wait</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.sheetContent} testID="dynamic-loaded-state">
+      <Text style={styles.sheetTitle}>Loaded Content</Text>
+      <Text style={styles.sheetText}>
+        Контент загружен! Высота шторки автоматически пересчиталась
+      </Text>
+
+      <ScrollView style={styles.dynamicScrollContent} testID="dynamic-scroll">
+        {Array.from({ length: 100 }, (_, i) => (
+          <Text
+            key={i}
+            style={styles.listItem}
+            testID={`dynamic-item-${i + 1}`}
+          >
+            Dynamic Item {i + 1}
+          </Text>
+        ))}
+      </ScrollView>
+
+      <TouchableOpacity
+        testID="close-dynamic-content-button"
+        style={[styles.button, styles.closeButton]}
+        onPress={() => sheetRef.current?.hide()}
+      >
+        <Text style={styles.buttonText}>Close Sheet</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -556,6 +644,7 @@ const styles = StyleSheet.create({
   },
   sheetContent: {
     padding: 20,
+    flexShrink: 1,
   },
   maxHeightSheetContent: {
     padding: 40,
@@ -583,11 +672,21 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
   scrollViewContainer: {
-    marginTop: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
     flexShrink: 1,
   },
-  scrollContentLimited: {
-    flexGrow: 0,
+  loadingContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dynamicScrollContent: {
+    marginTop: 20,
+    marginBottom: 20,
+    //flexShrink: 1,
+  },
+  dynamicScrollContent2: {
     flexShrink: 1,
   },
   listItem: {
