@@ -173,9 +173,9 @@ export default function E2ETestScreen() {
 
       {/* ScrollView Wrapped in View */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>ScrollView in View (Проблемный)</Text>
+        <Text style={styles.sectionTitle}>ScrollView in View (Problematic)</Text>
         <Text style={styles.warningText}>
-          ⚠️ ScrollView обернутый в View может неправильно определять высоту
+          ⚠️ ScrollView wrapped in View may incorrectly calculate height
         </Text>
         <TouchableOpacity
           testID="open-scrollview-wrapped-button"
@@ -189,10 +189,10 @@ export default function E2ETestScreen() {
       {/* ScrollView Wrapped in Fragment */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
-          ScrollView in Fragment (Правильный)
+          ScrollView in Fragment (Correct)
         </Text>
         <Text style={styles.successText}>
-          ✅ ScrollView обернутый в Fragment правильно работает
+          ✅ ScrollView wrapped in Fragment works correctly
         </Text>
         <TouchableOpacity
           testID="open-scrollfragment-wrapped-button"
@@ -207,7 +207,7 @@ export default function E2ETestScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Dynamic Content Loading</Text>
         <Text style={styles.successText}>
-          ✅ Контент загружается динамически, высота пересчитывается
+          ✅ Content loads dynamically, height recalculates
         </Text>
         <TouchableOpacity
           testID="open-dynamic-content-button"
@@ -409,8 +409,8 @@ export default function E2ETestScreen() {
               Max Height Sheet with ScrollView
             </Text>
             <Text style={styles.sheetText}>
-              ScrollView БЕЗ явного maxHeight - высота рассчитывается
-              автоматически
+              ScrollView WITHOUT explicit maxHeight - height is calculated
+              automatically
             </Text>
           </View>
 
@@ -437,7 +437,7 @@ export default function E2ETestScreen() {
             onPress={() => maxHeightSheetRef.current?.hide()}
           >
             <Text style={styles.buttonText}>
-              Close Sheet (должна быть видна)
+              Close Sheet (should be visible)
             </Text>
           </TouchableOpacity>
         </View>
@@ -580,7 +580,7 @@ function DynamicContentSheet({
     <View style={styles.sheetContent} testID="dynamic-loaded-state">
       <Text style={styles.sheetTitle}>Loaded Content</Text>
       <Text style={styles.sheetText}>
-        Контент загружен! Высота шторки автоматически пересчиталась
+        Content loaded! Sheet height recalculated automatically
       </Text>
 
       <ScrollView style={styles.dynamicScrollContent} testID="dynamic-scroll">

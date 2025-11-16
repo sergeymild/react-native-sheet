@@ -648,7 +648,16 @@ export const ScrollExample = () => {
     <ScrollView>...</ScrollView>
   </View>
 </FittedSheet>
+
+// ⚠️ If you must wrap ScrollView in a View, add flexGrow: 1
+<FittedSheet ref={sheetRef}>
+  <View style={{ flexGrow: 1 }}>
+    <ScrollView>...</ScrollView>
+  </View>
+</FittedSheet>
 ```
+
+**Note:** If you need to wrap `ScrollView` in a `View` (e.g., for additional styling), make sure to add `flexGrow: 1` to the wrapper `View` style. This ensures proper height calculation for the sheet content.
 
 ## Platform-Specific Notes
 

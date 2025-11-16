@@ -90,7 +90,7 @@ using namespace facebook::react;
   __weak SheetView *weakSelf = self;
   _view2.onSheetDismiss = ^{
     __strong SheetView *strongSelf = weakSelf;
-    if (!strongSelf) return; // объект уже уничтожен, выходим
+    if (!strongSelf) return; // object already destroyed, exiting
 
     NSLog(@"%@ SheetView.onSheetDismiss", strongSelf->_view2.uniqueId);
     auto eventEmitter = [strongSelf modalEventEmitter];
