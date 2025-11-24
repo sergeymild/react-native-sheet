@@ -2399,7 +2399,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - Sheet2 (7.0.0):
+  - Sheet2 (7.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2736,7 +2736,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 4d203eddf6f977caa324640a20f92e70408d648b
   ReactCommon: ce5d4226dfaf9d5dacbef57b4528819e39d3a120
   RNScreens: 0bbf16c074ae6bb1058a7bf2d1ae017f4306797c
-  Sheet2: 66a44fb095cc14d497f37c4b56b62ba467949079
+  Sheet2: 55727c0dbbd546b3837485c1246caf65b2135484
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 11c9686a21e2cd82a094a723649d9f4507200fb0
 

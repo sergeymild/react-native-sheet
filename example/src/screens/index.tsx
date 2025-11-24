@@ -14,8 +14,15 @@ import { Keyboard3Example } from './modal/Keyboard3Example';
 import { NamedExample } from './modal/NamedExample';
 import { MultipleExample } from './modal/MultipleExample';
 import { GlobalSimpleUsage } from './modal/GlobalSimpleUsage';
+import { DataPassingUsage } from './modal/DataPassingUsage';
+import E2ETestScreen from './modal/E2ETestScreen';
 
 export const screens = [
+  {
+    name: 'E2E Test',
+    slug: 'Modal/E2ETest',
+    getScreen: () => E2ETestScreen,
+  },
   {
     name: 'Dynamic Snap Point',
     slug: 'Modal/DynamicSnapPointExample',
@@ -95,5 +102,10 @@ export const screens = [
     name: 'GlobalSimpleUsage',
     slug: 'Modal/GlobalSimpleUsage',
     getScreen: () => GlobalSimpleUsage,
+  },
+  {
+    name: 'DataPassingUsage',
+    slug: 'Modal/DataPassingUsage',
+    getScreen: () => DataPassingUsage,
   },
 ];

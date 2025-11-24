@@ -12,7 +12,12 @@ import SheetModule from './NativeSheet';
 
 import { PortalProvider } from '@gorhom/portal';
 import type { ReactNode } from 'react';
-import { GlobalSheetView, presentGlobalFittedSheet } from './GlobalSheetView';
+import {
+  GlobalSheetView,
+  presentGlobalFittedSheet,
+  dismissGlobalFittedSheet,
+  attachScrollViewToGlobalFittedSheet,
+} from './GlobalSheetView';
 
 export function SheetProvider(props: {
   children: ReactNode;
@@ -42,5 +47,7 @@ export {
   dismissFittedPresented,
   attachScrollViewToFittedSheet,
   presentGlobalFittedSheet,
+  dismissGlobalFittedSheet,
+  attachScrollViewToGlobalFittedSheet,
   type FittedSheetParams,
 };
