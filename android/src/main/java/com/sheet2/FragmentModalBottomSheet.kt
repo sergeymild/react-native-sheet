@@ -11,14 +11,25 @@ import android.view.Window
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.lang.ref.WeakReference
 
-class FragmentModalBottomSheet(
-  private val modalView: ViewGroup,
-  private val dismissable: Boolean,
-  private val isSystemUILight: Boolean,
-  private val onDismiss: (dismissAll: Boolean) -> Unit
-) : BottomSheetDialogFragment() {
+class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
 
+  private var modalView: ViewGroup? = null
+  private var dismissable: Boolean = true
+  private var isSystemUILight: Boolean = false
+  private var onDismiss: ((dismissAll: Boolean) -> Unit)? = null
   var dismissAll = false
+
+  constructor(
+    modalView: ViewGroup,
+    dismissable: Boolean,
+    isSystemUILight: Boolean,
+    onDismiss: (dismissAll: Boolean) -> Unit
+  ) : this() {
+    this.modalView = modalView
+    this.dismissable = dismissable
+    this.isSystemUILight = isSystemUILight
+    this.onDismiss = onDismiss
+  }
 
   companion object {
     var presentedWindow: WeakReference<Window>? = null
@@ -28,7 +39,14 @@ class FragmentModalBottomSheet(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View = modalView
+  ): View? {
+    // If modalView is null (fragment restored by system), dismiss immediately
+    if (modalView == null) {
+      dismissAllowingStateLoss()
+      return null
+    }
+    return modalView
+  }
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     this.isCancelable = dismissable
@@ -62,6 +80,6 @@ class FragmentModalBottomSheet(
     super.onDismiss(dialog)
     presentedWindow?.clear()
     presentedWindow = null
-    onDismiss(dismissAll)
+    onDismiss?.invoke(dismissAll)
   }
 }

@@ -12,6 +12,7 @@ example/android/.bundle
 example/android/app/release
 # Xcode
 #
+.yarn
 build/
 *.pbxuser
 !default.pbxuser
