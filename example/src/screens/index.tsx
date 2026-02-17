@@ -15,6 +15,7 @@ import { NamedExample } from './modal/NamedExample';
 import { MultipleExample } from './modal/MultipleExample';
 import { GlobalSimpleUsage } from './modal/GlobalSimpleUsage';
 import { DataPassingUsage } from './modal/DataPassingUsage';
+import { InvertedListExample } from './modal/InvertedListExample';
 import E2ETestScreen from './modal/E2ETestScreen';
 
 export const screens = [
@@ -107,5 +108,10 @@ export const screens = [
     name: 'DataPassingUsage',
     slug: 'Modal/DataPassingUsage',
     getScreen: () => DataPassingUsage,
+  },
+  {
+    name: 'InvertedListExample',
+    slug: 'Modal/InvertedListExample',
+    getScreen: () => InvertedListExample,
   },
 ];

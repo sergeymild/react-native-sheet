@@ -673,7 +673,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
       && scroll != null
       && !ignoreEvents
       && state != STATE_DRAGGING
-      && (!parent.isPointInChildBounds(scroll, (int) event.getX(), (int) event.getY()) || (initialY - event.getY() < 10 && scroll.getScrollY() == 0))
+      && (!parent.isPointInChildBounds(scroll, (int) event.getX(), (int) event.getY()) || (initialY - event.getY() < 10 && !canVisuallyScrollUp(scroll)))
       && viewDragHelper != null
       && Math.abs(initialY - event.getY()) > viewDragHelper.getTouchSlop();
     return iss;
@@ -740,13 +740,22 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
     if (isNestedScrollingCheckEnabled() && target != scrollingChild) {
       return;
     }
+
+    // For inverted lists (e.g. inverted FlatList), the touch coordinates and scroll
+    // direction reported by nested scrolling are inverted. We negate dy to work
+    // in physical screen direction, then convert consumed[1] back to the child's
+    // coordinate system at the end.
+    boolean inverted = isScrollViewInverted(target);
+    int physicalDy = inverted ? -dy : dy;
+
     int currentTop = child.getTop();
-    int newTop = currentTop - dy;
-    if (dy > 0) { // Upward
+    int newTop = currentTop - physicalDy;
+    if (physicalDy > 0) { // Physically upward
       if (newTop < getExpandedOffset()) {
-        consumed[1] = currentTop - getExpandedOffset();
-        ViewCompat.offsetTopAndBottom(child, -consumed[1]);
+        int move = currentTop - getExpandedOffset();
+        ViewCompat.offsetTopAndBottom(child, -move);
         setStateInternal(STATE_EXPANDED);
+        consumed[1] = inverted ? -move : move;
       } else {
         if (!draggable) {
           // Prevent dragging
@@ -754,11 +763,11 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         }
 
         consumed[1] = dy;
-        ViewCompat.offsetTopAndBottom(child, -dy);
+        ViewCompat.offsetTopAndBottom(child, -physicalDy);
         setStateInternal(STATE_DRAGGING);
       }
-    } else if (dy < 0) { // Downward
-      if (!target.canScrollVertically(-1)) {
+    } else if (physicalDy < 0) { // Physically downward
+      if (!canVisuallyScrollUp(target)) {
         if (newTop <= collapsedOffset || canBeHiddenByDragging()) {
           if (!draggable) {
             // Prevent dragging
@@ -766,17 +775,18 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
           }
 
           consumed[1] = dy;
-          ViewCompat.offsetTopAndBottom(child, -dy);
+          ViewCompat.offsetTopAndBottom(child, -physicalDy);
           setStateInternal(STATE_DRAGGING);
         } else {
-          consumed[1] = currentTop - collapsedOffset;
-          ViewCompat.offsetTopAndBottom(child, -consumed[1]);
+          int move = currentTop - collapsedOffset;
+          ViewCompat.offsetTopAndBottom(child, -move);
           setStateInternal(STATE_COLLAPSED);
+          consumed[1] = inverted ? -move : move;
         }
       }
     }
     dispatchOnSlide(child.getTop());
-    lastNestedScrollDy = dy;
+    lastNestedScrollDy = physicalDy;
     nestedScrolled = true;
   }
 
@@ -1550,6 +1560,32 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
 //    return null;
   }
 
+  /**
+   * Checks whether the given view is vertically inverted (e.g. React Native's inverted FlatList).
+   *
+   * On Android, React Native uses {@code transform: [{scale: -1}]} for inverted lists.
+   * The matrix decomposition in React Native converts this to rotation=-180° with positive scale
+   * values, so we must check rotation in addition to scaleY.
+   */
+  private boolean isScrollViewInverted(@NonNull View view) {
+    if (view.getScaleY() < 0) return true;
+    float rotation = Math.abs(view.getRotation() % 360);
+    return Math.abs(rotation - 180) < 1;
+  }
+
+  /**
+   * Checks whether the view can scroll up visually, accounting for inverted lists.
+   * For normal views, this checks canScrollVertically(-1).
+   * For inverted views, the raw scroll direction is flipped,
+   * so we check canScrollVertically(1) instead.
+   */
+  private boolean canVisuallyScrollUp(@NonNull View view) {
+    if (isScrollViewInverted(view)) {
+      return view.canScrollVertically(1);
+    }
+    return view.canScrollVertically(-1);
+  }
+
   private boolean shouldHandleDraggingWithHelper() {
     // If it's not draggable, do not forward events to viewDragHelper; however, if it's already
     // dragging, let it finish.
@@ -1738,7 +1774,7 @@ public class BottomSheetBehavior<V extends View> extends CoordinatorLayout.Behav
         }
         if (state == STATE_EXPANDED && activePointerId == pointerId) {
           View scroll = nestedScrollingChildRef != null ? nestedScrollingChildRef.get() : null;
-          if (scroll != null && scroll.canScrollVertically(-1)) {
+          if (scroll != null && canVisuallyScrollUp(scroll)) {
             // Let the content scroll up
             return false;
           }
