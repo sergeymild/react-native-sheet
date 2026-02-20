@@ -626,9 +626,8 @@ extension SheetViewController: UIGestureRecognizerDelegate {
         guard pointInChildScrollView > 0, pointInChildScrollView < childScrollView.bounds.height else {
             return true
         }
-        let topInset = childScrollView.contentInset.top
 
-        if !(abs(velocity.y) > abs(velocity.x) && childScrollView.contentOffset.y <= -topInset) {
+        if !(abs(velocity.y) > abs(velocity.x) && isScrollViewAtVisualTop(childScrollView)) {
             return false
         }
 
@@ -638,6 +637,28 @@ extension SheetViewController: UIGestureRecognizerDelegate {
         } else {
             return true
         }
+    }
+
+    private func isScrollViewInverted(_ scrollView: UIScrollView) -> Bool {
+        // Check the scroll view itself and its ancestors for scaleY = -1.
+        // React Native applies the inverted transform via layer.transform (CATransform3D)
+        // on a parent wrapper view (RCTScrollView), not on the inner UIScrollView (RCTEnhancedScrollView).
+        var view: UIView? = scrollView
+        while let current = view {
+            if current.transform.d < 0 { return true }
+            if current.layer.transform.m22 < 0 { return true }
+            view = current.superview
+        }
+        return false
+    }
+
+    private func isScrollViewAtVisualTop(_ scrollView: UIScrollView) -> Bool {
+        if isScrollViewInverted(scrollView) {
+            let maxOffsetY = scrollView.contentSize.height - scrollView.bounds.height + scrollView.contentInset.bottom
+            if maxOffsetY <= 0 { return true }
+            return scrollView.contentOffset.y >= maxOffsetY - 1
+        }
+        return scrollView.contentOffset.y <= -scrollView.contentInset.top
     }
 }
 
