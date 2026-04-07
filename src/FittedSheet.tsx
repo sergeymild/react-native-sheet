@@ -25,6 +25,11 @@ export interface FittedSheetParams {
   topLeftRightCornerRadius?: number;
   backgroundColor?: string;
   /**
+   * iOS only. Window level for the sheet.
+   * 'normal' | 'statusBar' | 'alert' (default: 'alert')
+   */
+  windowLevel?: 'normal' | 'statusBar' | 'alert';
+  /**
    * Android only
    */
   isSystemUILight?: boolean;
@@ -206,6 +211,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
           topLeftRightCornerRadius={
             this.props.params?.topLeftRightCornerRadius ?? 20
           }
+          windowLevel={this.props.params?.windowLevel}
           isSystemUILight={this.props.params?.isSystemUILight ?? true}
           calculatedHeight={nativeHeight}
           passScrollViewReactTag={this.state.passScrollViewReactTag}

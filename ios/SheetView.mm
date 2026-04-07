@@ -71,6 +71,10 @@ using namespace facebook::react;
   auto color = RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor);
   [_view2 setSheetBackgroundColor:color];
 
+  if (oldViewProps.windowLevel != newViewProps.windowLevel) {
+    [_view2 setWindowLevel:[[NSString alloc]initWithUTF8String:newViewProps.windowLevel.c_str()]];
+  }
+
   if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
     [_view2 setPassScrollViewReactTag];
   }

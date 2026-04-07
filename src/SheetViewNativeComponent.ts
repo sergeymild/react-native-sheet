@@ -23,6 +23,7 @@ interface NativeProps extends ViewProps {
   passScrollViewReactTag?: string;
   uniqueId: string;
   sheetBackgroundColor?: ColorValue;
+  windowLevel?: string;
   onSheetDismiss: DirectEventHandler<null>;
 }
 

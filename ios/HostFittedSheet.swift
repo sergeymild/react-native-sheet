@@ -26,6 +26,7 @@ public final class HostFittedSheet: UIView {
   private var topLeftRightCornerRadius: CGFloat?
   private var stacked = false
   private var _backgroundColor: UIColor = .clear
+  private var _windowLevel: UIWindow.Level = .alert
   @objc
   public var uniqueId: String = ""
 
@@ -43,12 +44,25 @@ public final class HostFittedSheet: UIView {
 
     let controller = UIViewController()
     _alertWindow?.rootViewController = controller
-    _alertWindow?.windowLevel = UIWindow.Level.alert
+    _alertWindow?.windowLevel = _windowLevel
     _alertWindow?.isHidden = false
     _alertWindow?.makeKeyAndVisible()
     return controller
   }
   private var presentViewController: UIViewController?
+
+  @objc
+  public func setWindowLevel(_ level: NSString) {
+    let str = level as String
+    switch str {
+    case "normal":
+      _windowLevel = .normal
+    case "statusBar":
+      _windowLevel = .statusBar
+    default:
+      _windowLevel = .alert
+    }
+  }
 
   @objc
   public func setPassScrollViewReactTag() {
