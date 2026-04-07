@@ -24,6 +24,7 @@ interface NativeProps extends ViewProps {
   uniqueId: string;
   sheetBackgroundColor?: ColorValue;
   windowLevel?: string;
+  useInlinePresentation?: boolean;
   onSheetDismiss: DirectEventHandler<null>;
 }
 

@@ -30,6 +30,11 @@ export interface FittedSheetParams {
    */
   windowLevel?: 'normal' | 'statusBar' | 'alert';
   /**
+   * iOS only. When true, presents the sheet in the current view controller
+   * instead of creating a separate UIWindow. Default: false.
+   */
+  useInlinePresentation?: boolean;
+  /**
    * Android only
    */
   isSystemUILight?: boolean;
@@ -212,6 +217,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
             this.props.params?.topLeftRightCornerRadius ?? 20
           }
           windowLevel={this.props.params?.windowLevel}
+          useInlinePresentation={this.props.params?.useInlinePresentation}
           isSystemUILight={this.props.params?.isSystemUILight ?? true}
           calculatedHeight={nativeHeight}
           passScrollViewReactTag={this.state.passScrollViewReactTag}

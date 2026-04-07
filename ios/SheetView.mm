@@ -75,6 +75,10 @@ using namespace facebook::react;
     [_view2 setWindowLevel:[[NSString alloc]initWithUTF8String:newViewProps.windowLevel.c_str()]];
   }
 
+  if (oldViewProps.useInlinePresentation != newViewProps.useInlinePresentation) {
+    [_view2 setUseInlinePresentation:newViewProps.useInlinePresentation];
+  }
+
   if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
     [_view2 setPassScrollViewReactTag];
   }

@@ -27,6 +27,7 @@ public final class HostFittedSheet: UIView {
   private var stacked = false
   private var _backgroundColor: UIColor = .clear
   private var _windowLevel: UIWindow.Level = .alert
+  private var _useInlinePresentation = false
   @objc
   public var uniqueId: String = ""
 
@@ -62,6 +63,11 @@ public final class HostFittedSheet: UIView {
     default:
       _windowLevel = .alert
     }
+  }
+
+  @objc
+  public func setUseInlinePresentation(_ value: Bool) {
+    _useInlinePresentation = value
   }
 
   @objc
@@ -190,7 +196,11 @@ public final class HostFittedSheet: UIView {
     }
 
     if (!_isPresented) {
-      presentViewController = createVC()
+      if _useInlinePresentation {
+        presentViewController = RCTPresentedViewController()
+      } else {
+        presentViewController = createVC()
+      }
       // sheet already presented
       if stacked {
         if let controller = presentViewController as? SheetViewController {
