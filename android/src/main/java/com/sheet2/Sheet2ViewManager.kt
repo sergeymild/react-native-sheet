@@ -83,6 +83,14 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
     view._backgroundColor = value ?: Color.TRANSPARENT
   }
 
+  override fun setWindowLevel(view: Sheet2View, value: String?) {
+    // iOS only
+  }
+
+  override fun setUseInlinePresentation(view: Sheet2View, value: Boolean) {
+    // iOS only
+  }
+
   override fun setCalculatedHeight(view: Sheet2View, value: Double) {
     println("==========setCalculatedHeight $value")
     view.mHostView.setVirtualHeight(value.dpToPx())
