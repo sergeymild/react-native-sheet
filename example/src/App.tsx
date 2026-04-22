@@ -36,26 +36,25 @@ const Buttons = () => {
 export default function App() {
   return (
     <View style={styles.container}>
-      <SheetProvider addGlobalSheetView>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name={'Buttons'} component={Buttons} />
-            {screens.map((s) => (
-              <Stack.Screen
-                component={s.getScreen()}
-                key={s.slug}
-                {...s}
-                options={{
-                  presentation:
-                    s.name === 'FullScreenModalOverSheet'
-                      ? 'fullScreenModal'
-                      : 'card',
-                }}
-              />
-            ))}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SheetProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name={'Buttons'} component={Buttons} />
+          {screens.map((s) => (
+            <Stack.Screen
+              component={s.getScreen()}
+              key={s.slug}
+              {...s}
+              options={{
+                presentation:
+                  s.name === 'FullScreenModalOverSheet'
+                    ? 'fullScreenModal'
+                    : 'card',
+              }}
+            />
+          ))}
+        </Stack.Navigator>
+      </NavigationContainer>
+      <SheetProvider addGlobalSheetView />
     </View>
   );
 }

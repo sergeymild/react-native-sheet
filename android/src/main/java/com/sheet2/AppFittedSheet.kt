@@ -60,27 +60,44 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
    * Fabric state wrapper for this SheetView. Set by [Sheet2ViewManager.updateState].
    * Used to push `contentOriginOffset` values back to C++ so that
    * `SheetViewShadowNode::getContentOriginOffset()` reflects the visual position
-   * of the re-parented inline sheet — which keeps Pressability's responder region
-   * check aligned with actual touch coordinates.
+   * of the sheet content — which keeps Pressability's responder-region check
+   * aligned with actual touch coordinates.
    */
   internal var fabricStateWrapper: StateWrapper? = null
 
   /**
-   * Pushes the visual Y delta (from Yoga-computed position of this view to the
-   * actual on-screen position of [mHostView] after inline re-parenting) into our
-   * Fabric ShadowNode state.
+   * Pushes a Fabric state update whose effect is to make `measure()` / Pressability
+   * region checks see the sheet content at its on-screen position.
+   *
+   * Two cases:
+   *  - **Inline mode**: [mHostView] is re-parented into an overlay inside the same
+   *    Activity Window, visually offset from this AppFittedSheet's Yoga position.
+   *    The offset we need to add at the `<_FittedSheet>` shadow-node level is the
+   *    visual delta between `mHostView`'s on-screen position and this view's.
+   *  - **Dialog mode**: [mHostView] lives in a separate Dialog Window; touches
+   *    inside it are dispatched by `mHostView`'s own `JSTouchDispatcher` in
+   *    mHostView-local coordinates (top of sheet = 0). Meanwhile `measure()` on
+   *    Fabric goes through the main-surface shadow tree and would return
+   *    coordinates that include this AppFittedSheet's own Yoga-page position.
+   *    Pushing `-anchor.getLocationInWindow` cancels that out so `measure()`
+   *    reports mHostView-local coordinates that match the touch coords.
    */
-  internal fun pushInlineContentOriginOffset() {
+  internal fun pushContentOriginOffset() {
     val wrapper = fabricStateWrapper ?: return
-    if (!useInlinePresentation) return
-    // Attached check — wrapper can race with destruction during dismiss.
     if (!isAttachedToWindow) return
     val anchorLoc = IntArray(2).also { getLocationInWindow(it) }
-    val hostLoc = IntArray(2).also { mHostView.getLocationInWindow(it) }
-    // Fabric's shadow tree / Pressability work in density-independent units (DP).
-    // `getLocationInWindow` returns pixels, so convert before handing to C++.
-    val offsetYDp = (hostLoc[1] - anchorLoc[1]).toFloat().pxToDp()
-    val offsetXDp = (hostLoc[0] - anchorLoc[0]).toFloat().pxToDp()
+
+    val offsetXDp: Float
+    val offsetYDp: Float
+    if (useInlinePresentation) {
+      val hostLoc = IntArray(2).also { mHostView.getLocationInWindow(it) }
+      offsetXDp = (hostLoc[0] - anchorLoc[0]).toFloat().pxToDp()
+      offsetYDp = (hostLoc[1] - anchorLoc[1]).toFloat().pxToDp()
+    } else {
+      offsetXDp = (-anchorLoc[0]).toFloat().pxToDp()
+      offsetYDp = (-anchorLoc[1]).toFloat().pxToDp()
+    }
+
     val map = Arguments.createMap()
     map.putDouble("contentOriginOffsetX", offsetXDp.toDouble())
     map.putDouble("contentOriginOffsetY", offsetYDp.toDouble())
@@ -184,7 +201,14 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
           if (presentedSheets.contains(fragmentTag)) return
           presentedSheets.add(fragmentTag)
         }
+        // Sync Fabric shadow tree with our Yoga-position once Dialog is laid out —
+        // ensures Pressability's measure() returns coords matching the Dialog
+        // JSTouchDispatcher's touch coords (which are mHostView-local).
+        post { pushContentOriginOffset() }
       }
+    } else {
+      // Sheet already showing; reapply offset in case window position changed.
+      post { pushContentOriginOffset() }
     }
   }
 

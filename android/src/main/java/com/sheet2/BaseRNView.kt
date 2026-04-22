@@ -6,7 +6,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.UiThread
-import com.facebook.react.bridge.GuardedRunnable
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.config.ReactFeatureFlags
@@ -16,7 +15,6 @@ import com.facebook.react.uimanager.PixelUtil.pxToDp
 import com.facebook.react.uimanager.RootView
 import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.UIManagerModule
 import com.facebook.react.uimanager.events.EventDispatcher
 import com.facebook.react.views.view.ReactViewGroup
 
@@ -62,28 +60,13 @@ open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
 
   @UiThread
   public fun updateState(width: Int, height: Int) {
+    val sw = stateWrapper ?: return
     val realWidth: Float = width.toFloat().pxToDp()
     val realHeight: Float = height.toFloat().pxToDp()
-
-    stateWrapper?.let { sw ->
-      // new architecture
-      val newStateData: WritableMap = WritableNativeMap()
-      newStateData.putDouble("screenWidth", realWidth.toDouble())
-      newStateData.putDouble("screenHeight", realHeight.toDouble())
-      sw.updateState(newStateData)
-    }
-      ?: run {
-        // old architecture
-        // TODO: T44725185 remove after full migration to Fabric
-        reactContext.runOnNativeModulesQueueThread(
-          object : GuardedRunnable(reactContext) {
-            override fun runGuarded() {
-              reactContext.reactApplicationContext
-                .getNativeModule(UIManagerModule::class.java)
-                ?.updateNodeSize(id, viewWidth, viewHeight)
-            }
-          })
-      }
+    val newStateData: WritableMap = WritableNativeMap()
+    newStateData.putDouble("screenWidth", realWidth.toDouble())
+    newStateData.putDouble("screenHeight", realHeight.toDouble())
+    sw.updateState(newStateData)
   }
 
   override fun handleException(t: Throwable) {

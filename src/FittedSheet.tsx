@@ -11,7 +11,6 @@ import {
 
 import She, { Commands } from './SheetViewNativeComponent';
 import SheetModule from './NativeSheet';
-import { Portal } from '@gorhom/portal';
 
 const _FittedSheet = She;
 
@@ -199,10 +198,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
       this.log('render');
     }
     const background = this.props?.params?.backgroundColor;
-    const useInline =
-      Platform.OS === 'android' &&
-      !!this.props.params?.useInlinePresentation;
-    const sheet = (
+    return (
       <_FittedSheet
         key={this.uniqueId.toString()}
         onSheetDismiss={this.onDismiss}
@@ -245,11 +241,5 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         </View>
       </_FittedSheet>
     );
-    // For Android inline presentation we must keep the native view inside the
-    // current navigation screen's view hierarchy so that a newly pushed
-    // fullScreenModal from react-native-screens covers it naturally. The
-    // Portal would teleport it above the FragmentContainerView and defeat that.
-    if (useInline) return sheet;
-    return <Portal hostName={'SheetHost'}>{sheet}</Portal>;
   }
 }

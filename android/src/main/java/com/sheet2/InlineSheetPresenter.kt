@@ -95,14 +95,14 @@ internal class InlineSheetPresenter(
           ) {
             // Sheet settled — sync Fabric shadow tree with our new visual
             // position so Pressability measures correctly.
-            bottomSheet.post { anchor.pushInlineContentOriginOffset() }
+            bottomSheet.post { anchor.pushContentOriginOffset() }
           }
         }
 
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
           // While dragging, update offset each frame so the user can still tap
           // elements after the sheet settles at a non-expanded position.
-          anchor.pushInlineContentOriginOffset()
+          anchor.pushContentOriginOffset()
         }
       })
     }
@@ -121,7 +121,7 @@ internal class InlineSheetPresenter(
     designBottomSheet.post {
       behavior.setState(BottomSheetBehavior.STATE_EXPANDED)
       // Post once more so Fabric state sync runs after the expand-layout pass.
-      designBottomSheet.post { anchor.pushInlineContentOriginOffset() }
+      designBottomSheet.post { anchor.pushContentOriginOffset() }
     }
   }
 

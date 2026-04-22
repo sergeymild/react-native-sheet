@@ -10,8 +10,8 @@ import {
 } from './PublicSheetView';
 import SheetModule from './NativeSheet';
 
-import { PortalProvider } from '@gorhom/portal';
 import type { ReactNode } from 'react';
+import { Fragment } from 'react';
 import {
   GlobalSheetView,
   presentGlobalFittedSheet,
@@ -20,17 +20,17 @@ import {
 } from './GlobalSheetView';
 
 export function SheetProvider(props: {
-  children: ReactNode;
+  children?: ReactNode;
   addGlobalSheetView?: boolean;
   globalSheetProps?: Omit<SheetProps, 'children' | 'onSheetDismiss'>;
 }) {
   return (
-    <PortalProvider rootHostName={'SheetHost'}>
+    <Fragment>
       {props.children}
       {!!props.addGlobalSheetView && (
         <GlobalSheetView props={props.globalSheetProps} />
       )}
-    </PortalProvider>
+    </Fragment>
   );
 }
 
