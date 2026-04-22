@@ -9,9 +9,12 @@ import android.view.accessibility.AccessibilityEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
+import com.facebook.react.uimanager.PixelUtil.pxToDp
+import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.events.EventDispatcher
 
@@ -37,11 +40,73 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
 
-
   var dismissable = true
+    set(value) {
+      field = value
+      inlinePresenter.setDismissable(value)
+    }
   var topLeftRightCornerRadius: Float = 0F
   var _backgroundColor: Int = Color.TRANSPARENT
   var isSystemUILight: Boolean = false
+  var useInlinePresentation: Boolean = false
+    set(value) {
+      field = value
+      // When inline, mHostView sits inside the main ReactRootView; turn off its
+      // own JSTouchDispatcher so we don't double-dispatch touches.
+      mHostView.inlineMode = value
+    }
+
+  /**
+   * Fabric state wrapper for this SheetView. Set by [Sheet2ViewManager.updateState].
+   * Used to push `contentOriginOffset` values back to C++ so that
+   * `SheetViewShadowNode::getContentOriginOffset()` reflects the visual position
+   * of the sheet content — which keeps Pressability's responder-region check
+   * aligned with actual touch coordinates.
+   */
+  internal var fabricStateWrapper: StateWrapper? = null
+
+  /**
+   * Pushes a Fabric state update whose effect is to make `measure()` / Pressability
+   * region checks see the sheet content at its on-screen position.
+   *
+   * Two cases:
+   *  - **Inline mode**: [mHostView] is re-parented into an overlay inside the same
+   *    Activity Window, visually offset from this AppFittedSheet's Yoga position.
+   *    The offset we need to add at the `<_FittedSheet>` shadow-node level is the
+   *    visual delta between `mHostView`'s on-screen position and this view's.
+   *  - **Dialog mode**: [mHostView] lives in a separate Dialog Window; touches
+   *    inside it are dispatched by `mHostView`'s own `JSTouchDispatcher` in
+   *    mHostView-local coordinates (top of sheet = 0). Meanwhile `measure()` on
+   *    Fabric goes through the main-surface shadow tree and would return
+   *    coordinates that include this AppFittedSheet's own Yoga-page position.
+   *    Pushing `-anchor.getLocationInWindow` cancels that out so `measure()`
+   *    reports mHostView-local coordinates that match the touch coords.
+   */
+  internal fun pushContentOriginOffset() {
+    val wrapper = fabricStateWrapper ?: return
+    if (!isAttachedToWindow) return
+    val anchorLoc = IntArray(2).also { getLocationInWindow(it) }
+
+    val offsetXDp: Float
+    val offsetYDp: Float
+    if (useInlinePresentation) {
+      val hostLoc = IntArray(2).also { mHostView.getLocationInWindow(it) }
+      offsetXDp = (hostLoc[0] - anchorLoc[0]).toFloat().pxToDp()
+      offsetYDp = (hostLoc[1] - anchorLoc[1]).toFloat().pxToDp()
+    } else {
+      offsetXDp = (-anchorLoc[0]).toFloat().pxToDp()
+      offsetYDp = (-anchorLoc[1]).toFloat().pxToDp()
+    }
+
+    val map = Arguments.createMap()
+    map.putDouble("contentOriginOffsetX", offsetXDp.toDouble())
+    map.putDouble("contentOriginOffsetY", offsetYDp.toDouble())
+    runCatching { wrapper.updateState(map) }
+  }
+
+  private val inlinePresenter: InlineSheetPresenter by lazy {
+    InlineSheetPresenter(this, mHostView)
+  }
 
   var maxWidth: Float = 0F
     set(value) {
@@ -70,18 +135,30 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun setId(id: Int) {
     super.setId(id)
-    println("👀 setId $id")
-    // Forward the ID to our content view, so event dispatching behaves correctly
-    mHostView.id = id
+    // In inline mode mHostView is re-parented under our own overlay. Forwarding the
+    // RN tag to it would make two Android views share the same id, which confuses
+    // RN's responder/event routing. Keep the forwarding only for Dialog mode.
+    if (!useInlinePresentation) {
+      mHostView.id = id
+    } else {
+      mHostView.id = View.NO_ID
+    }
   }
 
   fun showOrUpdate() {
-    println("🥲 showOrUpdate")
     UiThreadUtil.assertOnUiThread()
 
-    val sheet = this.sheet
     mHostView.setCornerRadius(topLeftRightCornerRadius)
     mHostView.setBackgroundColor(_backgroundColor)
+
+    if (useInlinePresentation) {
+      if (!inlinePresenter.isShown) {
+        inlinePresenter.show(dismissable) { onSheetDismiss() }
+      }
+      return
+    }
+
+    val sheet = this.sheet
     if (sheet == null) {
       if (stacked) {
         presentedSheets.lastOrNull()?.let {
@@ -94,12 +171,10 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
         dismissable = dismissable,
         isSystemUILight = isSystemUILight
       ) { dismissAll ->
-        println("😀 onDismiss")
         val parent = mHostView.parent as? ViewGroup
         parent?.removeViewAt(0)
         onSheetDismiss()
         if (dismissAll) {
-          println("😁 dismissingSilently ${presentedSheets.size}")
           if (stacked) {
             var lastName = presentedSheets.removeLastOrNull()
             if (lastName == fragmentTag) lastName = presentedSheets.lastOrNull()
@@ -118,17 +193,22 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
             lastName = presentedSheets.lastOrNull()
           }
           lastName?.let { findSheet(it)?.expand() }
-          println("👀 Dismiss ${presentedSheets.size}")
         }
       }
       getCurrentActivity()?.supportFragmentManager?.let {
         fragment.safeShow(it, fragmentTag)
         if (stacked) {
-          println("👀 Show ${presentedSheets.size} name: $fragmentTag")
           if (presentedSheets.contains(fragmentTag)) return
           presentedSheets.add(fragmentTag)
         }
+        // Sync Fabric shadow tree with our Yoga-position once Dialog is laid out —
+        // ensures Pressability's measure() returns coords matching the Dialog
+        // JSTouchDispatcher's touch coords (which are mHostView-local).
+        post { pushContentOriginOffset() }
       }
+    } else {
+      // Sheet already showing; reapply offset in case window position changed.
+      post { pushContentOriginOffset() }
     }
   }
 
@@ -141,16 +221,8 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   }
 
   override fun addView(child: View, index: Int) {
-    println("🥲 addView parentId: $id id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     mHostView.addView(child, index)
-//    val ctx = context as ReactContext? ?: return
-//    val module = UIManagerHelper.getUIManager(ctx, UIManagerType.DEFAULT) as? UIManagerModule ?: return
-//    ctx.runOnNativeModulesQueueThread {
-//      val resolveShadowNode = module?.uiImplementation?.resolveShadowNode(child.id) ?: return@runOnNativeModulesQueueThread
-//      val height = resolveShadowNode.layoutHeight
-//      if (height > 0) mHostView.setVirtualHeight(height)
-//    }
   }
 
   override fun getChildCount(): Int = mHostView.childCount
@@ -158,39 +230,34 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   override fun getChildAt(index: Int): View? = mHostView.getChildAt(index)
 
   override fun removeView(child: View) {
-    println("🥲 removeView id: ${child.id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
 
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    println("🥲 onDetachedFromWindow: $id")
-  }
-
   override fun removeViewAt(index: Int) {
-    println("🥲 removeViewAt: $index id: ${mHostView.getChildAt(index).id}")
     UiThreadUtil.assertOnUiThread()
     dismiss()
   }
 
   private fun onDropInstance() {
-    println("🥲 onDropInstance")
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()
   }
 
   fun dismiss() {
-    println("🥲 dismiss")
     UiThreadUtil.assertOnUiThread()
+    if (useInlinePresentation) {
+      inlinePresenter.dismiss()
+      return
+    }
     this.sheet?.dismissAllowingStateLoss()
   }
+
   override fun addChildrenForAccessibility(outChildren: ArrayList<View?>?) {}
 
   override fun dispatchPopulateAccessibilityEvent(event: AccessibilityEvent?) = false
   override fun onHostResume() { showOrUpdate() }
   override fun onHostPause() {}
-
   override fun onHostDestroy() { onDropInstance() }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
