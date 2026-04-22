@@ -28,7 +28,14 @@ interface NativeProps extends ViewProps {
   onSheetDismiss: DirectEventHandler<null>;
 }
 
-export default codegenNativeComponent<NativeProps>('SheetView');
+// `interfaceOnly: true` tells codegen NOT to emit a default
+// `SheetViewShadowNode` typedef / ComponentDescriptor. The library provides
+// those itself in `android/src/main/cpp/` so that the custom shadow node can
+// override `getContentOriginOffset` (needed to keep Pressability coords in
+// sync when the Android host view is re-parented for inline presentation).
+export default codegenNativeComponent<NativeProps>('SheetView', {
+  interfaceOnly: true,
+});
 
 type MyNativeViewType = HostComponent<NativeProps>;
 export interface NativeCommands {

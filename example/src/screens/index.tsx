@@ -17,8 +17,14 @@ import { GlobalSimpleUsage } from './modal/GlobalSimpleUsage';
 import { DataPassingUsage } from './modal/DataPassingUsage';
 import { InvertedListExample } from './modal/InvertedListExample';
 import E2ETestScreen from './modal/E2ETestScreen';
+import { FullScreenModalOverSheetExample } from './modal/FullScreenModalOverSheetExample';
 
 export const screens = [
+  {
+    name: 'FullScreenModalOverSheet',
+    slug: 'Modal/FullScreenModalOverSheet',
+    getScreen: () => FullScreenModalOverSheetExample,
+  },
   {
     name: 'E2E Test',
     slug: 'Modal/E2ETest',

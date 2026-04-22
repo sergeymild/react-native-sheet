@@ -14,7 +14,9 @@ module.exports = {
         // Codegen script incorrectly fails without this
         // So we explicitly specify the platforms with empty object
         ios: {},
-        android: {},
+        // NB: android platform intentionally omitted — defer to the library's
+        // own `react-native.config.js` which declares `componentDescriptors`
+        // and `cmakeListsPath` for the Fabric ShadowNode override.
       },
     },
   },

@@ -6,6 +6,8 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.PixelUtil.dpToPx
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.ReactStylesDiffMap
+import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
@@ -88,7 +90,7 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
   }
 
   override fun setUseInlinePresentation(view: Sheet2View, value: Boolean) {
-    // iOS only
+    view.useInlinePresentation = value
   }
 
   override fun setCalculatedHeight(view: Sheet2View, value: Double) {
@@ -100,6 +102,15 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
     super.onAfterUpdateTransaction(view)
     println("==========onAfterUpdateTransaction")
     view.showOrUpdate()
+  }
+
+  override fun updateState(
+    view: Sheet2View,
+    props: ReactStylesDiffMap?,
+    stateWrapper: StateWrapper?
+  ): Any? {
+    view.fabricStateWrapper = stateWrapper
+    return super.updateState(view, props, stateWrapper)
   }
 
   protected override fun addEventEmitters(

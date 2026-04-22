@@ -41,7 +41,17 @@ export default function App() {
           <Stack.Navigator>
             <Stack.Screen name={'Buttons'} component={Buttons} />
             {screens.map((s) => (
-              <Stack.Screen {...s} component={s.getScreen()} key={s.slug} />
+              <Stack.Screen
+                component={s.getScreen()}
+                key={s.slug}
+                {...s}
+                options={{
+                  presentation:
+                    s.name === 'FullScreenModalOverSheet'
+                      ? 'fullScreenModal'
+                      : 'card',
+                }}
+              />
             ))}
           </Stack.Navigator>
         </NavigationContainer>
