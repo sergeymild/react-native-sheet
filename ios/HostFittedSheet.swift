@@ -16,6 +16,7 @@ public final class HostFittedSheet: UIView {
   private(set) var _modalViewController: SheetViewController?
   private let viewController = UIViewController()
   private var _touchHandler: RCTSurfaceTouchHandler?
+  private weak var _touchHandlerAttachedView: UIView?
   @objc
   public var onSheetDismiss: (() -> Void)?
   private var _reactSubview: UIView?
@@ -30,6 +31,13 @@ public final class HostFittedSheet: UIView {
   private var _useInlinePresentation = false
   @objc
   public var uniqueId: String = ""
+
+  // Wired by SheetView.mm to push a contentOriginOffset through Fabric state.
+  // Used only in inline containment — in dialog mode the sheet lives in its
+  // own UIWindow so the Yoga-computed position already matches the physical
+  // one and no delta is needed.
+  @objc
+  public var stateUpdater: ((Float, Float) -> Void)?
 
   private var sheetMaxWidth: CGFloat {
     return sheetMaxWidthSize ?? viewPort().width
@@ -72,7 +80,6 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func setPassScrollViewReactTag() {
-    debugPrint("\(uniqueId) HostFittedSheet.setPassScrollViewReactTag")
     tryAttachScrollView()
   }
 
@@ -84,7 +91,6 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func setFittedSheetParams(_ params: NSDictionary) {
-    debugPrint("\(uniqueId) HostFittedSheetsetFittedSheetParams", params)
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
@@ -96,7 +102,6 @@ public final class HostFittedSheet: UIView {
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
-    debugPrint("\(uniqueId) HostFittedSheet.init")
   }
 
   required init?(coder: NSCoder) {
@@ -104,29 +109,31 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeFromSuperview() {
-    debugPrint("\(uniqueId) HostFittedSheet.removeFromSuperview, _isPresented: \(_isPresented)")
     super.removeFromSuperview()
     if _isPresented {
-      debugPrint("\(uniqueId) HostFittedSheet.removeFromSuperview - calling destroy")
       destroy()
     }
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
-    debugPrint("\(uniqueId) HostFittedSheet.insertReactSubview", subview.tag as Any)
-    //super.insertReactSubview(subview, at: atIndex)
     _touchHandler = RCTSurfaceTouchHandler()
     _touchHandler?.attach(to: subview)
+    _touchHandlerAttachedView = subview
     viewController.view.insertSubview(subview, at: 0)
     _reactSubview = subview
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
-    debugPrint("\(uniqueId) HostFittedSheet.removeReactSubview", subview.tag as Any)
-    //super.removeReactSubview(subview)
-    _touchHandler?.detach(from: subview)
+    detachTouchHandler()
     _reactSubview?.removeFromSuperview()
     _reactSubview = nil
+  }
+
+  private func detachTouchHandler() {
+    if let v = _touchHandlerAttachedView {
+      _touchHandler?.detach(from: v)
+    }
+    _touchHandlerAttachedView = nil
   }
 
   // need to leave it empty
@@ -134,13 +141,11 @@ public final class HostFittedSheet: UIView {
 
   public override func didMoveToWindow() {
     super.didMoveToWindow()
-    //tryToPresent()
   }
 
 
   @objc
   public func finalizeUpdates() {
-    debugPrint("\(uniqueId) HostFittedSheet.finalizeUpdates _isPresented: \(_isPresented), superviewNil: \(superview == nil)")
     if _isPresented && superview == nil {
       destroy()
     } else {
@@ -151,17 +156,20 @@ public final class HostFittedSheet: UIView {
   // MARK: calculatedSize
   @objc
   public func setCalculatedHeight(_ height: CGFloat) {
-    debugPrint("\(uniqueId) HostFittedSheet.setCalculatedHeight", height)
     // prevent show on change orientation for stack
     if let m = _modalViewController, presentedSheets.contains(m) {
       return
     }
     _sheetSize = RCTConvert.cgFloat(height)
     _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
+    // Inline-containment mode: tryToPresent early-returned while height was
+    // still 0 — now that we have a real size, try again.
+    if _useInlinePresentation && !_isPresented && (_sheetSize ?? 0) > 0 {
+      tryToPresent()
+    }
   }
 
   private func initializeSheet(_ size: CGSize) {
-    debugPrint("\(uniqueId) HostFittedSheet.initializeSheet", size)
     self._modalViewController = SheetViewController(
       controller: self.viewController,
       sizes: [.fixed(size.height)],
@@ -169,6 +177,7 @@ public final class HostFittedSheet: UIView {
         pullBarHeight: 0,
         shouldExtendBackground: false,
         shrinkPresentingViewController: false,
+        useInlineMode: _useInlinePresentation,
         maxWidth: self.sheetMaxWidth
       )
     )
@@ -182,12 +191,28 @@ public final class HostFittedSheet: UIView {
 
   private func tryAttachScrollView() {
     guard let controller = _modalViewController else { return }
-    debugPrint("\(uniqueId) HostFittedSheet.tryAttachScrollView")
     let scrollView = self._reactSubview?.find(deepIndex: 0)
     if let v = scrollView {
-      debugPrint("\(uniqueId) HostFittedSheet.tryAttachScrollView.found")
       controller.handleScrollView(v)
     }
+  }
+
+  /// Pushes the delta between this view's Yoga position (where the Fabric
+  /// shadow tree thinks the sheet content lives) and the physical
+  /// on-screen position of the RN subview after child-VC containment.
+  /// Consumed by `SheetViewShadowNode::getContentOriginOffset` so that
+  /// `measure()` / Pressability region checks report window-relative coords
+  /// matching the real touch positions. Only meaningful in inline
+  /// containment — dialog mode has matching coords and needs no offset.
+  private func pushContentOriginOffset() {
+    guard _useInlinePresentation else { return }
+    guard self.window != nil else { return }
+    guard let reactSubview = _reactSubview, reactSubview.window != nil else { return }
+    let yogaPos = self.convert(CGPoint.zero, to: nil)
+    let physicalPos = reactSubview.convert(CGPoint.zero, to: nil)
+    let offsetX = Float(physicalPos.x - yogaPos.x)
+    let offsetY = Float(physicalPos.y - yogaPos.y)
+    stateUpdater?(offsetX, offsetY)
   }
 
   private func tryToPresent() {
@@ -195,9 +220,26 @@ public final class HostFittedSheet: UIView {
       return;
     }
 
+    // Inline-containment mode needs a real height on first present: the
+    // contentVC.view height constraint is set to `_sheetSize` at init time,
+    // and changes to sheet sizes go through `setSizes` (which expects a
+    // presented sheet). If we present at height 0, contentVC.view has 0
+    // height, its hit-testable bounds are 0, and touches on RN content never
+    // reach the RN view. Wait for the JS-side onLayout to push a non-zero
+    // height first.
+    if (_useInlinePresentation && !_isPresented && (_sheetSize ?? 0) <= 0) {
+      return
+    }
+
     if (!_isPresented) {
       if _useInlinePresentation {
-        presentViewController = RCTPresentedViewController()
+        // Present on the current react-navigation Screen's VC (found via
+        // UIResponder chain), so the sheet lives inside the same nav
+        // subtree and react-native-screens `fullScreenModal` push covers
+        // the sheet naturally. `RCTPresentedViewController()` would return
+        // the app's ROOT VC — fallback only.
+        presentViewController = self.findEnclosingViewController()
+          ?? RCTPresentedViewController()
       } else {
         presentViewController = createVC()
       }
@@ -215,7 +257,6 @@ public final class HostFittedSheet: UIView {
 
       _isPresented = true
       let size: CGSize = .init(width: self.sheetMaxWidth, height: _sheetSize ?? 0)
-      debugPrint("\(uniqueId) HostFittedSheet.tryToPresent", self.presentViewController)
       RCTExecuteOnMainQueue { [weak self] in
         guard let self else { return }
 
@@ -223,13 +264,67 @@ public final class HostFittedSheet: UIView {
         guard let sheetVC = self._modalViewController,
               let hostVC = self.presentViewController else { return }
 
-        hostVC.present(sheetVC, animated: true)
+        if self._useInlinePresentation {
+          // Child-VC containment: sheet is a child of host VC, NOT a modal.
+          // This prevents react-native-screens from auto-dismissing the
+          // sheet when it pushes a new fullScreenModal (rn-screens calls
+          // dismiss on the current presentedViewController before
+          // presenting a new modal; as a child VC we don't appear as
+          // presentedViewController).
+          sheetVC.willMove(toParent: hostVC)
+          hostVC.addChild(sheetVC)
+          sheetVC.view.frame = hostVC.view.bounds
+          sheetVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+          hostVC.view.addSubview(sheetVC.view)
+          sheetVC.didMove(toParent: hostVC)
+
+          // Don't attach our own RCTSurfaceTouchHandler in inline
+          // containment: the sheet's subtree stays within the main Fabric
+          // surface (RNSScreenStackView/RNSScreen are Fabric views), so
+          // the main surface's touch handler already receives touches via
+          // UIKit hit-test and dispatches them through Fabric's normal
+          // pipeline. Keeping our own handler duplicates every touch event
+          // and breaks Pressability state after the first tap.
+          self.detachTouchHandler()
+
+          // Push the visual delta (Yoga-position → physical on-screen
+          // position) into the Fabric state so that descendants' measure()
+          // / Pressability region checks report the real window-relative
+          // coords. Without this, containment breaks taps on any button
+          // inside the sheet (same root cause as the Android fix). Run on
+          // the next layout tick so hostVC.view and self have settled
+          // window positions.
+          DispatchQueue.main.async { [weak self] in
+            self?.pushContentOriginOffset()
+          }
+
+          // Slide-in animation — UIKit's modal transition isn't used in
+          // containment, so do it manually (mirror of animateOut: translate
+          // content down, fade overlay, then animate back to resting).
+          sheetVC.view.layoutIfNeeded()
+          let contentView = sheetVC.contentViewController.view!
+          let startY = max(contentView.bounds.height, 1)
+          contentView.transform = CGAffineTransform(translationX: 0, y: startY)
+          sheetVC.overlayView.alpha = 0
+          UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            usingSpringWithDamping: 1,
+            initialSpringVelocity: 0,
+            options: [.curveEaseOut],
+            animations: {
+              contentView.transform = .identity
+              sheetVC.overlayView.alpha = 1
+            },
+            completion: nil
+          )
+        } else {
+          hostVC.present(sheetVC, animated: true)
+        }
         sheetVC.didDismiss = { [weak self] old, silent in
           guard let self else { return }
-          debugPrint("\(uniqueId) HostFittedSheet._modalViewController.didDismiss")
           onSheetDismiss?()
           if old.dismissAll == true {
-            debugPrint("\(uniqueId) HostFittedSheet._modalViewController.dismissingSilently")
             if stacked, let popped = presentedSheets.popLast() {
               popped.dismissAll = true
               popped.dismiss(animated: false)
@@ -253,15 +348,18 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func dismiss() {
-    _modalViewController?.dismiss(animated: true)
+    if _useInlinePresentation {
+      // attemptDismiss handles both inline (removeFromSuperview +
+      // removeFromParent) and modal paths internally.
+      _modalViewController?.attemptDismiss(animated: true)
+    } else {
+      _modalViewController?.dismiss(animated: true)
+    }
   }
 
   @objc
   public func destroy() {
-    debugPrint("\(uniqueId) HostFittedSheet.destroy - _isPresented: \(_isPresented), modalVC: \(_modalViewController != nil)")
-
     if !_isPresented && _modalViewController == nil {
-      debugPrint("\(uniqueId) HostFittedSheet.destroy - already destroyed, skipping")
       return
     }
 
@@ -269,7 +367,6 @@ public final class HostFittedSheet: UIView {
 
     // Remove from global array if present
     if let modalVC = _modalViewController, let index = presentedSheets.firstIndex(of: modalVC) {
-      debugPrint("\(uniqueId) HostFittedSheet.destroy - removing from presentedSheets at index \(index)")
       presentedSheets.remove(at: index)
       if lastPresentedSheetSizes.count > index {
         lastPresentedSheetSizes.remove(at: index)
@@ -278,10 +375,8 @@ public final class HostFittedSheet: UIView {
 
     let cleanup = { [weak self] in
       guard let self else {
-        debugPrint("HostFittedSheet.cleanup - self is nil (already deallocated)")
         return
       }
-      debugPrint("\(self.uniqueId) HostFittedSheet.cleanup - starting")
 
       // Clear dismiss callback first to prevent retain cycles
       self._modalViewController?.didDismiss = nil
@@ -289,9 +384,7 @@ public final class HostFittedSheet: UIView {
 
       // Remove view hierarchy
       self._reactSubview?.removeFromSuperview()
-      if let v = self._reactSubview {
-        self._touchHandler?.detach(from: v)
-      }
+      self.detachTouchHandler()
       self.viewController.view.removeFromSuperview()
       self.viewController.removeFromParent()
 
@@ -314,22 +407,22 @@ public final class HostFittedSheet: UIView {
       self.sheetMaxWidthSize = nil
       self._reactSubview = nil
       self._alertWindow = nil
-
-      debugPrint("\(self.uniqueId) HostFittedSheet.cleanup - completed")
     }
 
     if let modalVC = self._modalViewController, modalVC.isBeingDismissed != true && modalVC.isBeingPresented != true {
-      debugPrint("\(uniqueId) HostFittedSheet.destroy - dismissing with animation")
-      modalVC.dismiss(animated: true, completion: cleanup)
+      if _useInlinePresentation {
+        // Containment path — no modal presenter, run animateOut then cleanup.
+        modalVC.attemptDismiss(animated: true)
+        cleanup()
+      } else {
+        modalVC.dismiss(animated: true, completion: cleanup)
+      }
     } else {
-      debugPrint("\(uniqueId) HostFittedSheet.destroy - calling cleanup directly")
       cleanup()
     }
   }
 
-  deinit {
-    debugPrint("\(uniqueId) HostFittedSheet.HostFittedSheet.deinit")
-  }
+  deinit {}
 
 }
 
@@ -349,5 +442,18 @@ extension UIView {
     return nil
   }
 
+  /// Walks the UIResponder chain to find the nearest enclosing
+  /// `UIViewController` (standard RN pattern — see
+  /// `node_modules/react-native/React/Views/UIView+React.m`).
+  /// Used for inline sheet presentation so the sheet is attached to the
+  /// current react-navigation Screen's VC (not app root), allowing
+  /// react-native-screens `fullScreenModal` to cover the sheet.
+  fileprivate func findEnclosingViewController() -> UIViewController? {
+    var responder: UIResponder? = self.next
+    while let r = responder {
+      if let vc = r as? UIViewController { return vc }
+      responder = r.next
+    }
+    return nil
+  }
 }
-
