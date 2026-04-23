@@ -220,8 +220,11 @@ public final class HostFittedSheet: UIView {
         guard let self else { return }
 
         self.initializeSheet(size)
-        self.presentViewController?.present(self._modalViewController!, animated: true)
-        self._modalViewController?.didDismiss = { [weak self] old, silent in
+        guard let sheetVC = self._modalViewController,
+              let hostVC = self.presentViewController else { return }
+
+        hostVC.present(sheetVC, animated: true)
+        sheetVC.didDismiss = { [weak self] old, silent in
           guard let self else { return }
           debugPrint("\(uniqueId) HostFittedSheet._modalViewController.didDismiss")
           onSheetDismiss?()
@@ -345,5 +348,6 @@ extension UIView {
 
     return nil
   }
+
 }
 

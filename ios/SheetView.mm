@@ -1,5 +1,5 @@
 #import "SheetView.h"
-#import <react/renderer/components/SheetViewSpec/ComponentDescriptors.h>
+#import "SheetViewComponentDescriptor.h"
 #import <react/renderer/components/SheetViewSpec/EventEmitters.h>
 #import <react/renderer/components/SheetViewSpec/Props.h>
 #import <react/renderer/components/SheetViewSpec/RCTComponentViewHelpers.h>
@@ -15,6 +15,12 @@
 #endif
 
 using namespace facebook::react;
+
+// Definition for the `extern` declared in `SheetViewComponentDescriptor.h` —
+// required because codegen no longer emits it when `interfaceOnly: true`.
+namespace facebook::react {
+const char SheetViewComponentName[] = "SheetView";
+} // namespace facebook::react
 
 @interface SheetView () <RCTSheetViewViewProtocol>
 
