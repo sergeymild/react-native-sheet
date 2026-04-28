@@ -343,6 +343,17 @@ public class SheetViewController: UIViewController {
             self.firstPanPoint = point
             self.prePanHeight = self.contentViewController.view.bounds.height
             self.isPanning = true
+            if self.options.useInlineMode {
+                // Inline containment: the sheet lives inside the host
+                // RCTSurfaceView, so the main surface's RCTSurfaceTouchHandler
+                // (a UIGestureRecognizer on an ancestor) is tracking the same
+                // touch in parallel. `cancelsTouchesInView` only cancels
+                // delivery to UIViews — sibling gesture recognizers continue
+                // tracking and would emit a press on touchesEnded. Bounce
+                // their `isEnabled` to force-cancel and dispatch a touchCancel
+                // to JS so a swipe-to-dismiss isn't mistaken for a tap.
+                self.cancelAncestorRNTouchHandlers()
+            }
         }
 
         let minHeight: CGFloat = self.height(for: self.orderedSizes.first)
@@ -469,6 +480,21 @@ public class SheetViewController: UIViewController {
                 break
             @unknown default:
                 break // Do nothing
+        }
+    }
+
+    private func cancelAncestorRNTouchHandlers() {
+        var v: UIView? = self.view.superview
+        while let view = v {
+            if let recognizers = view.gestureRecognizers {
+                for r in recognizers where r is RCTSurfaceTouchHandler {
+                    if r.isEnabled {
+                        r.isEnabled = false
+                        r.isEnabled = true
+                    }
+                }
+            }
+            v = view.superview
         }
     }
 

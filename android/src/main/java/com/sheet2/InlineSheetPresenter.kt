@@ -2,13 +2,16 @@ package com.sheet2
 
 import android.animation.ValueAnimator
 import android.graphics.Color
+import android.os.SystemClock
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.behavior.BottomSheetBehavior
+import com.facebook.react.uimanager.RootView
 
 /**
  * Presents the sheet inline — as a child of the current react-native-screens
@@ -87,7 +90,14 @@ internal class InlineSheetPresenter(
       setState(BottomSheetBehavior.STATE_HIDDEN)
       addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-          if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+          if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+            // BottomSheetBehavior took over the gesture natively. In inline
+            // mode JS touches are dispatched by the ancestor ReactRootView's
+            // JSTouchDispatcher, which doesn't see the native intercept and
+            // would still fire a press on ACTION_UP. Notify it to cancel the
+            // active responder so a swipe-to-dismiss isn't mistaken for a tap.
+            cancelAncestorJsTouches(bottomSheet)
+          } else if (newState == BottomSheetBehavior.STATE_HIDDEN) {
             dismiss(animated = false, invokeCallback = true)
           } else if (newState == BottomSheetBehavior.STATE_EXPANDED ||
             newState == BottomSheetBehavior.STATE_COLLAPSED ||
@@ -170,6 +180,23 @@ internal class InlineSheetPresenter(
       current = current.parent
     }
     return lastGroup
+  }
+
+  private fun cancelAncestorJsTouches(child: View) {
+    var p: ViewParent? = child.parent
+    while (p != null) {
+      if (p is RootView) {
+        val now = SystemClock.uptimeMillis()
+        val ev = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, 0f, 0f, 0)
+        try {
+          (p as RootView).onChildStartedNativeGesture(child, ev)
+        } finally {
+          ev.recycle()
+        }
+        return
+      }
+      p = p.parent
+    }
   }
 
   private fun animateScrim(target: View, fromAlpha: Float, toAlpha: Float) {

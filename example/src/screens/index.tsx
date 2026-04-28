@@ -18,8 +18,14 @@ import { DataPassingUsage } from './modal/DataPassingUsage';
 import { InvertedListExample } from './modal/InvertedListExample';
 import E2ETestScreen from './modal/E2ETestScreen';
 import { FullScreenModalOverSheetExample } from './modal/FullScreenModalOverSheetExample';
+import { BigRedTouchExample } from './modal/BigRedTouchExample';
 
 export const screens = [
+  {
+    name: 'BigRedTouch',
+    slug: 'Modal/BigRedTouch',
+    getScreen: () => BigRedTouchExample,
+  },
   {
     name: 'FullScreenModalOverSheet',
     slug: 'Modal/FullScreenModalOverSheet',
