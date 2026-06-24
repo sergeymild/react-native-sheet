@@ -5,15 +5,19 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.FrameLayout
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.lang.ref.WeakReference
 
 class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
 
   private var modalView: ViewGroup? = null
+  private var overlayHost: ViewGroup? = null
+  private var overlayView: View? = null
   private var dismissable: Boolean = true
   private var isSystemUILight: Boolean = false
   private var onDismiss: ((dismissAll: Boolean) -> Unit)? = null
@@ -64,6 +68,53 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
     return dialog
   }
 
+  override fun onStart() {
+    super.onStart()
+    attachOverlayView()
+  }
+
+  fun setOverlayView(view: View?) {
+    if (overlayView == view) return
+    detachOverlayView()
+    overlayView = view
+    attachOverlayView()
+  }
+
+  private fun attachOverlayView() {
+    val view = overlayView ?: return
+    val decorView = dialog?.window?.decorView as? ViewGroup ?: return
+    detachOverlayHost()
+    (view.parent as? ViewGroup)?.removeView(view)
+
+    val host = DialogPassThroughFrameLayout(decorView.context).apply {
+      layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.MATCH_PARENT
+      )
+      isClickable = false
+      isFocusable = false
+    }
+
+    view.layoutParams = FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.MATCH_PARENT,
+      FrameLayout.LayoutParams.MATCH_PARENT
+    )
+    host.addView(view)
+    decorView.addView(host)
+    host.bringToFront()
+    overlayHost = host
+  }
+
+  private fun detachOverlayHost() {
+    (overlayHost?.parent as? ViewGroup)?.removeView(overlayHost)
+    overlayHost = null
+  }
+
+  private fun detachOverlayView() {
+    detachOverlayHost()
+    (overlayView?.parent as? ViewGroup)?.removeView(overlayView)
+  }
+
   fun setNewNestedScrollView(view: View) {
     (dialog as CustomBottomSheetDialog).setNewNestedScrollView(view)
   }
@@ -78,8 +129,16 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
 
   override fun onDismiss(dialog: DialogInterface) {
     super.onDismiss(dialog)
+    detachOverlayView()
+    overlayView = null
     presentedWindow?.clear()
     presentedWindow = null
     onDismiss?.invoke(dismissAll)
   }
+}
+
+private class DialogPassThroughFrameLayout(context: android.content.Context) : FrameLayout(context) {
+  override fun dispatchTouchEvent(ev: MotionEvent): Boolean = false
+  override fun onInterceptTouchEvent(ev: MotionEvent): Boolean = false
+  override fun onTouchEvent(event: MotionEvent): Boolean = false
 }

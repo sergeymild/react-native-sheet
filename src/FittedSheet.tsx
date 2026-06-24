@@ -48,6 +48,7 @@ export interface SheetProps {
   params?: FittedSheetParams;
   onSheetDismiss?: (passThroughParam?: any) => void;
   children?: FittedSheetChildren;
+  overlay?: React.ReactNode;
   rootViewStyle?: StyleProp<Omit<ViewStyle, 'flex' | 'flexGrow' | 'position'>>;
 }
 
@@ -239,6 +240,7 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
             typeof this.props.children !== 'function' &&
             this.props.children}
         </View>
+        {this.props.overlay}
       </_FittedSheet>
     );
   }

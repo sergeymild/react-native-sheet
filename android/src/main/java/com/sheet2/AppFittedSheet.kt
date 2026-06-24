@@ -39,6 +39,8 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
   private var stacked = true
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
+  private var inlineOverlayView: View? = null
+  private var dialogOverlayView: View? = null
 
   var dismissable = true
     set(value) {
@@ -197,6 +199,7 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       }
       getCurrentActivity()?.supportFragmentManager?.let {
         fragment.safeShow(it, fragmentTag)
+        fragment.setOverlayView(dialogOverlayView)
         if (stacked) {
           if (presentedSheets.contains(fragmentTag)) return
           presentedSheets.add(fragmentTag)
@@ -222,20 +225,58 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun addView(child: View, index: Int) {
     UiThreadUtil.assertOnUiThread()
+    if (useInlinePresentation && index > 0) {
+      inlineOverlayView = child
+      inlinePresenter.setOverlayView(child)
+      return
+    }
+    if (!useInlinePresentation && index > 0) {
+      dialogOverlayView = child
+      sheet?.setOverlayView(child)
+      return
+    }
     mHostView.addView(child, index)
   }
 
-  override fun getChildCount(): Int = mHostView.childCount
+  override fun getChildCount(): Int =
+    mHostView.childCount +
+      (if (inlineOverlayView != null) 1 else 0) +
+      (if (dialogOverlayView != null) 1 else 0)
 
-  override fun getChildAt(index: Int): View? = mHostView.getChildAt(index)
+  override fun getChildAt(index: Int): View? {
+    if (index < mHostView.childCount) return mHostView.getChildAt(index)
+    val overlayIndex = index - mHostView.childCount
+    if (inlineOverlayView != null && overlayIndex == 0) return inlineOverlayView
+    return dialogOverlayView
+  }
 
   override fun removeView(child: View) {
     UiThreadUtil.assertOnUiThread()
+    if (child == inlineOverlayView) {
+      inlineOverlayView = null
+      inlinePresenter.setOverlayView(null)
+      return
+    }
+    if (child == dialogOverlayView) {
+      dialogOverlayView = null
+      sheet?.setOverlayView(null)
+      return
+    }
     dismiss()
   }
 
   override fun removeViewAt(index: Int) {
     UiThreadUtil.assertOnUiThread()
+    if (useInlinePresentation && index >= mHostView.childCount && inlineOverlayView != null) {
+      inlineOverlayView = null
+      inlinePresenter.setOverlayView(null)
+      return
+    }
+    if (!useInlinePresentation && index >= mHostView.childCount && dialogOverlayView != null) {
+      dialogOverlayView = null
+      sheet?.setOverlayView(null)
+      return
+    }
     dismiss()
   }
 
