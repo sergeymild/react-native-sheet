@@ -110,6 +110,10 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     InlineSheetPresenter(this, mHostView)
   }
 
+  init {
+    mHostView.onSheetLayoutChanged = { pushContentOriginOffset() }
+  }
+
   var maxWidth: Float = 0F
     set(value) {
       field = value

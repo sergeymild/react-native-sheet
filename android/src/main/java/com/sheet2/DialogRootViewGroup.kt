@@ -12,6 +12,7 @@ import kotlin.math.min
 
 class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   private var reactView: View? = null
+  var onSheetLayoutChanged: (() -> Unit)? = null
 
   var sheetMaxHeightSize = Float.MAX_VALUE
   var sheetMaxWidthSize = Float.MAX_VALUE
@@ -56,6 +57,10 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     }
   }
 
+  private fun notifySheetLayoutChanged() {
+    post { onSheetLayoutChanged?.invoke() }
+  }
+
   fun setVirtualHeight(h: Float) {
     if (reactView == null) return
     this.sheetMaxHeightSize = h
@@ -68,6 +73,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
     layoutParams?.width = newWidth
     layout()
+    notifySheetLayoutChanged()
   }
 
   fun updateMaxWidth(value: Float) {
@@ -76,6 +82,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
     layoutParams?.width = newWidth
     layout()
+    notifySheetLayoutChanged()
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
@@ -96,7 +103,9 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     super.removeViewAt(index)
   }
 
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    notifySheetLayoutChanged()
+  }
 
   private fun releaseReactView() {
     sheetMaxHeightSize = Float.MAX_VALUE
