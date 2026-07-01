@@ -55,6 +55,20 @@ export const MultipleExample = () => {
           <Text style={{ color: 'red' }}>{value}</Text>
         </View>
       </FittedSheet>
+
+      <FittedSheet name={'third'} params={{ backgroundColor: 'purple' }}>
+        <View style={styles.contentContainerStyle}>
+          <View style={{ height: 200, backgroundColor: 'orange' }} />
+          <Button
+            label="dismiss 3"
+            onPress={() => {
+              setValue('from sheet 3');
+              dismissFittedSheet('third');
+            }}
+          />
+          <Text style={{ color: 'red' }}>{value}</Text>
+        </View>
+      </FittedSheet>
     </View>
   );
 };
