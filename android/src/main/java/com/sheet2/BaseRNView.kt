@@ -75,10 +75,7 @@ open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
 
   override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
     if (!inlineMode) {
-      eventDispatcher?.let { eventDispatcher ->
-        jSTouchDispatcher.handleTouchEvent(event, eventDispatcher, reactContext)
-        jSPointerDispatcher?.handleMotionEvent(event, eventDispatcher, true)
-      }
+      dispatchTouchEventToJs(event, isCapture = true)
     }
     return super.onInterceptTouchEvent(event)
   }
@@ -90,10 +87,7 @@ open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
       // touch events or eat the event; let normal target finding run.
       return super.onTouchEvent(event)
     }
-    eventDispatcher?.let { eventDispatcher ->
-      jSTouchDispatcher.handleTouchEvent(event, eventDispatcher, reactContext)
-      jSPointerDispatcher?.handleMotionEvent(event, eventDispatcher, false)
-    }
+    dispatchTouchEventToJs(event, isCapture = false)
     super.onTouchEvent(event)
     // In case when there is no children interested in handling touch event, we return true from
     // the root view in order to receive subsequent events related to that gesture
@@ -123,5 +117,12 @@ open class BaseRNView(context: Context?) : ReactViewGroup(context), RootView {
     }
     // No-op - override in order to still receive events to onInterceptTouchEvent
     // even when some other view disallow that
+  }
+
+  private fun dispatchTouchEventToJs(event: MotionEvent, isCapture: Boolean) {
+    eventDispatcher?.let { eventDispatcher ->
+      jSTouchDispatcher.handleTouchEvent(event, eventDispatcher, reactContext)
+      jSPointerDispatcher?.handleMotionEvent(event, eventDispatcher, isCapture)
+    }
   }
 }

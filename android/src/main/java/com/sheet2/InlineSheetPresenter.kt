@@ -32,6 +32,8 @@ internal class InlineSheetPresenter(
 ) {
 
   private var overlay: FrameLayout? = null
+  private var overlayHost: FrameLayout? = null
+  private var overlayView: View? = null
   private var behavior: BottomSheetBehavior<FrameLayout>? = null
   private var scrimAnimator: ValueAnimator? = null
   private var onDismiss: (() -> Unit)? = null
@@ -145,6 +147,7 @@ internal class InlineSheetPresenter(
     scrimAnimator?.cancel()
     scrimAnimator = null
     this.behavior = null
+    this.overlayHost = null
     overlay = null
     (layout.parent as? ViewGroup)?.removeView(layout)
     (hostView.parent as? ViewGroup)?.removeView(hostView)
@@ -154,6 +157,24 @@ internal class InlineSheetPresenter(
 
   fun setDismissable(dismissable: Boolean) {
     behavior?.setDraggable(dismissable)
+  }
+
+  fun setOverlayView(view: View?) {
+    if (overlayView == view) return
+    (overlayView?.parent as? ViewGroup)?.removeView(overlayView)
+    overlayView = view
+    attachOverlayView()
+  }
+
+  private fun attachOverlayView() {
+    val host = overlayHost ?: return
+    val view = overlayView ?: return
+    (view.parent as? ViewGroup)?.removeView(view)
+    view.layoutParams = FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.MATCH_PARENT,
+      FrameLayout.LayoutParams.MATCH_PARENT,
+    )
+    host.addView(view)
   }
 
   /**

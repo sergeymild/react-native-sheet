@@ -20,6 +20,7 @@ public final class HostFittedSheet: UIView {
   @objc
   public var onSheetDismiss: (() -> Void)?
   private var _reactSubview: UIView?
+  private var _overlaySubview: UIView?
   private var _isPresented = false
   private var _sheetSize: CGFloat?
   public var sheetMaxWidthSize: CGFloat?
@@ -76,6 +77,10 @@ public final class HostFittedSheet: UIView {
   @objc
   public func setUseInlinePresentation(_ value: Bool) {
     _useInlinePresentation = value
+    // Re-place the overlay for the current mode. Safe to call in either mode:
+    // attachOverlaySubview no-ops until both the overlay subview and the
+    // sheet VC's view exist (the sheet isn't initialized yet at this point).
+    attachOverlaySubview()
   }
 
   @objc
@@ -116,6 +121,13 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    if atIndex > 0 {
+      _overlaySubview = subview
+      subview.isUserInteractionEnabled = false
+      attachOverlaySubview()
+      return
+    }
+
     _touchHandler = RCTSurfaceTouchHandler()
     _touchHandler?.attach(to: subview)
     _touchHandlerAttachedView = subview
@@ -124,9 +136,32 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
+    if let overlaySubview = _overlaySubview, subview === overlaySubview {
+      _overlaySubview?.removeFromSuperview()
+      _overlaySubview = nil
+      return
+    }
+
     detachTouchHandler()
     _reactSubview?.removeFromSuperview()
     _reactSubview = nil
+  }
+
+  private func attachOverlaySubview() {
+    // Works in both inline containment and modal presentation: in both cases
+    // the sheet's root view is `_modalViewController?.view`, so the visual,
+    // non-interactive overlay is placed on top of it the same way.
+    guard let overlaySubview = _overlaySubview,
+          let sheetView = _modalViewController?.view else { return }
+
+    overlaySubview.removeFromSuperview()
+    overlaySubview.frame = sheetView.bounds
+    overlaySubview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    overlaySubview.isUserInteractionEnabled = false
+    sheetView.addSubview(overlaySubview)
+    sheetView.bringSubviewToFront(overlaySubview)
+    overlaySubview.setNeedsLayout()
+    overlaySubview.layoutIfNeeded()
   }
 
   private func detachTouchHandler() {
@@ -277,6 +312,9 @@ public final class HostFittedSheet: UIView {
           sheetVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
           hostVC.view.addSubview(sheetVC.view)
           sheetVC.didMove(toParent: hostVC)
+          self.attachOverlaySubview()
+          sheetVC.view.setNeedsLayout()
+          sheetVC.view.layoutIfNeeded()
 
           // Don't attach our own RCTSurfaceTouchHandler in inline
           // containment: the sheet's subtree stays within the main Fabric
@@ -319,7 +357,11 @@ public final class HostFittedSheet: UIView {
             completion: nil
           )
         } else {
-          hostVC.present(sheetVC, animated: true)
+          hostVC.present(sheetVC, animated: true) { [weak self] in
+            // Modal presentation: attach the overlay once the sheet VC's view
+            // is on screen (mirrors the inline-containment attach above).
+            self?.attachOverlaySubview()
+          }
         }
         sheetVC.didDismiss = { [weak self] old, silent in
           guard let self else { return }
@@ -383,6 +425,7 @@ public final class HostFittedSheet: UIView {
       self.onSheetDismiss = nil
 
       // Remove view hierarchy
+      self._overlaySubview?.removeFromSuperview()
       self._reactSubview?.removeFromSuperview()
       self.detachTouchHandler()
       self.viewController.view.removeFromSuperview()
@@ -405,6 +448,7 @@ public final class HostFittedSheet: UIView {
       self._touchHandler = nil
       self._sheetSize = nil
       self.sheetMaxWidthSize = nil
+      self._overlaySubview = nil
       self._reactSubview = nil
       self._alertWindow = nil
     }
