@@ -77,11 +77,10 @@ public final class HostFittedSheet: UIView {
   @objc
   public func setUseInlinePresentation(_ value: Bool) {
     _useInlinePresentation = value
-    if value {
-      attachOverlaySubview()
-    } else {
-      _overlaySubview?.removeFromSuperview()
-    }
+    // Re-place the overlay for the current mode. Safe to call in either mode:
+    // attachOverlaySubview no-ops until both the overlay subview and the
+    // sheet VC's view exist (the sheet isn't initialized yet at this point).
+    attachOverlaySubview()
   }
 
   @objc
@@ -149,7 +148,9 @@ public final class HostFittedSheet: UIView {
   }
 
   private func attachOverlaySubview() {
-    guard _useInlinePresentation else { return }
+    // Works in both inline containment and modal presentation: in both cases
+    // the sheet's root view is `_modalViewController?.view`, so the visual,
+    // non-interactive overlay is placed on top of it the same way.
     guard let overlaySubview = _overlaySubview,
           let sheetView = _modalViewController?.view else { return }
 
@@ -356,7 +357,11 @@ public final class HostFittedSheet: UIView {
             completion: nil
           )
         } else {
-          hostVC.present(sheetVC, animated: true)
+          hostVC.present(sheetVC, animated: true) { [weak self] in
+            // Modal presentation: attach the overlay once the sheet VC's view
+            // is on screen (mirrors the inline-containment attach above).
+            self?.attachOverlaySubview()
+          }
         }
         sheetVC.didDismiss = { [weak self] old, silent in
           guard let self else { return }

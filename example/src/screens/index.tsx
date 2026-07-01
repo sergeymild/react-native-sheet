@@ -19,8 +19,14 @@ import { InvertedListExample } from './modal/InvertedListExample';
 import E2ETestScreen from './modal/E2ETestScreen';
 import { FullScreenModalOverSheetExample } from './modal/FullScreenModalOverSheetExample';
 import { BigRedTouchExample } from './modal/BigRedTouchExample';
+import { OverlayExample } from './modal/OverlayExample';
 
 export const screens = [
+  {
+    name: 'Overlay',
+    slug: 'Modal/Overlay',
+    getScreen: () => OverlayExample,
+  },
   {
     name: 'BigRedTouch',
     slug: 'Modal/BigRedTouch',
