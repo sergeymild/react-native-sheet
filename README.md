@@ -507,6 +507,8 @@ export const MultipleExample = () => {
 | `topLeftRightCornerRadius` | `number` | `20` | Radius for top corners |
 | `backgroundColor` | `string` | `'white'` | Background color of sheet |
 | `isSystemUILight` | `boolean` | `undefined` | Android only - status bar styling |
+| `presentationStyle` | `'bottom' \| 'center'` | `'bottom'` | `'center'` shows the sheet as a dialog card in the vertical center with a full-screen dim; dismiss by swiping down or tapping the dim. Ignores `useInlinePresentation`. |
+| `centerAnimation` | `'fade' \| 'slide'` | `'fade'` | Enter animation for `presentationStyle: 'center'`. `'fade'` = fade + scale in; `'slide'` = slide up into center. |
 
 ### FittedSheetRef Methods
 
@@ -658,6 +660,32 @@ export const ScrollExample = () => {
 ```
 
 **Note:** If you need to wrap `ScrollView` in a `View` (e.g., for additional styling), make sure to add `flexGrow: 1` to the wrapper `View` style. This ensures proper height calculation for the sheet content.
+
+### Centered / Tablet Dialog
+
+Show the sheet as a centered dialog card (useful for tablets) instead of a
+bottom sheet. The whole screen dims and the card is dismissed by swiping down or
+tapping outside:
+
+```tsx
+<FittedSheet
+  ref={sheetRef}
+  params={{
+    presentationStyle: 'center',
+    centerAnimation: 'fade', // or 'slide'
+    maxPortraitWidth: 420,
+    maxLandscapeWidth: 420,
+    backgroundColor: 'white',
+    topLeftRightCornerRadius: 20,
+  }}
+>
+  <YourContent />
+</FittedSheet>
+```
+
+`presentationStyle: 'center'` always presents modally — `useInlinePresentation`
+is ignored in this mode. Your app decides when to enable it (for example, based
+on tablet detection).
 
 ## Platform-Specific Notes
 
