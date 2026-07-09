@@ -120,6 +120,9 @@ using namespace facebook::react;
 
   [_view2 setUseInlinePresentation:newViewProps.useInlinePresentation];
 
+  [_view2 setPresentationStyle:[[NSString alloc] initWithUTF8String:newViewProps.presentationStyle.c_str()]];
+  [_view2 setCenterAnimation:[[NSString alloc] initWithUTF8String:newViewProps.centerAnimation.c_str()]];
+
   if (oldViewProps.passScrollViewReactTag != newViewProps.passScrollViewReactTag) {
     [_view2 setPassScrollViewReactTag];
   }
