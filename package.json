@@ -4,7 +4,7 @@
     "example"
   ],
   "private": "true",
-  "version": "7.9.3",
+  "version": "7.10.0",
   "description": "Native implementation of Bottom sheet",
   "main": "src/index.tsx",
   "module": "src/index",
