@@ -59,6 +59,13 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     }
 
   var presentationStyle: String = "bottom"
+    set(value) {
+      field = value
+      // In centered mode the FrameLayout centers the card; disable the RN
+      // view's own translationX centering so it isn't double-shifted (right
+      // side in landscape).
+      mHostView.centeredPresentation = value == "center"
+    }
   var centerAnimation: String = "fade"
   private var centeredDialog: CenteredSheetDialog? = null
 

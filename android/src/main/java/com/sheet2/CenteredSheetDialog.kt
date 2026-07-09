@@ -80,12 +80,36 @@ class CenteredSheetDialog(
     // because a MATCH_PARENT window never reports a touch as "outside".
     dialog.setCancelable(dismissable)
     dialog.setCanceledOnTouchOutside(false)
-    dialog.setOnCancelListener { onDismiss() }
+    dialog.setOnCancelListener {
+      // Back button: suppress the window's own exit animation to avoid the
+      // flicker (also dodges the shared fade_out resource being a fade-in).
+      dialog.window?.setWindowAnimations(0)
+    }
+    // Single teardown point: fires exactly once per show/dismiss cycle for EVERY
+    // dismissal path (swipe, tap-outside, programmatic hide, back button), so the
+    // host view is always detached and JS always receives the dismiss event.
+    dialog.setOnDismissListener { onDismiss() }
   }
 
   fun show() = dialog.show()
 
   fun dismiss() {
+    if (!dialog.isShowing || dismissing) return
+    // Animate the card off the bottom (parity with a swipe / tap-outside
+    // dismiss) instead of letting the window fade out — the window exit
+    // animation flickered.
+    animateDismiss(contentView, contentView.resources.displayMetrics.heightPixels.toFloat())
+  }
+
+  /**
+   * Tears the dialog down after the custom exit animation has finished. Disables
+   * the window's own exit animation first: the slide-off + dim fade already did
+   * the visual exit, so the window transition would only flash on top of it
+   * (the shared fade_out resource is actually a fade-in).
+   */
+  private fun finishDialog() {
+    // onDismiss() is dispatched by setOnDismissListener, so just close the window.
+    dialog.window?.setWindowAnimations(0)
     if (dialog.isShowing) dialog.dismiss()
   }
 
@@ -110,8 +134,7 @@ class CenteredSheetDialog(
       }
       addListener(object : android.animation.AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: android.animation.Animator) {
-          onDismiss()
-          dialog.dismiss()
+          finishDialog()
         }
       })
       start()
@@ -225,11 +248,12 @@ class CenteredSheetDialog(
               animateSpringBack(card)
             }
           } else if (!downInsideCard && dismissable && !dismissing) {
-            // Tap on the dimmed background.
+            // Tap on the dimmed background — slide the card off the bottom (parity
+            // with iOS) instead of the flickering window exit animation.
             val moved = abs(ev.x - downX) > touchSlop || abs(ev.y - downY) > touchSlop
-            if (!moved) {
-              onDismiss()
-              dialog.dismiss()
+            val c = card
+            if (!moved && c != null) {
+              animateDismiss(c, screenHeight)
             }
           }
           dragging = false
