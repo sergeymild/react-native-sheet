@@ -44,11 +44,17 @@ jest.mock('./src/SheetViewNativeComponent', () => {
 });
 
 // Mock @gorhom/portal
-jest.mock('@gorhom/portal', () => ({
-  Portal: ({ children }) => children,
-  PortalProvider: ({ children }) => children,
-  PortalHost: ({ children }) => children,
-}));
+// `virtual: true` because @gorhom/portal is not a project dependency (nothing
+// in `src/` imports it); without it jest.mock fails to resolve the module.
+jest.mock(
+  '@gorhom/portal',
+  () => ({
+    Portal: ({ children }) => children,
+    PortalProvider: ({ children }) => children,
+    PortalHost: ({ children }) => children,
+  }),
+  { virtual: true }
+);
 
 // Suppress console logs during tests
 global.console = {

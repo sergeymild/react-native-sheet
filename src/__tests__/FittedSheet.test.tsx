@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { act, render, waitFor } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
 import { FittedSheet, SheetProvider, type FittedSheetRef } from '../index';
+import SheetViewNativeComponent from '../SheetViewNativeComponent';
 
 describe('FittedSheet', () => {
   const TestWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -219,6 +220,35 @@ describe('FittedSheet', () => {
       await waitFor(() => {
         expect(getByText('Non-dismissable Sheet')).toBeTruthy();
       });
+    });
+
+    it('forwards presentationStyle and centerAnimation to the native component', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet
+          ref={ref}
+          params={{ presentationStyle: 'center', centerAnimation: 'slide' }}
+        >
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.presentationStyle).toBe('center');
+      expect(native.props.centerAnimation).toBe('slide');
+    });
+
+    it('defaults presentationStyle to bottom and centerAnimation to fade', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet ref={ref}>
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.presentationStyle).toBe('bottom');
+      expect(native.props.centerAnimation).toBe('fade');
     });
   });
 

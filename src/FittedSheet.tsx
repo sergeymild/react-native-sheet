@@ -34,6 +34,20 @@ export interface FittedSheetParams {
    */
   useInlinePresentation?: boolean;
   /**
+   * Presentation placement.
+   * - 'bottom' (default): anchored to the bottom of the screen.
+   * - 'center': floats in the vertical center as a dialog card, the whole
+   *   screen is dimmed, dismissed by swiping down or tapping the dim.
+   * When 'center', `useInlinePresentation` is ignored (always modal).
+   */
+  presentationStyle?: 'bottom' | 'center';
+  /**
+   * Enter/exit animation for `presentationStyle: 'center'`. Ignored otherwise.
+   * - 'fade' (default): fades + scales in at the center.
+   * - 'slide': slides up from the bottom and settles at the center.
+   */
+  centerAnimation?: 'fade' | 'slide';
+  /**
    * Android only
    */
   isSystemUILight?: boolean;
@@ -217,6 +231,8 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         }
         windowLevel={this.props.params?.windowLevel}
         useInlinePresentation={this.props.params?.useInlinePresentation}
+        presentationStyle={this.props.params?.presentationStyle ?? 'bottom'}
+        centerAnimation={this.props.params?.centerAnimation ?? 'fade'}
         isSystemUILight={this.props.params?.isSystemUILight ?? true}
         calculatedHeight={nativeHeight}
         passScrollViewReactTag={this.state.passScrollViewReactTag}
