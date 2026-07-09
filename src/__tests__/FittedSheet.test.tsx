@@ -250,6 +250,19 @@ describe('FittedSheet', () => {
       expect(native.props.presentationStyle).toBe('bottom');
       expect(native.props.centerAnimation).toBe('fade');
     });
+
+    it('keeps centerAnimation at its fade default when only presentationStyle is set', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet ref={ref} params={{ presentationStyle: 'center' }}>
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.presentationStyle).toBe('center');
+      expect(native.props.centerAnimation).toBe('fade');
+    });
   });
 
   describe('Data Passing', () => {
