@@ -2,6 +2,7 @@ package com.sheet2;
 
 import android.annotation.SuppressLint;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -191,9 +192,35 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
       .findViewById(R.id.touch_outside)
       .setOnClickListener(
         view12 -> {if (cancelable && isShowing()) cancel();});
-    // Handle accessibility events
-    bottomSheet.setOnTouchListener((view1, event) -> true);
+    // The bottom sheet container spans the full width, but the card content can be
+    // narrower and horizontally centered (maxWidth / landscape). A blanket
+    // `event -> true` here swallows taps that land in the dim strips beside the
+    // card so they never reach `touch_outside`, meaning left/right taps couldn't
+    // dismiss (only taps above the sheet did). Treat a tap that lands outside the
+    // card's on-screen bounds as a tap-outside and cancel; taps on the card are
+    // consumed as before.
+    final View card = view;
+    bottomSheet.setOnTouchListener((view1, event) -> {
+      if (event.getActionMasked() == MotionEvent.ACTION_UP
+        && cancelable && isShowing() && card != null
+        && !isPointInsideCard(card, event.getRawX(), event.getRawY())) {
+        cancel();
+      }
+      return true;
+    });
     return container;
+  }
+
+  /**
+   * Whether the raw (screen) touch point falls within the card's on-screen box.
+   * Uses getLocationOnScreen so it stays correct regardless of the card's
+   * horizontal centering offset (translationX).
+   */
+  private static boolean isPointInsideCard(@NonNull View card, float rawX, float rawY) {
+    int[] loc = new int[2];
+    card.getLocationOnScreen(loc);
+    return rawX >= loc[0] && rawX <= loc[0] + card.getWidth()
+      && rawY >= loc[1] && rawY <= loc[1] + card.getHeight();
   }
 
   private static int getThemeResId(@NonNull android.content.Context context, int themeId) {

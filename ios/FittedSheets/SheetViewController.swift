@@ -282,33 +282,23 @@ public class SheetViewController: UIViewController {
         overlayTapView.backgroundColor = .clear
         overlayTapView.isUserInteractionEnabled = !self.allowGestureThroughOverlay
         self.view.addSubview(overlayTapView)
-        if self.options.centered {
-            // Centered: the whole screen (except the card, which sits in front
-            // in z-order) is a tap-to-dismiss surface — taps above AND below
-            // the card dismiss.
-            Constraints(for: overlayTapView) {
-                $0.edges(.top, .left, .right, .bottom).pinToSuperview()
-            }
-        } else {
-            Constraints(for: overlayTapView, self.contentViewController.view) {
-                $0.top.pinToSuperview()
-                $0.left.pinToSuperview()
-                $0.right.pinToSuperview()
-                $0.bottom.align(with: $1.top)
-            }
+        // The whole screen (except the card, which sits in front in z-order) is a
+        // tap-to-dismiss surface — taps above, below AND to the sides of the card
+        // dismiss. Previously the non-centered surface stopped at the card's top,
+        // so when the card was narrower than the screen (maxWidth / landscape) the
+        // dim strips beside the card had no tap handler and didn't dismiss.
+        Constraints(for: overlayTapView) {
+            $0.edges(.top, .left, .right, .bottom).pinToSuperview()
         }
 
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(overlayTapped))
         self.overlayTapGesture = tapGestureRecognizer
         overlayTapView.addGestureRecognizer(tapGestureRecognizer)
 
-        if self.options.centered {
-            // In centered mode the tap surface covers the whole screen, so it
-            // is added on top of the card (addContentView runs first). Bring
-            // the card back to front so taps on the card reach its content and
-            // only taps in the surrounding dim hit the dismiss surface.
-            self.view.bringSubviewToFront(self.contentViewController.view)
-        }
+        // The tap surface covers the whole screen and is added after the card
+        // (addContentView runs first), so bring the card back to front — taps on
+        // the card reach its content and only taps on the surrounding dim dismiss.
+        self.view.bringSubviewToFront(self.contentViewController.view)
     }
 
     @objc func overlayTapped(_ gesture: UITapGestureRecognizer) {
