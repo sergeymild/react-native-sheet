@@ -146,7 +146,7 @@ public class SheetViewController: UIViewController {
     var overflowView = UIView()
     var overlayTapGesture: UITapGestureRecognizer?
     private var contentViewHeightConstraint: NSLayoutConstraint!
-    private var contentViewWidthConstraint: NSLayoutConstraint!
+    private var contentViewWidthConstraint: NSLayoutConstraint?
 
     /// The child view controller's scroll view we are watching so we can override the pull down/up to work on the sheet when needed
     private weak var childScrollView: UIScrollView?
@@ -307,7 +307,11 @@ public class SheetViewController: UIViewController {
     }
   
   func updateMaxWidth(value: CGFloat) {
-    self.contentViewWidthConstraint.constant = value
+    // `contentViewWidthConstraint` is only created in `addContentView()` when
+    // `options.maxWidth` is non-nil (and note SheetOptions maps maxWidth == 0 -> nil).
+    // A Fabric prop update always calls this (sheetMaxWidthSize defaults to 0), so
+    // guard against the constraint being absent to avoid an unexpectedly-nil crash.
+    self.contentViewWidthConstraint?.constant = value
   }
 
     private func addContentView() {
