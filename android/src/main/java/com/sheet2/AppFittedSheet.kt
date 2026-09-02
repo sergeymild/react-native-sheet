@@ -58,6 +58,17 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       mHostView.inlineMode = value
     }
 
+  var presentationStyle: String = "bottom"
+    set(value) {
+      field = value
+      // In centered mode the FrameLayout centers the card; disable the RN
+      // view's own translationX centering so it isn't double-shifted (right
+      // side in landscape).
+      mHostView.centeredPresentation = value == "center"
+    }
+  var centerAnimation: String = "fade"
+  private var centeredDialog: CenteredSheetDialog? = null
+
   /**
    * Fabric state wrapper for this SheetView. Set by [Sheet2ViewManager.updateState].
    * Used to push `contentOriginOffset` values back to C++ so that
@@ -156,6 +167,28 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
     mHostView.setCornerRadius(topLeftRightCornerRadius)
     mHostView.setBackgroundColor(_backgroundColor)
+
+    if (presentationStyle == "center") {
+      if (centeredDialog == null || centeredDialog?.isShowing != true) {
+        // mHostView may still be attached to a previous parent; detach first.
+        (mHostView.parent as? ViewGroup)?.removeView(mHostView)
+        centeredDialog = CenteredSheetDialog(
+          context = getCurrentActivity() ?: context,
+          contentView = mHostView,
+          dismissable = dismissable,
+          slide = centerAnimation == "slide",
+        ) {
+          (mHostView.parent as? ViewGroup)?.removeView(mHostView)
+          centeredDialog = null
+          onSheetDismiss()
+        }
+        centeredDialog?.show()
+        // Sync Fabric shadow tree with our Yoga-position once the centered Dialog
+        // is laid out (same reason as the bottom-sheet Dialog path below).
+        post { pushContentOriginOffset() }
+      }
+      return
+    }
 
     if (useInlinePresentation) {
       if (!inlinePresenter.isShown) {
@@ -291,6 +324,11 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   fun dismiss() {
     UiThreadUtil.assertOnUiThread()
+    if (centeredDialog != null) {
+      centeredDialog?.dismiss()
+      centeredDialog = null
+      return
+    }
     if (useInlinePresentation) {
       inlinePresenter.dismiss()
       return

@@ -18,6 +18,25 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   var sheetMaxWidthSize = Float.MAX_VALUE
   var sheetMinHeightSize = Float.MIN_VALUE
 
+  /**
+   * When true the card is horizontally centered by its parent container (the
+   * centered Dialog's FrameLayout via Gravity.CENTER), so this view must NOT
+   * additionally offset itself through [translationX]. Applying both double-
+   * shifts the card to the right in landscape (where widthPixels >> card width).
+   * The bottom-sheet path keeps translationX centering because there the RN view
+   * sits left-aligned inside a full-width container.
+   */
+  var centeredPresentation: Boolean = false
+    set(value) {
+      field = value
+      if (value) translationX = 0f
+      layout()
+    }
+
+  private fun centeringTranslationX(newWidth: Int): Float =
+    if (centeredPresentation) 0f
+    else ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
+
   private val metrics: Resources by lazy { Resources.getSystem() }
 
   fun setCornerRadius(r: Float) {
@@ -70,7 +89,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.pxToDp()} :${newWidth.pxToDp()}")
     ensureLayoutParams()
     layoutParams?.height = newHeight
-    translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
+    translationX = centeringTranslationX(newWidth)
     layoutParams?.width = newWidth
     layout()
     notifySheetLayoutChanged()
@@ -79,7 +98,7 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   fun updateMaxWidth(value: Float) {
     sheetMaxWidthSize = value
     val newWidth = allowedWidth
-    translationX = ((metrics.displayMetrics.widthPixels - newWidth) / 2).toFloat()
+    translationX = centeringTranslationX(newWidth)
     layoutParams?.width = newWidth
     layout()
     notifySheetLayoutChanged()

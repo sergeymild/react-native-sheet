@@ -20,8 +20,14 @@ import E2ETestScreen from './modal/E2ETestScreen';
 import { FullScreenModalOverSheetExample } from './modal/FullScreenModalOverSheetExample';
 import { BigRedTouchExample } from './modal/BigRedTouchExample';
 import { OverlayExample } from './modal/OverlayExample';
+import { CenteredExample } from './modal/CenteredExample';
 
 export const screens = [
+  {
+    name: 'Centered',
+    slug: 'Modal/Centered',
+    getScreen: () => CenteredExample,
+  },
   {
     name: 'Overlay',
     slug: 'Modal/Overlay',

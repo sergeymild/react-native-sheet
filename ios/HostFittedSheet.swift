@@ -30,6 +30,8 @@ public final class HostFittedSheet: UIView {
   private var _backgroundColor: UIColor = .clear
   private var _windowLevel: UIWindow.Level = .alert
   private var _useInlinePresentation = false
+  private var _centered: Bool = false
+  private var _centerSlide: Bool = false
   @objc
   public var uniqueId: String = ""
 
@@ -81,6 +83,16 @@ public final class HostFittedSheet: UIView {
     // attachOverlaySubview no-ops until both the overlay subview and the
     // sheet VC's view exist (the sheet isn't initialized yet at this point).
     attachOverlaySubview()
+  }
+
+  @objc
+  public func setPresentationStyle(_ value: NSString) {
+    _centered = (value as String) == "center"
+  }
+
+  @objc
+  public func setCenterAnimation(_ value: NSString) {
+    _centerSlide = (value as String) == "slide"
   }
 
   @objc
@@ -205,16 +217,19 @@ public final class HostFittedSheet: UIView {
   }
 
   private func initializeSheet(_ size: CGSize) {
+    var opts = SheetOptions(
+      pullBarHeight: 0,
+      shouldExtendBackground: false,
+      shrinkPresentingViewController: false,
+      useInlineMode: _useInlinePresentation && !_centered,
+      maxWidth: self.sheetMaxWidth
+    )
+    opts.centered = _centered
+    opts.centerSlide = _centerSlide
     self._modalViewController = SheetViewController(
       controller: self.viewController,
       sizes: [.fixed(size.height)],
-      options: .init(
-        pullBarHeight: 0,
-        shouldExtendBackground: false,
-        shrinkPresentingViewController: false,
-        useInlineMode: _useInlinePresentation,
-        maxWidth: self.sheetMaxWidth
-      )
+      options: opts
     )
 
     self._modalViewController?.allowPullingPastMaxHeight = false

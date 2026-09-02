@@ -50,15 +50,77 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             sheet.contentViewController.updatePreferredHeight()
             sheet.resize(to: sheet.currentSize, animated: false)
             let contentView = sheet.contentViewController.contentView
+
+            if self.options.centered && !self.options.centerSlide {
+                // Centered fade: the card is centered by constraint, so fade +
+                // scale it in (0.9 -> 1.0) and fade the overlay in.
+                contentView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+                contentView.alpha = 0
+                sheet.overlayView.alpha = 0
+
+                UIView.performWithoutAnimation {
+                    sheet.view.layoutIfNeeded()
+                }
+
+                UIView.animate(
+                    withDuration: self.options.transitionDuration,
+                    delay: 0,
+                    options: [.curveEaseOut],
+                    animations: {
+                        contentView.transform = .identity
+                        contentView.alpha = 1
+                        sheet.overlayView.alpha = 1
+                    },
+                    completion: { _ in
+                        transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+                    }
+                )
+                return
+            }
+
+            if self.options.centered {
+                // Centered slide: start the card fully below the bottom edge and
+                // slide it up into its centered resting position — symmetric with
+                // the centered dismiss (which slides it back down off the bottom).
+                // The offset is measured AFTER layout so it never reads a stale or
+                // zero height; reading it before layout was making the slide
+                // collapse into a fade on some presentations ("every other time").
+                UIView.performWithoutAnimation {
+                    sheet.view.layoutIfNeeded()
+                }
+                let cardTop = contentView.convert(contentView.bounds, to: sheet.view).minY
+                let startOffset = max(contentView.bounds.height, sheet.view.bounds.height - cardTop)
+                contentView.transform = CGAffineTransform(translationX: 0, y: startOffset)
+                sheet.overlayView.alpha = 0
+
+                UIView.animate(
+                    withDuration: self.options.transitionDuration,
+                    delay: 0,
+                    usingSpringWithDamping: 0.9,
+                    initialSpringVelocity: 0,
+                    options: [.curveEaseOut],
+                    animations: {
+                        contentView.transform = .identity
+                        sheet.overlayView.alpha = 1
+                    },
+                    completion: { _ in
+                        transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+                    }
+                )
+                return
+            }
+
+            // Slide-up (bottom presentation). For centered mode the branch above
+            // handles the slide; this is the original bottom-sheet path.
             contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
             sheet.overlayView.alpha = 0
-            
+
             let heightPercent = contentView.bounds.height / UIScreen.main.bounds.height
-            
+
             UIView.performWithoutAnimation {
                 sheet.view.layoutIfNeeded()
             }
-            
+
             // Use a normal animation to animate the shadown and background view
             UIView.animate(withDuration: self.options.transitionDuration * 0.6, delay: 0, options: [.curveEaseOut], animations: {
                 if self.options.shrinkPresentingViewController {
@@ -91,10 +153,27 @@ public class SheetTransition: NSObject, UIViewControllerAnimatedTransitioning {
             containerView.addSubview(sheet.view)
             let contentView = sheet.contentViewController.contentView
 
+            let dismissTransform: CGAffineTransform
+            if self.options.centered {
+                // The card sits in the vertical center, so translating it down
+                // by only its own height leaves it stranded mid-screen while the
+                // overlay has already faded out. Instead slide it all the way
+                // off the bottom of the screen — exactly like the bottom sheet —
+                // so the dim and the card leave the screen together. The offset
+                // is measured from the card's CURRENT on-screen top (which
+                // already includes any swipe-drag transform), so a pan-initiated
+                // dismiss continues smoothly from the finger's position.
+                let cardTop = contentView.convert(contentView.bounds, to: sheet.view).minY
+                let offset = max(contentView.bounds.height, sheet.view.bounds.height - cardTop)
+                dismissTransform = CGAffineTransform(translationX: 0, y: offset)
+            } else {
+                dismissTransform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
+            }
+
             self.restorePresentor(
                 presenter,
                 animations: {
-                    contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
+                    contentView.transform = dismissTransform
                     sheet.overlayView.alpha = 0
                 }, completion: { _ in
                     transitionContext.completeTransition(!transitionContext.transitionWasCancelled)

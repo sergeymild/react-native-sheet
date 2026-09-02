@@ -146,7 +146,7 @@ public class SheetViewController: UIViewController {
     var overflowView = UIView()
     var overlayTapGesture: UITapGestureRecognizer?
     private var contentViewHeightConstraint: NSLayoutConstraint!
-    private var contentViewWidthConstraint: NSLayoutConstraint!
+    private var contentViewWidthConstraint: NSLayoutConstraint?
 
     /// The child view controller's scroll view we are watching so we can override the pull down/up to work on the sheet when needed
     private weak var childScrollView: UIScrollView?
@@ -282,16 +282,23 @@ public class SheetViewController: UIViewController {
         overlayTapView.backgroundColor = .clear
         overlayTapView.isUserInteractionEnabled = !self.allowGestureThroughOverlay
         self.view.addSubview(overlayTapView)
-        Constraints(for: overlayTapView, self.contentViewController.view) {
-            $0.top.pinToSuperview()
-            $0.left.pinToSuperview()
-            $0.right.pinToSuperview()
-            $0.bottom.align(with: $1.top)
+        // The whole screen (except the card, which sits in front in z-order) is a
+        // tap-to-dismiss surface — taps above, below AND to the sides of the card
+        // dismiss. Previously the non-centered surface stopped at the card's top,
+        // so when the card was narrower than the screen (maxWidth / landscape) the
+        // dim strips beside the card had no tap handler and didn't dismiss.
+        Constraints(for: overlayTapView) {
+            $0.edges(.top, .left, .right, .bottom).pinToSuperview()
         }
 
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(overlayTapped))
         self.overlayTapGesture = tapGestureRecognizer
         overlayTapView.addGestureRecognizer(tapGestureRecognizer)
+
+        // The tap surface covers the whole screen and is added after the card
+        // (addContentView runs first), so bring the card back to front — taps on
+        // the card reach its content and only taps on the surrounding dim dismiss.
+        self.view.bringSubviewToFront(self.contentViewController.view)
     }
 
     @objc func overlayTapped(_ gesture: UITapGestureRecognizer) {
@@ -300,7 +307,11 @@ public class SheetViewController: UIViewController {
     }
   
   func updateMaxWidth(value: CGFloat) {
-    self.contentViewWidthConstraint.constant = value
+    // `contentViewWidthConstraint` is only created in `addContentView()` when
+    // `options.maxWidth` is non-nil (and note SheetOptions maps maxWidth == 0 -> nil).
+    // A Fabric prop update always calls this (sheetMaxWidthSize defaults to 0), so
+    // guard against the constraint being absent to avoid an unexpectedly-nil crash.
+    self.contentViewWidthConstraint?.constant = value
   }
 
     private func addContentView() {
@@ -319,14 +330,18 @@ public class SheetViewController: UIViewController {
             $0.centerX.alignWithSuperview()
             self.contentViewHeightConstraint = $0.height.set(self.height(for: self.currentSize))
 
-            let top: CGFloat
-            if (self.options.useFullScreenMode) {
-                top = 0
+            if self.options.centered {
+                $0.centerY.alignWithSuperview()
             } else {
-                top = max(12, UIApplication.shared.windows.first(where:  { $0.isKeyWindow })?.compatibleSafeAreaInsets.top ?? 12)
+                let top: CGFloat
+                if (self.options.useFullScreenMode) {
+                    top = 0
+                } else {
+                    top = max(12, UIApplication.shared.windows.first(where:  { $0.isKeyWindow })?.compatibleSafeAreaInsets.top ?? 12)
+                }
+                $0.bottom.pinToSuperview()
+                $0.top.pinToSuperview(inset: top, relation: .greaterThanOrEqual).priority = UILayoutPriority(999)
             }
-            $0.bottom.pinToSuperview()
-            $0.top.pinToSuperview(inset: top, relation: .greaterThanOrEqual).priority = UILayoutPriority(999)
         }
     }
 
@@ -339,6 +354,10 @@ public class SheetViewController: UIViewController {
 
     @objc func panned(_ gesture: UIPanGestureRecognizer) {
         let point = gesture.translation(in: gesture.view?.superview)
+        if self.options.centered {
+            self.pannedCentered(gesture, point: point)
+            return
+        }
         if gesture.state == .began {
             self.firstPanPoint = point
             self.prePanHeight = self.contentViewController.view.bounds.height
@@ -480,6 +499,41 @@ public class SheetViewController: UIViewController {
                 break
             @unknown default:
                 break // Do nothing
+        }
+    }
+
+    /// Pan handling for centered presentation: the card follows the finger
+    /// downward (a translation, not a resize), the overlay fades by drag
+    /// progress, and the sheet dismisses past ~1/3 of the card height or on a
+    /// fast flick — otherwise it springs back to center.
+    private func pannedCentered(_ gesture: UIPanGestureRecognizer, point: CGPoint) {
+        let card = self.contentViewController.view!
+        switch gesture.state {
+        case .began:
+            self.firstPanPoint = point
+            self.isPanning = true
+        case .changed:
+            // Translation is already relative to gesture start; only follow the
+            // finger downward and clamp upward drag to 0.
+            let ty = max(0, point.y)
+            card.transform = CGAffineTransform(translationX: 0, y: ty)
+            let progress = min(1, ty / max(1, card.bounds.height))
+            self.overlayView.alpha = 1 - progress
+        case .ended, .cancelled, .failed:
+            self.isPanning = false
+            let ty = card.transform.ty
+            let velocity = gesture.velocity(in: gesture.view).y
+            let shouldDismiss = self.dismissOnPull && (ty > card.bounds.height / 3 || velocity > 800)
+            if shouldDismiss {
+                self.attemptDismiss(animated: true)
+            } else {
+                UIView.animate(withDuration: 0.25) {
+                    card.transform = .identity
+                    self.overlayView.alpha = 1
+                }
+            }
+        default:
+            break
         }
     }
 

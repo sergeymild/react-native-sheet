@@ -93,6 +93,14 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
     view.useInlinePresentation = value
   }
 
+  override fun setPresentationStyle(view: Sheet2View, value: String?) {
+    view.presentationStyle = value ?: "bottom"
+  }
+
+  override fun setCenterAnimation(view: Sheet2View, value: String?) {
+    view.centerAnimation = value ?: "fade"
+  }
+
   override fun setCalculatedHeight(view: Sheet2View, value: Double) {
     println("==========setCalculatedHeight $value")
     view.mHostView.setVirtualHeight(value.dpToPx())

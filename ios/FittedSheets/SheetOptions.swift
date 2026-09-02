@@ -44,6 +44,11 @@ public struct SheetOptions {
     public var horizontalPadding: CGFloat = 0
     public var maxWidth: CGFloat?
 
+    /// Present the sheet centered on screen instead of pinned to the bottom.
+    public var centered: Bool = false
+    /// When `centered`, slide the card up into place instead of fade+scale.
+    public var centerSlide: Bool = false
+
     public var isRubberBandEnabled: Bool = false
     
     /// Experimental flag that attempts to shrink the nested presentations more each time a new sheet is presented. This must be set before any sheet is presented.
