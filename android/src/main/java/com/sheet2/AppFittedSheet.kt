@@ -211,6 +211,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
         isSystemUILight = isSystemUILight
       ) { dismissAll ->
         val parent = mHostView.parent as? ViewGroup
+        SheetTreeLog.log(
+          context,
+          "sheet.detachHost",
+          "host=${SheetTreeLog.tag(mHostView)} parent=${SheetTreeLog.tag(parent)}" +
+            " parentChildren=${SheetTreeLog.childTags(parent)}",
+        )
         parent?.removeViewAt(0)
         onSheetDismiss()
         if (dismissAll) {
@@ -262,6 +268,16 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun addView(child: View, index: Int) {
     UiThreadUtil.assertOnUiThread()
+    // An overlay child is kept out of mHostView while getChildCount keeps
+    // counting it, so from here on this view's children and React Native's idea
+    // of them are two different lists.
+    SheetTreeLog.log(
+      context,
+      "sheet.addView",
+      "child=${SheetTreeLog.tag(child)} index=$index self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}" +
+        " inline=$useInlinePresentation",
+    )
     if (useInlinePresentation && index > 0) {
       inlineOverlayView = child
       inlinePresenter.setOverlayView(child)
@@ -289,6 +305,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun removeView(child: View) {
     UiThreadUtil.assertOnUiThread()
+    SheetTreeLog.log(
+      context,
+      "sheet.removeView",
+      "child=${SheetTreeLog.tag(child)} self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}",
+    )
     if (child == inlineOverlayView) {
       inlineOverlayView = null
       inlinePresenter.setOverlayView(null)
@@ -304,6 +326,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun removeViewAt(index: Int) {
     UiThreadUtil.assertOnUiThread()
+    SheetTreeLog.log(
+      context,
+      "sheet.removeViewAt",
+      "index=$index self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}",
+    )
     if (useInlinePresentation && index >= mHostView.childCount && inlineOverlayView != null) {
       inlineOverlayView = null
       inlinePresenter.setOverlayView(null)

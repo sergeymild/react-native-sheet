@@ -135,6 +135,10 @@ using namespace facebook::react;
 }
 
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  [SheetTreeLog log:@"host.mountChild"
+              details:[NSString stringWithFormat:@"child=%@ index=%ld host=%@",
+                                        [SheetTreeLog name:childComponentView], (long)index,
+                                        [SheetTreeLog name:_view2]]];
   [_view2 insertReactSubview:childComponentView atIndex:index];
 
   __weak SheetView *weakSelf = self;
@@ -150,10 +154,18 @@ using namespace facebook::react;
 }
 
 - (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  [SheetTreeLog log:@"host.unmountChild"
+              details:[NSString stringWithFormat:@"child=%@ index=%ld host=%@",
+                                        [SheetTreeLog name:childComponentView], (long)index,
+                                        [SheetTreeLog name:_view2]]];
   [_view2 removeReactSubview:childComponentView];
 }
 
 - (void)prepareForRecycle {
+  // The HostFittedSheet is thrown away and rebuilt here, so anything the
+  // mounting layer still holds from before this point is stale.
+  [SheetTreeLog log:@"host.prepareForRecycle"
+              details:[NSString stringWithFormat:@"host=%@", [SheetTreeLog name:_view2]]];
   [_view2 destroy];
   _view2.onSheetDismiss = nil;
 

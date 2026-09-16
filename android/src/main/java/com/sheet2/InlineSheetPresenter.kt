@@ -169,7 +169,16 @@ internal class InlineSheetPresenter(
   private fun attachOverlayView() {
     val host = overlayHost ?: return
     val view = overlayView ?: return
-    (view.parent as? ViewGroup)?.removeView(view)
+    // Re-parenting a view React Native mounted somewhere else: its old parent
+    // loses a child without React Native being told.
+    val previousParent = view.parent as? ViewGroup
+    SheetTreeLog.log(
+      view.context,
+      "inline.attachOverlay",
+      "overlay=${SheetTreeLog.tag(view)} from=${SheetTreeLog.tag(previousParent)}" +
+        " fromChildren=${SheetTreeLog.childTags(previousParent)} to=${SheetTreeLog.tag(host)}",
+    )
+    previousParent?.removeView(view)
     view.layoutParams = FrameLayout.LayoutParams(
       FrameLayout.LayoutParams.MATCH_PARENT,
       FrameLayout.LayoutParams.MATCH_PARENT,

@@ -133,7 +133,14 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    SheetTreeLog.log(
+      "sheet.insertReactSubview",
+      details: "child=\(SheetTreeLog.name(subview)) index=\(atIndex) self=\(SheetTreeLog.name(self))"
+        + " presented=\(_isPresented)"
+    )
     if atIndex > 0 {
+      // The overlay never becomes a subview of the content view React Native
+      // mounted it into.
       _overlaySubview = subview
       subview.isUserInteractionEnabled = false
       attachOverlaySubview()
@@ -148,6 +155,11 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
+    SheetTreeLog.log(
+      "sheet.removeReactSubview",
+      details: "child=\(SheetTreeLog.name(subview)) self=\(SheetTreeLog.name(self))"
+        + " presented=\(_isPresented)"
+    )
     if let overlaySubview = _overlaySubview, subview === overlaySubview {
       _overlaySubview?.removeFromSuperview()
       _overlaySubview = nil
@@ -166,6 +178,12 @@ public final class HostFittedSheet: UIView {
     guard let overlaySubview = _overlaySubview,
           let sheetView = _modalViewController?.view else { return }
 
+    SheetTreeLog.log(
+      "sheet.attachOverlay",
+      details: "overlay=\(SheetTreeLog.name(overlaySubview))"
+        + " from=\(SheetTreeLog.name(overlaySubview.superview))"
+        + " to=\(SheetTreeLog.name(sheetView))"
+    )
     overlaySubview.removeFromSuperview()
     overlaySubview.frame = sheetView.bounds
     overlaySubview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -416,6 +434,11 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func destroy() {
+    SheetTreeLog.log(
+      "sheet.destroy",
+      details: "self=\(SheetTreeLog.name(self)) content=\(SheetTreeLog.name(_reactSubview))"
+        + " overlay=\(SheetTreeLog.name(_overlaySubview)) presented=\(_isPresented)"
+    )
     if !_isPresented && _modalViewController == nil {
       return
     }

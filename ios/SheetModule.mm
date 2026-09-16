@@ -37,6 +37,10 @@ RCT_EXPORT_MODULE(Sheet)
   return dict;
 }
 
+- (NSArray<NSString *> *)getTreeLog {
+  return [SheetTreeLog snapshot];
+}
+
 - (void)dismiss:(NSInteger)tag {
   NSLog(@"😀 dismissModule %d", [[NSNumber alloc] initWithInt:tag].intValue);
 }

@@ -84,7 +84,16 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
     val view = overlayView ?: return
     val decorView = dialog?.window?.decorView as? ViewGroup ?: return
     detachOverlayHost()
-    (view.parent as? ViewGroup)?.removeView(view)
+    // Same as the inline presenter: the overlay is taken out of whatever parent
+    // React Native gave it and put into the dialog's own host.
+    val previousParent = view.parent as? ViewGroup
+    SheetTreeLog.log(
+      view.context,
+      "dialog.attachOverlay",
+      "overlay=${SheetTreeLog.tag(view)} from=${SheetTreeLog.tag(previousParent)}" +
+        " fromChildren=${SheetTreeLog.childTags(previousParent)}",
+    )
+    previousParent?.removeView(view)
 
     val host = DialogPassThroughFrameLayout(decorView.context).apply {
       layoutParams = ViewGroup.LayoutParams(
