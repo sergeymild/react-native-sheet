@@ -21,6 +21,7 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
   private FrameLayout container;
   boolean dismissWithAnimation;
   boolean cancelable = true;
+  public boolean dismissOnOverlayTap = true;
 
   protected int startState = BottomSheetBehavior.STATE_EXPANDED;
 
@@ -191,7 +192,7 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
     coordinator
       .findViewById(R.id.touch_outside)
       .setOnClickListener(
-        view12 -> {if (cancelable && isShowing()) cancel();});
+        view12 -> {if (cancelable && dismissOnOverlayTap && isShowing()) cancel();});
     // The bottom sheet container spans the full width, but the card content can be
     // narrower and horizontally centered (maxWidth / landscape). A blanket
     // `event -> true` here swallows taps that land in the dim strips beside the
@@ -202,7 +203,7 @@ public class CustomBottomSheetDialog extends AppCompatDialog {
     final View card = view;
     bottomSheet.setOnTouchListener((view1, event) -> {
       if (event.getActionMasked() == MotionEvent.ACTION_UP
-        && cancelable && isShowing() && card != null
+        && cancelable && dismissOnOverlayTap && isShowing() && card != null
         && !isPointInsideCard(card, event.getRawX(), event.getRawY())) {
         cancel();
       }

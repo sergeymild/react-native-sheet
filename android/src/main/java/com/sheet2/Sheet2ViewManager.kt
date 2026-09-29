@@ -101,6 +101,18 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
     view.centerAnimation = value ?: "fade"
   }
 
+  override fun setDismissOnOverlayTap(view: Sheet2View, value: Boolean) {
+    view.dismissOnOverlayTap = value
+  }
+
+  override fun setOverlayOpacity(view: Sheet2View, value: Double) {
+    view.overlayOpacity = value.toFloat()
+  }
+
+  override fun setCollapsedHeight(view: Sheet2View, value: Double) {
+    view.collapsedHeight = value.dpToPx()
+  }
+
   override fun setCalculatedHeight(view: Sheet2View, value: Double) {
     println("==========setCalculatedHeight $value")
     view.mHostView.setVirtualHeight(value.dpToPx())

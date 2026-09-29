@@ -47,6 +47,9 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       field = value
       inlinePresenter.setDismissable(value)
     }
+  var dismissOnOverlayTap = true
+  var overlayOpacity = -1F
+  var collapsedHeight = 0F
   var topLeftRightCornerRadius: Float = 0F
   var _backgroundColor: Int = Color.TRANSPARENT
   var isSystemUILight: Boolean = false
@@ -192,7 +195,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
     if (useInlinePresentation) {
       if (!inlinePresenter.isShown) {
-        inlinePresenter.show(dismissable) { onSheetDismiss() }
+        inlinePresenter.show(
+          dismissable = dismissable,
+          dismissOnOverlayTap = dismissOnOverlayTap,
+          overlayOpacity = overlayOpacity,
+          collapsedHeight = collapsedHeight.toInt(),
+        ) { onSheetDismiss() }
       }
       return
     }
@@ -208,6 +216,8 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
         dismissable = dismissable,
+        dismissOnOverlayTap = dismissOnOverlayTap,
+        overlayOpacity = overlayOpacity,
         isSystemUILight = isSystemUILight
       ) { dismissAll ->
         val parent = mHostView.parent as? ViewGroup
