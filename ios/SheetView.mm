@@ -64,6 +64,13 @@ using namespace facebook::react;
   return self;
 }
 
+// The sheet content is rendered in another view hierarchy; this placeholder must never take touches.
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+  UIView *view = [super hitTest:point withEvent:event];
+  return view == self || view == _view2 ? nil : view;
+}
+
 - (void)_bindStateUpdater
 {
   __weak SheetView *weakSelf = self;
@@ -110,7 +117,10 @@ using namespace facebook::react;
   [_view2 setFittedSheetParams:@{
     @"maxWidth": @(newViewProps.maxWidth),
     @"dismissable": @(newViewProps.dismissable),
-    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
+    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius),
+    @"dismissOnOverlayTap": @(newViewProps.dismissOnOverlayTap),
+    @"overlayOpacity": @(newViewProps.overlayOpacity),
+    @"collapsedHeight": @(newViewProps.collapsedHeight)
   }];
 
   auto color = RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor);

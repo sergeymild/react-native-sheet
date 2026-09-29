@@ -622,6 +622,7 @@ public class SheetViewController: UIViewController {
     }
 
     public func attemptDismiss(animated: Bool) {
+        self.view.endEditing(true)
         if self.options.useInlineMode {
             if animated {
                 self.animateOut {
