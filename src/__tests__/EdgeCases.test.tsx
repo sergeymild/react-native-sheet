@@ -568,6 +568,39 @@ describe('Edge Cases', () => {
       expect(Commands.dismissSheet).not.toHaveBeenCalled();
     });
 
+    it('still dispatches the native dismiss command for an explicit hide', async () => {
+      const { Commands } = require('../SheetViewNativeComponent');
+      const ref = React.createRef<FittedSheetRef>();
+      const { getByText } = render(
+        <FittedSheet ref={ref}>
+          <View>
+            <Text>Explicit Hide</Text>
+          </View>
+        </FittedSheet>
+      );
+      React.act(() => ref.current?.show());
+      await waitFor(() => expect(getByText('Explicit Hide')).toBeTruthy());
+      Commands.dismissSheet.mockClear();
+
+      React.act(() => ref.current?.hide());
+
+      expect(Commands.dismissSheet).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends nothing when unmounting a sheet that was never shown', () => {
+      const { Commands } = require('../SheetViewNativeComponent');
+      Commands.dismissSheet.mockClear();
+      const { unmount } = render(
+        <FittedSheet>
+          <View />
+        </FittedSheet>
+      );
+
+      unmount();
+
+      expect(Commands.dismissSheet).not.toHaveBeenCalled();
+    });
+
     it('should cleanup when sheet is unmounted while shown', async () => {
       const TestComponent = ({ mounted }: { mounted: boolean }) => {
         const sheetRef = useRef<FittedSheetRef>(null);

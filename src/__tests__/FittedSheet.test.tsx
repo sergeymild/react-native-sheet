@@ -289,6 +289,46 @@ describe('FittedSheet', () => {
       expect(native.props.maxHeight).toBe(812);
     });
 
+    it('lets tap-outside follow dismissable when not set', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet ref={ref}>
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.dismissable).toBe(true);
+      expect(native.props.dismissOnOverlayTap).toBe(true);
+    });
+
+    it('keeps an explicit maxHeight for a footer', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet
+          ref={ref}
+          params={{ presentationStyle: 'footer', maxHeight: 120 }}
+        >
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.maxHeight).toBe(120);
+    });
+
+    it('still clamps a regular sheet by the safe-area insets', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet ref={ref}>
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.maxHeight).toBe(812 - 44 - 34);
+    });
+
     it('defaults overlay and snap params', () => {
       const ref = React.createRef<FittedSheetRef>();
       const tree = render(
