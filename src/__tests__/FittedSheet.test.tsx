@@ -238,6 +238,41 @@ describe('FittedSheet', () => {
       expect(native.props.centerAnimation).toBe('slide');
     });
 
+    it('forwards overlay and snap params to the native component', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet
+          ref={ref}
+          params={{
+            dismissOnOverlayTap: false,
+            overlayOpacity: 0,
+            collapsedHeight: 500,
+          }}
+        >
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.dismissOnOverlayTap).toBe(false);
+      expect(native.props.overlayOpacity).toBe(0);
+      expect(native.props.collapsedHeight).toBe(500);
+    });
+
+    it('defaults overlay and snap params', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet ref={ref} params={{ dismissable: false }}>
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.dismissOnOverlayTap).toBe(false);
+      expect(native.props.overlayOpacity).toBe(-1);
+      expect(native.props.collapsedHeight).toBe(0);
+    });
+
     it('defaults presentationStyle to bottom and centerAnimation to fade', () => {
       const ref = React.createRef<FittedSheetRef>();
       const tree = render(

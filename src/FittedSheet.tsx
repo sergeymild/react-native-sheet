@@ -47,6 +47,9 @@ export interface FittedSheetParams {
    * - 'slide': slides up from the bottom and settles at the center.
    */
   centerAnimation?: 'fade' | 'slide';
+  dismissOnOverlayTap?: boolean;
+  overlayOpacity?: number;
+  collapsedHeight?: number;
   /**
    * Android only
    */
@@ -233,6 +236,13 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         useInlinePresentation={this.props.params?.useInlinePresentation}
         presentationStyle={this.props.params?.presentationStyle ?? 'bottom'}
         centerAnimation={this.props.params?.centerAnimation ?? 'fade'}
+        dismissOnOverlayTap={
+          this.props.params?.dismissOnOverlayTap ??
+          this.props.params?.dismissable ??
+          true
+        }
+        overlayOpacity={this.props.params?.overlayOpacity ?? -1}
+        collapsedHeight={this.props.params?.collapsedHeight ?? 0}
         isSystemUILight={this.props.params?.isSystemUILight ?? true}
         calculatedHeight={nativeHeight}
         passScrollViewReactTag={this.state.passScrollViewReactTag}

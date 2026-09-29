@@ -509,6 +509,9 @@ export const MultipleExample = () => {
 | `isSystemUILight` | `boolean` | `undefined` | Android only - status bar styling |
 | `presentationStyle` | `'bottom' \| 'center'` | `'bottom'` | `'center'` shows the sheet as a dialog card in the vertical center with a full-screen dim; dismiss by swiping down or tapping the dim. Ignores `useInlinePresentation`. |
 | `centerAnimation` | `'fade' \| 'slide'` | `'fade'` | Enter animation for `presentationStyle: 'center'`. `'fade'` = fade + scale in; `'slide'` = slide up into center. |
+| `dismissOnOverlayTap` | `boolean` | `dismissable` | Tap on the dimmed background dismisses the sheet. `false` with `dismissable: true` keeps swipe-to-dismiss but ignores taps. |
+| `overlayOpacity` | `number` | platform default | Background dim opacity, 0..1. `0` with `useInlinePresentation` removes the background and lets touches reach the screen behind. |
+| `collapsedHeight` | `number` | — | `useInlinePresentation` only. Lower snap point; the sheet opens there and can be dragged up to its full height. |
 
 ### FittedSheetRef Methods
 
