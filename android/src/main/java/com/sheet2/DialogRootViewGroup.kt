@@ -6,7 +6,6 @@ import android.graphics.Outline
 import android.os.Looper
 import android.view.View
 import android.view.ViewOutlineProvider
-import com.facebook.react.uimanager.PixelUtil.pxToDp
 import kotlin.math.max
 import kotlin.math.min
 
@@ -86,7 +85,6 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
     if (sheetMaxHeightSize == Float.MAX_VALUE) return
     val newHeight = allowedHeight
     val newWidth = allowedWidth
-    println("😀 DialogRootViewGroup.setVirtualHeight ${newHeight.pxToDp()} :${newWidth.pxToDp()}")
     ensureLayoutParams()
     layoutParams?.height = newHeight
     translationX = centeringTranslationX(newWidth)
@@ -105,19 +103,39 @@ class DialogRootViewGroup(context: Context) : BaseRNView(context) {
   }
 
   override fun addView(child: View, index: Int, params: LayoutParams) {
-    println("😀 DialogRootViewGroup.addView ${child.id}")
-    if (reactView != null) removeView(reactView)
+    // Dropping the previous child here is a removal React Native never hears
+    // about: it goes on counting that child, and its next insert lands at an
+    // index the group no longer has.
+    val replaced = reactView
+    SheetTreeLog.log(
+      context,
+      "host.addView",
+      "child=${SheetTreeLog.tag(child)} index=$index children=${SheetTreeLog.childTags(this)}" +
+        " replaces=${SheetTreeLog.tag(replaced)}",
+    )
+    if (replaced != null) removeView(replaced)
     super.addView(child, index, params)
     reactView = child
     setVirtualHeight(sheetMaxHeightSize)
   }
 
   override fun removeView(view: View?) {
+    SheetTreeLog.log(
+      context,
+      "host.removeView",
+      "child=${SheetTreeLog.tag(view)} children=${SheetTreeLog.childTags(this)}",
+    )
     if (view == reactView) releaseReactView()
     super.removeView(view)
   }
 
   override fun removeViewAt(index: Int) {
+    SheetTreeLog.log(
+      context,
+      "host.removeViewAt",
+      "index=$index child=${SheetTreeLog.tag(getChildAt(index))}" +
+        " children=${SheetTreeLog.childTags(this)}",
+    )
     if (getChildAt(index) === reactView) releaseReactView()
     super.removeViewAt(index)
   }

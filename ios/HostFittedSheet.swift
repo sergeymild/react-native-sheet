@@ -10,6 +10,7 @@ func viewPort() -> CGSize {
 }
 
 var presentedSheets: [SheetViewController] = []
+var footers: [UIView] = []
 var lastPresentedSheetSizes: [[SheetSize]] = []
 
 public final class HostFittedSheet: UIView {
@@ -25,6 +26,12 @@ public final class HostFittedSheet: UIView {
   private var _sheetSize: CGFloat?
   public var sheetMaxWidthSize: CGFloat?
   private var dismissable = true
+  private var dismissOnOverlayTap = true
+  private var overlayOpacity: CGFloat = -1
+  private var collapsedHeight: CGFloat = 0
+  private var _footer = false
+  // Inline sheets mounted outside any RN surface (e.g. at the app root) get no touches from the surface handler.
+  private var _ownsTouches = false
   private var topLeftRightCornerRadius: CGFloat?
   private var stacked = false
   private var _backgroundColor: UIColor = .clear
@@ -88,6 +95,7 @@ public final class HostFittedSheet: UIView {
   @objc
   public func setPresentationStyle(_ value: NSString) {
     _centered = (value as String) == "center"
+    _footer = (value as String) == "footer"
   }
 
   @objc
@@ -110,6 +118,9 @@ public final class HostFittedSheet: UIView {
   public func setFittedSheetParams(_ params: NSDictionary) {
     sheetMaxWidthSize = RCTConvert.cgFloat(params["maxWidth"])
     dismissable = params["dismissable"] as? Bool ?? true
+    dismissOnOverlayTap = params["dismissOnOverlayTap"] as? Bool ?? true
+    overlayOpacity = RCTConvert.cgFloat(params["overlayOpacity"])
+    collapsedHeight = RCTConvert.cgFloat(params["collapsedHeight"])
     topLeftRightCornerRadius = RCTConvert.cgFloat(params["topLeftRightCornerRadius"])
 
     if let value = sheetMaxWidthSize {
@@ -133,7 +144,14 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+    SheetTreeLog.log(
+      "sheet.insertReactSubview",
+      details: "child=\(SheetTreeLog.name(subview)) index=\(atIndex) self=\(SheetTreeLog.name(self))"
+        + " presented=\(_isPresented)"
+    )
     if atIndex > 0 {
+      // The overlay never becomes a subview of the content view React Native
+      // mounted it into.
       _overlaySubview = subview
       subview.isUserInteractionEnabled = false
       attachOverlaySubview()
@@ -148,6 +166,11 @@ public final class HostFittedSheet: UIView {
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
+    SheetTreeLog.log(
+      "sheet.removeReactSubview",
+      details: "child=\(SheetTreeLog.name(subview)) self=\(SheetTreeLog.name(self))"
+        + " presented=\(_isPresented)"
+    )
     if let overlaySubview = _overlaySubview, subview === overlaySubview {
       _overlaySubview?.removeFromSuperview()
       _overlaySubview = nil
@@ -166,6 +189,12 @@ public final class HostFittedSheet: UIView {
     guard let overlaySubview = _overlaySubview,
           let sheetView = _modalViewController?.view else { return }
 
+    SheetTreeLog.log(
+      "sheet.attachOverlay",
+      details: "overlay=\(SheetTreeLog.name(overlaySubview))"
+        + " from=\(SheetTreeLog.name(overlaySubview.superview))"
+        + " to=\(SheetTreeLog.name(sheetView))"
+    )
     overlaySubview.removeFromSuperview()
     overlaySubview.frame = sheetView.bounds
     overlaySubview.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -208,7 +237,11 @@ public final class HostFittedSheet: UIView {
       return
     }
     _sheetSize = RCTConvert.cgFloat(height)
-    _modalViewController?.setSizes([.fixed(_sheetSize ?? 0)])
+    if _footer {
+      layoutFooter()
+    } else {
+      _modalViewController?.setSizes(sheetSizes(_sheetSize ?? 0))
+    }
     // Inline-containment mode: tryToPresent early-returned while height was
     // still 0 — now that we have a real size, try again.
     if _useInlinePresentation && !_isPresented && (_sheetSize ?? 0) > 0 {
@@ -228,15 +261,64 @@ public final class HostFittedSheet: UIView {
     opts.centerSlide = _centerSlide
     self._modalViewController = SheetViewController(
       controller: self.viewController,
-      sizes: [.fixed(size.height)],
+      sizes: sheetSizes(size.height),
       options: opts
     )
 
     self._modalViewController?.allowPullingPastMaxHeight = false
-    self._modalViewController?.dismissOnOverlayTap = self.dismissable
+    self._modalViewController?.dismissOnOverlayTap = self.dismissable && self.dismissOnOverlayTap
+    if overlayOpacity >= 0 {
+      self._modalViewController?.overlayColor = UIColor(white: 0, alpha: overlayOpacity)
+    }
+    self._modalViewController?.allowGestureThroughOverlay = overlayOpacity == 0
     self._modalViewController?.dismissOnPull = self.dismissable
     self._modalViewController?.cornerRadius = self.topLeftRightCornerRadius ?? 12
     self._modalViewController?.contentBackgroundColor = _backgroundColor
+  }
+
+  private func hasSurfaceTouchHandler(_ view: UIView?) -> Bool {
+    var current = view
+    while let v = current {
+      if v.gestureRecognizers?.contains(where: { $0 is RCTSurfaceTouchHandler }) == true { return true }
+      current = v.superview
+    }
+    return false
+  }
+
+  private func sheetSizes(_ height: CGFloat) -> [SheetSize] {
+    guard _useInlinePresentation, collapsedHeight > 0, collapsedHeight < height else {
+      return [.fixed(height)]
+    }
+    return [.fixed(collapsedHeight), .fixed(height)]
+  }
+
+  private func presentFooter() {
+    guard let hostVC = presentViewController else { return }
+    hostVC.view.addSubview(viewController.view)
+    _ownsTouches = !hasSurfaceTouchHandler(hostVC.view)
+    if !_ownsTouches { detachTouchHandler() }
+    footers.append(viewController.view)
+    layoutFooter()
+    DispatchQueue.main.async { [weak self] in
+      self?.pushContentOriginOffset()
+    }
+  }
+
+  private func layoutFooter() {
+    guard _footer, let host = viewController.view.superview else { return }
+    let height = _sheetSize ?? 0
+    viewController.view.frame = CGRect(
+      x: 0,
+      y: host.bounds.height - height,
+      width: host.bounds.width,
+      height: height
+    )
+    viewController.view.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+    _reactSubview?.frame = viewController.view.bounds
+    host.bringSubviewToFront(viewController.view)
+    DispatchQueue.main.async { [weak self] in
+      self?.pushContentOriginOffset()
+    }
   }
 
   private func tryAttachScrollView() {
@@ -255,7 +337,7 @@ public final class HostFittedSheet: UIView {
   /// matching the real touch positions. Only meaningful in inline
   /// containment — dialog mode has matching coords and needs no offset.
   private func pushContentOriginOffset() {
-    guard _useInlinePresentation else { return }
+    guard _useInlinePresentation, !_ownsTouches else { return }
     guard self.window != nil else { return }
     guard let reactSubview = _reactSubview, reactSubview.window != nil else { return }
     let yogaPos = self.convert(CGPoint.zero, to: nil)
@@ -278,6 +360,16 @@ public final class HostFittedSheet: UIView {
     // reach the RN view. Wait for the JS-side onLayout to push a non-zero
     // height first.
     if (_useInlinePresentation && !_isPresented && (_sheetSize ?? 0) <= 0) {
+      return
+    }
+
+    if !_isPresented && _footer {
+      if (_sheetSize ?? 0) <= 0 { return }
+      presentViewController = self.findEnclosingViewController() ?? RCTPresentedViewController()
+      _isPresented = true
+      RCTExecuteOnMainQueue { [weak self] in
+        self?.presentFooter()
+      }
       return
     }
 
@@ -327,6 +419,9 @@ public final class HostFittedSheet: UIView {
           sheetVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
           hostVC.view.addSubview(sheetVC.view)
           sheetVC.didMove(toParent: hostVC)
+          footers.forEach { footer in
+            if footer.superview === hostVC.view { hostVC.view.bringSubviewToFront(footer) }
+          }
           self.attachOverlaySubview()
           sheetVC.view.setNeedsLayout()
           sheetVC.view.layoutIfNeeded()
@@ -338,7 +433,8 @@ public final class HostFittedSheet: UIView {
           // UIKit hit-test and dispatches them through Fabric's normal
           // pipeline. Keeping our own handler duplicates every touch event
           // and breaks Pressability state after the first tap.
-          self.detachTouchHandler()
+          self._ownsTouches = !self.hasSurfaceTouchHandler(hostVC.view)
+          if !self._ownsTouches { self.detachTouchHandler() }
 
           // Push the visual delta (Yoga-position → physical on-screen
           // position) into the Fabric state so that descendants' measure()
@@ -369,8 +465,15 @@ public final class HostFittedSheet: UIView {
               contentView.transform = .identity
               sheetVC.overlayView.alpha = 1
             },
-            completion: nil
+            completion: { [weak self] _ in
+              self?.pushContentOriginOffset()
+            }
           )
+          sheetVC.sizeChanged = { [weak self] _, _, _ in
+            DispatchQueue.main.async {
+              self?.pushContentOriginOffset()
+            }
+          }
         } else {
           hostVC.present(sheetVC, animated: true) { [weak self] in
             // Modal presentation: attach the overlay once the sheet VC's view
@@ -405,6 +508,12 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func dismiss() {
+    _reactSubview?.endEditing(true)
+    if _footer {
+      destroy()
+      onSheetDismiss?()
+      return
+    }
     if _useInlinePresentation {
       // attemptDismiss handles both inline (removeFromSuperview +
       // removeFromParent) and modal paths internally.
@@ -416,6 +525,19 @@ public final class HostFittedSheet: UIView {
 
   @objc
   public func destroy() {
+    SheetTreeLog.log(
+      "sheet.destroy",
+      details: "self=\(SheetTreeLog.name(self)) content=\(SheetTreeLog.name(_reactSubview))"
+        + " overlay=\(SheetTreeLog.name(_overlaySubview)) presented=\(_isPresented)"
+    )
+    _reactSubview?.endEditing(true)
+    if _footer {
+      _isPresented = false
+      footers.removeAll { $0 === viewController.view }
+      viewController.view.removeFromSuperview()
+      presentViewController = nil
+      return
+    }
     if !_isPresented && _modalViewController == nil {
       return
     }

@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 
 class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(reactContext) {
@@ -21,6 +22,12 @@ class SheetModule(reactContext: ReactApplicationContext) : NativeSheetSpec(react
 
   override fun viewportSize(): WritableMap {
     return Arguments.createMap()
+  }
+
+  override fun getTreeLog(): WritableArray {
+    val entries = Arguments.createArray()
+    SheetTreeLog.snapshot().forEach { entries.pushString(it) }
+    return entries
   }
 
   override fun dismissAll() {

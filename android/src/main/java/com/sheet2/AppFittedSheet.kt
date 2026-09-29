@@ -14,6 +14,8 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.pxToDp
+import com.facebook.react.uimanager.PointerEvents
+import com.facebook.react.uimanager.ReactPointerEventsView
 import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.events.EventDispatcher
@@ -35,7 +37,13 @@ internal fun AppFittedSheet.onSheetDismiss() {
 
 private var presentedSheets: MutableList<String> = mutableListOf()
 
-open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
+open class AppFittedSheet(context: Context) :
+  ViewGroup(context),
+  LifecycleEventListener,
+  ReactPointerEventsView {
+  // The sheet content lives in its own window or overlay; this placeholder must never take touches.
+  override val pointerEvents: PointerEvents = PointerEvents.NONE
+
   private var stacked = true
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
@@ -47,6 +55,9 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       field = value
       inlinePresenter.setDismissable(value)
     }
+  var dismissOnOverlayTap = true
+  var overlayOpacity = -1F
+  var collapsedHeight = 0F
   var topLeftRightCornerRadius: Float = 0F
   var _backgroundColor: Int = Color.TRANSPARENT
   var isSystemUILight: Boolean = false
@@ -121,6 +132,10 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     InlineSheetPresenter(this, mHostView)
   }
 
+  private val footerPresenter: InlineFooterPresenter by lazy {
+    InlineFooterPresenter(this, mHostView)
+  }
+
   init {
     mHostView.onSheetLayoutChanged = { pushContentOriginOffset() }
   }
@@ -190,9 +205,19 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       return
     }
 
+    if (presentationStyle == "footer") {
+      footerPresenter.show()
+      return
+    }
+
     if (useInlinePresentation) {
       if (!inlinePresenter.isShown) {
-        inlinePresenter.show(dismissable) { onSheetDismiss() }
+        inlinePresenter.show(
+          dismissable = dismissable,
+          dismissOnOverlayTap = dismissOnOverlayTap,
+          overlayOpacity = overlayOpacity,
+          collapsedHeight = collapsedHeight.toInt(),
+        ) { onSheetDismiss() }
       }
       return
     }
@@ -208,9 +233,17 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
       val fragment = FragmentModalBottomSheet(
         modalView = mHostView,
         dismissable = dismissable,
+        dismissOnOverlayTap = dismissOnOverlayTap,
+        overlayOpacity = overlayOpacity,
         isSystemUILight = isSystemUILight
       ) { dismissAll ->
         val parent = mHostView.parent as? ViewGroup
+        SheetTreeLog.log(
+          context,
+          "sheet.detachHost",
+          "host=${SheetTreeLog.tag(mHostView)} parent=${SheetTreeLog.tag(parent)}" +
+            " parentChildren=${SheetTreeLog.childTags(parent)}",
+        )
         parent?.removeViewAt(0)
         onSheetDismiss()
         if (dismissAll) {
@@ -262,6 +295,16 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun addView(child: View, index: Int) {
     UiThreadUtil.assertOnUiThread()
+    // An overlay child is kept out of mHostView while getChildCount keeps
+    // counting it, so from here on this view's children and React Native's idea
+    // of them are two different lists.
+    SheetTreeLog.log(
+      context,
+      "sheet.addView",
+      "child=${SheetTreeLog.tag(child)} index=$index self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}" +
+        " inline=$useInlinePresentation",
+    )
     if (useInlinePresentation && index > 0) {
       inlineOverlayView = child
       inlinePresenter.setOverlayView(child)
@@ -289,6 +332,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun removeView(child: View) {
     UiThreadUtil.assertOnUiThread()
+    SheetTreeLog.log(
+      context,
+      "sheet.removeView",
+      "child=${SheetTreeLog.tag(child)} self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}",
+    )
     if (child == inlineOverlayView) {
       inlineOverlayView = null
       inlinePresenter.setOverlayView(null)
@@ -304,6 +353,12 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
 
   override fun removeViewAt(index: Int) {
     UiThreadUtil.assertOnUiThread()
+    SheetTreeLog.log(
+      context,
+      "sheet.removeViewAt",
+      "index=$index self=${SheetTreeLog.tag(this)}" +
+        " hostChildren=${SheetTreeLog.childTags(mHostView)}",
+    )
     if (useInlinePresentation && index >= mHostView.childCount && inlineOverlayView != null) {
       inlineOverlayView = null
       inlinePresenter.setOverlayView(null)
@@ -317,7 +372,7 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     dismiss()
   }
 
-  private fun onDropInstance() {
+  internal fun onDropInstance() {
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()
   }
@@ -327,6 +382,11 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     if (centeredDialog != null) {
       centeredDialog?.dismiss()
       centeredDialog = null
+      return
+    }
+    if (presentationStyle == "footer") {
+      footerPresenter.dismiss()
+      onSheetDismiss()
       return
     }
     if (useInlinePresentation) {

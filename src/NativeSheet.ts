@@ -13,6 +13,8 @@ export interface Spec extends TurboModule {
   viewportSize(): { width: Double; height: Double };
   dismissAll(): void;
   dismissPresented(): void;
+  /** Last native view-tree moves this library made — see SheetTreeLog. */
+  getTreeLog(): string[];
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Sheet');

@@ -64,6 +64,13 @@ using namespace facebook::react;
   return self;
 }
 
+// The sheet content is rendered in another view hierarchy; this placeholder must never take touches.
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+  UIView *view = [super hitTest:point withEvent:event];
+  return view == self || view == _view2 ? nil : view;
+}
+
 - (void)_bindStateUpdater
 {
   __weak SheetView *weakSelf = self;
@@ -110,7 +117,10 @@ using namespace facebook::react;
   [_view2 setFittedSheetParams:@{
     @"maxWidth": @(newViewProps.maxWidth),
     @"dismissable": @(newViewProps.dismissable),
-    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius)
+    @"topLeftRightCornerRadius": @(newViewProps.topLeftRightCornerRadius),
+    @"dismissOnOverlayTap": @(newViewProps.dismissOnOverlayTap),
+    @"overlayOpacity": @(newViewProps.overlayOpacity),
+    @"collapsedHeight": @(newViewProps.collapsedHeight)
   }];
 
   auto color = RCTUIColorFromSharedColor(newViewProps.sheetBackgroundColor);
@@ -135,6 +145,10 @@ using namespace facebook::react;
 }
 
 - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  [SheetTreeLog log:@"host.mountChild"
+              details:[NSString stringWithFormat:@"child=%@ index=%ld host=%@",
+                                        [SheetTreeLog name:childComponentView], (long)index,
+                                        [SheetTreeLog name:_view2]]];
   [_view2 insertReactSubview:childComponentView atIndex:index];
 
   __weak SheetView *weakSelf = self;
@@ -150,10 +164,18 @@ using namespace facebook::react;
 }
 
 - (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index {
+  [SheetTreeLog log:@"host.unmountChild"
+              details:[NSString stringWithFormat:@"child=%@ index=%ld host=%@",
+                                        [SheetTreeLog name:childComponentView], (long)index,
+                                        [SheetTreeLog name:_view2]]];
   [_view2 removeReactSubview:childComponentView];
 }
 
 - (void)prepareForRecycle {
+  // The HostFittedSheet is thrown away and rebuilt here, so anything the
+  // mounting layer still holds from before this point is stale.
+  [SheetTreeLog log:@"host.prepareForRecycle"
+              details:[NSString stringWithFormat:@"host=%@", [SheetTreeLog name:_view2]]];
   [_view2 destroy];
   _view2.onSheetDismiss = nil;
 

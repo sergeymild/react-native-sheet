@@ -27,6 +27,9 @@ interface NativeProps extends ViewProps {
   useInlinePresentation?: boolean;
   presentationStyle?: string;
   centerAnimation?: string;
+  dismissOnOverlayTap?: boolean;
+  overlayOpacity?: Double;
+  collapsedHeight?: Double;
   onSheetDismiss: DirectEventHandler<null>;
 }
 

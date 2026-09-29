@@ -1,6 +1,8 @@
 package com.sheet2
 
 import android.animation.ValueAnimator
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import android.graphics.Color
 import android.os.SystemClock
 import android.view.Gravity
@@ -37,24 +39,33 @@ internal class InlineSheetPresenter(
   private var behavior: BottomSheetBehavior<FrameLayout>? = null
   private var scrimAnimator: ValueAnimator? = null
   private var onDismiss: (() -> Unit)? = null
+  private var snaps = false
 
   val isShown: Boolean get() = overlay != null
 
-  fun show(dismissable: Boolean, onDismiss: () -> Unit) {
+  fun show(
+    dismissable: Boolean,
+    dismissOnOverlayTap: Boolean,
+    overlayOpacity: Float,
+    collapsedHeight: Int,
+    onDismiss: () -> Unit,
+  ) {
     if (isShown) return
-    val root = findInlineRoot() ?: return
+    val root = findInlineRoot(anchor) ?: return
     this.onDismiss = onDismiss
+    snaps = collapsedHeight > 0
+    val scrimAlpha = if (overlayOpacity >= 0) overlayOpacity else SCRIM_ALPHA
 
     val ctx = anchor.context
 
-    val overlayRoot = FrameLayout(ctx).apply {
+    val overlayRoot = PassThroughFrameLayout(ctx).apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT,
       )
     }
 
-    val coordinator = CoordinatorLayout(ctx).apply {
+    val coordinator = PassThroughCoordinatorLayout(ctx).apply {
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -69,9 +80,10 @@ internal class InlineSheetPresenter(
         CoordinatorLayout.LayoutParams.MATCH_PARENT,
       )
     }
-    coordinator.addView(touchOutside)
+    // Without a scrim touches outside the sheet must reach the screen behind.
+    if (scrimAlpha > 0) coordinator.addView(touchOutside)
 
-    val designBottomSheet = FrameLayout(ctx).apply {
+    val designBottomSheet = PassThroughFrameLayout(ctx).apply {
       layoutParams = CoordinatorLayout.LayoutParams(
         CoordinatorLayout.LayoutParams.MATCH_PARENT,
         CoordinatorLayout.LayoutParams.WRAP_CONTENT,
@@ -86,9 +98,9 @@ internal class InlineSheetPresenter(
 
     val behavior = BottomSheetBehavior<FrameLayout>().apply {
       setHideable(true)
-      setSkipCollapsed(true)
-      setDraggable(dismissable)
-      setPeekHeight(10, false)
+      setSkipCollapsed(!snaps)
+      setDraggable(dismissable || snaps)
+      setPeekHeight(if (snaps) collapsedHeight else 10, false)
       setState(BottomSheetBehavior.STATE_HIDDEN)
       addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -105,6 +117,7 @@ internal class InlineSheetPresenter(
             newState == BottomSheetBehavior.STATE_COLLAPSED ||
             newState == BottomSheetBehavior.STATE_HALF_EXPANDED
           ) {
+            if (snaps) behavior?.setHideable(dismissable)
             // Sheet settled — sync Fabric shadow tree with our new visual
             // position so Pressability measures correctly.
             bottomSheet.post { anchor.pushContentOriginOffset() }
@@ -122,16 +135,19 @@ internal class InlineSheetPresenter(
     this.behavior = behavior
 
     touchOutside.setOnClickListener {
-      if (dismissable) behavior.setState(BottomSheetBehavior.STATE_HIDDEN)
+      if (dismissable && dismissOnOverlayTap) behavior.setState(BottomSheetBehavior.STATE_HIDDEN)
     }
 
-    animateScrim(coordinator, fromAlpha = 0f, toAlpha = SCRIM_ALPHA)
+    if (scrimAlpha > 0) animateScrim(coordinator, fromAlpha = 0f, toAlpha = scrimAlpha)
 
     root.addView(overlayRoot)
+    InlineFooterPresenter.bringFootersToFront(root)
     overlay = overlayRoot
 
     designBottomSheet.post {
-      behavior.setState(BottomSheetBehavior.STATE_EXPANDED)
+      behavior.setState(
+        if (snaps) BottomSheetBehavior.STATE_COLLAPSED else BottomSheetBehavior.STATE_EXPANDED
+      )
       // Post once more so Fabric state sync runs after the expand-layout pass.
       designBottomSheet.post { anchor.pushContentOriginOffset() }
     }
@@ -139,8 +155,10 @@ internal class InlineSheetPresenter(
 
   fun dismiss(animated: Boolean = true, invokeCallback: Boolean = true) {
     val layout = overlay ?: return
+    hideKeyboard()
     val behavior = this.behavior
     if (animated && behavior != null && behavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+      behavior.setHideable(true)
       behavior.setState(BottomSheetBehavior.STATE_HIDDEN)
       return
     }
@@ -156,7 +174,7 @@ internal class InlineSheetPresenter(
   }
 
   fun setDismissable(dismissable: Boolean) {
-    behavior?.setDraggable(dismissable)
+    behavior?.setDraggable(dismissable || snaps)
   }
 
   fun setOverlayView(view: View?) {
@@ -169,7 +187,16 @@ internal class InlineSheetPresenter(
   private fun attachOverlayView() {
     val host = overlayHost ?: return
     val view = overlayView ?: return
-    (view.parent as? ViewGroup)?.removeView(view)
+    // Re-parenting a view React Native mounted somewhere else: its old parent
+    // loses a child without React Native being told.
+    val previousParent = view.parent as? ViewGroup
+    SheetTreeLog.log(
+      view.context,
+      "inline.attachOverlay",
+      "overlay=${SheetTreeLog.tag(view)} from=${SheetTreeLog.tag(previousParent)}" +
+        " fromChildren=${SheetTreeLog.childTags(previousParent)} to=${SheetTreeLog.tag(host)}",
+    )
+    previousParent?.removeView(view)
     view.layoutParams = FrameLayout.LayoutParams(
       FrameLayout.LayoutParams.MATCH_PARENT,
       FrameLayout.LayoutParams.MATCH_PARENT,
@@ -177,30 +204,11 @@ internal class InlineSheetPresenter(
     host.addView(view)
   }
 
-  /**
-   * Walks up from [anchor] looking for the closest react-native-screens Screen
-   * ancestor and returns its parent (the ScreenStack / ScreensCoordinatorLayout).
-   * Attaching the overlay there places it as a sibling of the current Screen —
-   * so when a new Screen is pushed (e.g. fullScreenModal) it lands as a later
-   * child of the same container and naturally draws on top of us.
-   *
-   * Using the Screen itself does not work: Screen and ScreenContentWrapper rely on
-   * RN/Yoga to lay out their children and leave non-RN children at 0×0.
-   *
-   * Falls back to the top-most ViewGroup ancestor when not hosted by
-   * react-native-screens.
-   */
-  private fun findInlineRoot(): ViewGroup? {
-    var current: ViewParent? = anchor.parent
-    var lastGroup: ViewGroup? = null
-    while (current != null) {
-      if (current is ViewGroup) lastGroup = current
-      if (current.javaClass.name == SCREEN_CLASS_NAME) {
-        return (current.parent as? ViewGroup) ?: (current as? ViewGroup)
-      }
-      current = current.parent
-    }
-    return lastGroup
+  private fun hideKeyboard() {
+    val focused = hostView.findFocus() ?: return
+    val imm = hostView.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(focused.windowToken, 0)
+    focused.clearFocus()
   }
 
   private fun cancelAncestorJsTouches(child: View) {
@@ -237,6 +245,5 @@ internal class InlineSheetPresenter(
   companion object {
     private const val SCRIM_ALPHA = 0.5f
     private const val SCRIM_DURATION_MS = 250L
-    private const val SCREEN_CLASS_NAME = "com.swmansion.rnscreens.Screen"
   }
 }

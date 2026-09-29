@@ -38,15 +38,20 @@ export interface FittedSheetParams {
    * - 'bottom' (default): anchored to the bottom of the screen.
    * - 'center': floats in the vertical center as a dialog card, the whole
    *   screen is dimmed, dismissed by swiping down or tapping the dim.
+   * - 'footer': with `useInlinePresentation`, a static bar pinned to the bottom
+   *   of the screen above inline sheets; no gestures, no dim. Android only for now.
    * When 'center', `useInlinePresentation` is ignored (always modal).
    */
-  presentationStyle?: 'bottom' | 'center';
+  presentationStyle?: 'bottom' | 'center' | 'footer';
   /**
    * Enter/exit animation for `presentationStyle: 'center'`. Ignored otherwise.
    * - 'fade' (default): fades + scales in at the center.
    * - 'slide': slides up from the bottom and settles at the center.
    */
   centerAnimation?: 'fade' | 'slide';
+  dismissOnOverlayTap?: boolean;
+  overlayOpacity?: number;
+  collapsedHeight?: number;
   /**
    * Android only
    */
@@ -155,7 +160,8 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   componentWillUnmount() {
     this.log('componentWillUnmount');
-    this.hide();
+    // The native view tears the sheet down when it is removed; a command sent to a view
+    // that is being deleted crashes Fabric.
     this.cleanup?.();
     this.cleanup = undefined;
   }
@@ -173,9 +179,13 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   render() {
     if (!this.state.show) return null;
+    const insetsHeight =
+      this.props.params?.presentationStyle === 'footer'
+        ? 0
+        : this.insets().top + this.insets().bottom;
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
-      this.dimensions.height - this.insets().top - this.insets().bottom
+      this.dimensions.height - insetsHeight
     );
     const paramsMaxWidth = this.state.isLandscape
       ? this.props.params?.maxLandscapeWidth
@@ -233,6 +243,13 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
         useInlinePresentation={this.props.params?.useInlinePresentation}
         presentationStyle={this.props.params?.presentationStyle ?? 'bottom'}
         centerAnimation={this.props.params?.centerAnimation ?? 'fade'}
+        dismissOnOverlayTap={
+          this.props.params?.dismissOnOverlayTap ??
+          this.props.params?.dismissable ??
+          true
+        }
+        overlayOpacity={this.props.params?.overlayOpacity ?? -1}
+        collapsedHeight={this.props.params?.collapsedHeight ?? 0}
         isSystemUILight={this.props.params?.isSystemUILight ?? true}
         calculatedHeight={nativeHeight}
         passScrollViewReactTag={this.state.passScrollViewReactTag}

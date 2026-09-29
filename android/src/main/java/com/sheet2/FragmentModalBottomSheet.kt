@@ -19,6 +19,8 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
   private var overlayHost: ViewGroup? = null
   private var overlayView: View? = null
   private var dismissable: Boolean = true
+  private var dismissOnOverlayTap: Boolean = true
+  private var overlayOpacity: Float = -1F
   private var isSystemUILight: Boolean = false
   private var onDismiss: ((dismissAll: Boolean) -> Unit)? = null
   var dismissAll = false
@@ -26,11 +28,15 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
   constructor(
     modalView: ViewGroup,
     dismissable: Boolean,
+    dismissOnOverlayTap: Boolean,
+    overlayOpacity: Float,
     isSystemUILight: Boolean,
     onDismiss: (dismissAll: Boolean) -> Unit
   ) : this() {
     this.modalView = modalView
     this.dismissable = dismissable
+    this.dismissOnOverlayTap = dismissOnOverlayTap
+    this.overlayOpacity = overlayOpacity
     this.isSystemUILight = isSystemUILight
     this.onDismiss = onDismiss
   }
@@ -56,6 +62,8 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
     this.isCancelable = dismissable
     val dialog = CustomBottomSheetDialog(requireContext(), R.style.AppBottomSheetDialog)
     dialog.setSheetBackgroundColor(Color.TRANSPARENT)
+    dialog.dismissOnOverlayTap = dismissOnOverlayTap
+    if (overlayOpacity >= 0) dialog.window?.setDimAmount(overlayOpacity)
     dialog.window?.let {
       presentedWindow = WeakReference(it)
       it.setStatusBarStyle(isSystemUILight)
@@ -84,7 +92,16 @@ class FragmentModalBottomSheet() : BottomSheetDialogFragment() {
     val view = overlayView ?: return
     val decorView = dialog?.window?.decorView as? ViewGroup ?: return
     detachOverlayHost()
-    (view.parent as? ViewGroup)?.removeView(view)
+    // Same as the inline presenter: the overlay is taken out of whatever parent
+    // React Native gave it and put into the dialog's own host.
+    val previousParent = view.parent as? ViewGroup
+    SheetTreeLog.log(
+      view.context,
+      "dialog.attachOverlay",
+      "overlay=${SheetTreeLog.tag(view)} from=${SheetTreeLog.tag(previousParent)}" +
+        " fromChildren=${SheetTreeLog.childTags(previousParent)}",
+    )
+    previousParent?.removeView(view)
 
     val host = DialogPassThroughFrameLayout(decorView.context).apply {
       layoutParams = ViewGroup.LayoutParams(

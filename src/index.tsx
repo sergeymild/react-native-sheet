@@ -9,6 +9,7 @@ import {
   dismissFittedPresented,
 } from './PublicSheetView';
 import SheetModule from './NativeSheet';
+import { addSheetTreeListener, getSheetTreeLog } from './SheetTreeLog';
 
 import type { ReactNode } from 'react';
 import { Fragment } from 'react';
@@ -49,5 +50,7 @@ export {
   presentGlobalFittedSheet,
   dismissGlobalFittedSheet,
   attachScrollViewToGlobalFittedSheet,
+  addSheetTreeListener,
+  getSheetTreeLog,
   type FittedSheetParams,
 };

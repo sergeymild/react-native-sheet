@@ -622,6 +622,7 @@ public class SheetViewController: UIViewController {
     }
 
     public func attemptDismiss(animated: Bool) {
+        self.view.endEditing(true)
         if self.options.useInlineMode {
             if animated {
                 self.animateOut {
@@ -675,12 +676,9 @@ public class SheetViewController: UIViewController {
 
 extension SheetViewController: SheetViewDelegate {
     func sheetPoint(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let isInOverlay = self.overlayTapView.bounds.contains(point)
-        if self.allowGestureThroughOverlay, isInOverlay {
-            return false
-        } else {
-            return true
-        }
+        guard self.allowGestureThroughOverlay else { return true }
+        let cardView = self.contentViewController.view!
+        return cardView.bounds.contains(self.view.convert(point, to: cardView))
     }
 }
 
