@@ -274,6 +274,21 @@ describe('FittedSheet', () => {
       expect(native.props.presentationStyle).toBe('footer');
     });
 
+    it('lets a footer span the whole screen height without inset clamping', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet
+          ref={ref}
+          params={{ presentationStyle: 'footer', useInlinePresentation: true }}
+        >
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.maxHeight).toBe(812);
+    });
+
     it('defaults overlay and snap params', () => {
       const ref = React.createRef<FittedSheetRef>();
       const tree = render(

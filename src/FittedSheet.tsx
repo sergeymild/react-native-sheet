@@ -178,9 +178,13 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   render() {
     if (!this.state.show) return null;
+    const insetsHeight =
+      this.props.params?.presentationStyle === 'footer'
+        ? 0
+        : this.insets().top + this.insets().bottom;
     let maxHeight = Math.min(
       this.props.params?.maxHeight ?? Number.MAX_VALUE,
-      this.dimensions.height - this.insets().top - this.insets().bottom
+      this.dimensions.height - insetsHeight
     );
     const paramsMaxWidth = this.state.isLandscape
       ? this.props.params?.maxLandscapeWidth

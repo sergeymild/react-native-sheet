@@ -14,6 +14,8 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.UiThreadUtil
 import com.facebook.react.uimanager.PixelUtil.pxToDp
+import com.facebook.react.uimanager.PointerEvents
+import com.facebook.react.uimanager.ReactPointerEventsView
 import com.facebook.react.uimanager.StateWrapper
 import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.events.EventDispatcher
@@ -35,7 +37,13 @@ internal fun AppFittedSheet.onSheetDismiss() {
 
 private var presentedSheets: MutableList<String> = mutableListOf()
 
-open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEventListener {
+open class AppFittedSheet(context: Context) :
+  ViewGroup(context),
+  LifecycleEventListener,
+  ReactPointerEventsView {
+  // The sheet content lives in its own window or overlay; this placeholder must never take touches.
+  override val pointerEvents: PointerEvents = PointerEvents.NONE
+
   private var stacked = true
   private val fragmentTag = "CCBottomSheet-${System.currentTimeMillis()}"
   var mHostView = DialogRootViewGroup(context)
