@@ -676,12 +676,9 @@ public class SheetViewController: UIViewController {
 
 extension SheetViewController: SheetViewDelegate {
     func sheetPoint(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let isInOverlay = self.overlayTapView.bounds.contains(point)
-        if self.allowGestureThroughOverlay, isInOverlay {
-            return false
-        } else {
-            return true
-        }
+        guard self.allowGestureThroughOverlay else { return true }
+        let cardView = self.contentViewController.view!
+        return cardView.bounds.contains(self.view.convert(point, to: cardView))
     }
 }
 
