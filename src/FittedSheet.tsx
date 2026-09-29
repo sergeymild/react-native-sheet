@@ -38,9 +38,11 @@ export interface FittedSheetParams {
    * - 'bottom' (default): anchored to the bottom of the screen.
    * - 'center': floats in the vertical center as a dialog card, the whole
    *   screen is dimmed, dismissed by swiping down or tapping the dim.
+   * - 'footer': with `useInlinePresentation`, a static bar pinned to the bottom
+   *   of the screen above inline sheets; no gestures, no dim. Android only for now.
    * When 'center', `useInlinePresentation` is ignored (always modal).
    */
-  presentationStyle?: 'bottom' | 'center';
+  presentationStyle?: 'bottom' | 'center' | 'footer';
   /**
    * Enter/exit animation for `presentationStyle: 'center'`. Ignored otherwise.
    * - 'fade' (default): fades + scales in at the center.

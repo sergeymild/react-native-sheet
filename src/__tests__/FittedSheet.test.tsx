@@ -259,6 +259,21 @@ describe('FittedSheet', () => {
       expect(native.props.collapsedHeight).toBe(500);
     });
 
+    it('forwards the footer presentation style', () => {
+      const ref = React.createRef<FittedSheetRef>();
+      const tree = render(
+        <FittedSheet
+          ref={ref}
+          params={{ presentationStyle: 'footer', useInlinePresentation: true }}
+        >
+          <View />
+        </FittedSheet>
+      );
+      act(() => ref.current?.show());
+      const native = tree.UNSAFE_getByType(SheetViewNativeComponent);
+      expect(native.props.presentationStyle).toBe('footer');
+    });
+
     it('defaults overlay and snap params', () => {
       const ref = React.createRef<FittedSheetRef>();
       const tree = render(

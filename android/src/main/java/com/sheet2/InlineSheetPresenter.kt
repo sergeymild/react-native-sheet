@@ -49,7 +49,7 @@ internal class InlineSheetPresenter(
     onDismiss: () -> Unit,
   ) {
     if (isShown) return
-    val root = findInlineRoot() ?: return
+    val root = findInlineRoot(anchor) ?: return
     this.onDismiss = onDismiss
     snaps = collapsedHeight > 0
     val scrimAlpha = if (overlayOpacity >= 0) overlayOpacity else SCRIM_ALPHA
@@ -139,6 +139,7 @@ internal class InlineSheetPresenter(
     if (scrimAlpha > 0) animateScrim(coordinator, fromAlpha = 0f, toAlpha = scrimAlpha)
 
     root.addView(overlayRoot)
+    InlineFooterPresenter.bringFootersToFront(root)
     overlay = overlayRoot
 
     designBottomSheet.post {
@@ -200,32 +201,6 @@ internal class InlineSheetPresenter(
     host.addView(view)
   }
 
-  /**
-   * Walks up from [anchor] looking for the closest react-native-screens Screen
-   * ancestor and returns its parent (the ScreenStack / ScreensCoordinatorLayout).
-   * Attaching the overlay there places it as a sibling of the current Screen —
-   * so when a new Screen is pushed (e.g. fullScreenModal) it lands as a later
-   * child of the same container and naturally draws on top of us.
-   *
-   * Using the Screen itself does not work: Screen and ScreenContentWrapper rely on
-   * RN/Yoga to lay out their children and leave non-RN children at 0×0.
-   *
-   * Falls back to the top-most ViewGroup ancestor when not hosted by
-   * react-native-screens.
-   */
-  private fun findInlineRoot(): ViewGroup? {
-    var current: ViewParent? = anchor.parent
-    var lastGroup: ViewGroup? = null
-    while (current != null) {
-      if (current is ViewGroup) lastGroup = current
-      if (current.javaClass.name == SCREEN_CLASS_NAME) {
-        return (current.parent as? ViewGroup) ?: (current as? ViewGroup)
-      }
-      current = current.parent
-    }
-    return lastGroup
-  }
-
   private fun cancelAncestorJsTouches(child: View) {
     var p: ViewParent? = child.parent
     while (p != null) {
@@ -260,6 +235,5 @@ internal class InlineSheetPresenter(
   companion object {
     private const val SCRIM_ALPHA = 0.5f
     private const val SCRIM_DURATION_MS = 250L
-    private const val SCREEN_CLASS_NAME = "com.swmansion.rnscreens.Screen"
   }
 }

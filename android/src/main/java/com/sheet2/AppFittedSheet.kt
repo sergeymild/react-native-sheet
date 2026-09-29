@@ -124,6 +124,10 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     InlineSheetPresenter(this, mHostView)
   }
 
+  private val footerPresenter: InlineFooterPresenter by lazy {
+    InlineFooterPresenter(this, mHostView)
+  }
+
   init {
     mHostView.onSheetLayoutChanged = { pushContentOriginOffset() }
   }
@@ -190,6 +194,11 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
         // is laid out (same reason as the bottom-sheet Dialog path below).
         post { pushContentOriginOffset() }
       }
+      return
+    }
+
+    if (presentationStyle == "footer") {
+      footerPresenter.show()
       return
     }
 
@@ -365,6 +374,11 @@ open class AppFittedSheet(context: Context) : ViewGroup(context), LifecycleEvent
     if (centeredDialog != null) {
       centeredDialog?.dismiss()
       centeredDialog = null
+      return
+    }
+    if (presentationStyle == "footer") {
+      footerPresenter.dismiss()
+      onSheetDismiss()
       return
     }
     if (useInlinePresentation) {
