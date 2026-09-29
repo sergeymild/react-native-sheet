@@ -56,14 +56,14 @@ internal class InlineSheetPresenter(
 
     val ctx = anchor.context
 
-    val overlayRoot = FrameLayout(ctx).apply {
+    val overlayRoot = PassThroughFrameLayout(ctx).apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT,
       )
     }
 
-    val coordinator = CoordinatorLayout(ctx).apply {
+    val coordinator = PassThroughCoordinatorLayout(ctx).apply {
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.MATCH_PARENT,
@@ -81,7 +81,7 @@ internal class InlineSheetPresenter(
     // Without a scrim touches outside the sheet must reach the screen behind.
     if (scrimAlpha > 0) coordinator.addView(touchOutside)
 
-    val designBottomSheet = FrameLayout(ctx).apply {
+    val designBottomSheet = PassThroughFrameLayout(ctx).apply {
       layoutParams = CoordinatorLayout.LayoutParams(
         CoordinatorLayout.LayoutParams.MATCH_PARENT,
         CoordinatorLayout.LayoutParams.WRAP_CONTENT,

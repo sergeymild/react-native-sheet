@@ -19,7 +19,7 @@ internal class InlineFooterPresenter(
     if (isShown) return
     val root = findInlineRoot(anchor) ?: return
 
-    val overlayRoot = FrameLayout(anchor.context).apply {
+    val overlayRoot = PassThroughFrameLayout(anchor.context).apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT,
