@@ -372,7 +372,7 @@ open class AppFittedSheet(context: Context) :
     dismiss()
   }
 
-  private fun onDropInstance() {
+  internal fun onDropInstance() {
     (context as ReactContext).removeLifecycleEventListener(this)
     dismiss()
   }

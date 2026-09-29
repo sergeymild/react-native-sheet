@@ -118,6 +118,11 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
     view.mHostView.setVirtualHeight(value.dpToPx())
   }
 
+  override fun onDropViewInstance(view: Sheet2View) {
+    super.onDropViewInstance(view)
+    view.onDropInstance()
+  }
+
   override fun onAfterUpdateTransaction(view: Sheet2View) {
     super.onAfterUpdateTransaction(view)
     println("==========onAfterUpdateTransaction")

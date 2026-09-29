@@ -549,6 +549,25 @@ describe('Edge Cases', () => {
   });
 
   describe('Unmounting Edge Cases', () => {
+    it('does not dispatch a native dismiss command while unmounting a shown sheet', async () => {
+      const { Commands } = require('../SheetViewNativeComponent');
+      const ref = React.createRef<FittedSheetRef>();
+      const { getByText, unmount } = render(
+        <FittedSheet ref={ref}>
+          <View>
+            <Text>Unmount Command</Text>
+          </View>
+        </FittedSheet>
+      );
+      React.act(() => ref.current?.show());
+      await waitFor(() => expect(getByText('Unmount Command')).toBeTruthy());
+      Commands.dismissSheet.mockClear();
+
+      unmount();
+
+      expect(Commands.dismissSheet).not.toHaveBeenCalled();
+    });
+
     it('should cleanup when sheet is unmounted while shown', async () => {
       const TestComponent = ({ mounted }: { mounted: boolean }) => {
         const sheetRef = useRef<FittedSheetRef>(null);

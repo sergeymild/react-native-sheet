@@ -160,7 +160,8 @@ export class PrivateFittedSheet extends React.PureComponent<SheetProps, State> {
 
   componentWillUnmount() {
     this.log('componentWillUnmount');
-    this.hide();
+    // The native view tears the sheet down when it is removed; a command sent to a view
+    // that is being deleted crashes Fabric.
     this.cleanup?.();
     this.cleanup = undefined;
   }
