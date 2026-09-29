@@ -1,6 +1,8 @@
 package com.sheet2
 
 import android.animation.ValueAnimator
+import android.content.Context
+import android.view.inputmethod.InputMethodManager
 import android.graphics.Color
 import android.os.SystemClock
 import android.view.Gravity
@@ -153,6 +155,7 @@ internal class InlineSheetPresenter(
 
   fun dismiss(animated: Boolean = true, invokeCallback: Boolean = true) {
     val layout = overlay ?: return
+    hideKeyboard()
     val behavior = this.behavior
     if (animated && behavior != null && behavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
       behavior.setHideable(true)
@@ -199,6 +202,13 @@ internal class InlineSheetPresenter(
       FrameLayout.LayoutParams.MATCH_PARENT,
     )
     host.addView(view)
+  }
+
+  private fun hideKeyboard() {
+    val focused = hostView.findFocus() ?: return
+    val imm = hostView.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(focused.windowToken, 0)
+    focused.clearFocus()
   }
 
   private fun cancelAncestorJsTouches(child: View) {
