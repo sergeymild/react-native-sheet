@@ -1,6 +1,7 @@
 package com.sheet2
 
 import android.graphics.Color
+import android.view.View
 import com.behavior.BottomSheetBehavior
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
@@ -77,7 +78,7 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
   override fun setPassScrollViewReactTag(view: Sheet2View, value: String?) {
     println("==========setPassScrollViewReactTag $value")
     value ?: return
-    val v = BottomSheetBehavior.findView(view) ?: return
+    val v = BottomSheetBehavior.findView(view.mHostView) ?: return
     view.setNewNestedScrollView(v)
   }
 
@@ -116,6 +117,14 @@ class Sheet2ViewManager(reactContext: ReactApplicationContext) : ViewGroupManage
   override fun setCalculatedHeight(view: Sheet2View, value: Double) {
     println("==========setCalculatedHeight $value")
     view.mHostView.setVirtualHeight(value.dpToPx())
+  }
+
+  override fun getChildCount(parent: Sheet2View): Int {
+    return parent.reactChildCount()
+  }
+
+  override fun getChildAt(parent: Sheet2View, index: Int): View? {
+    return parent.reactChildAt(index)
   }
 
   override fun onDropViewInstance(view: Sheet2View) {

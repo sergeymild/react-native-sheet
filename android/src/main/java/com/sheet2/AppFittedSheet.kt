@@ -319,11 +319,17 @@ open class AppFittedSheet(context: Context) :
   }
 
   override fun getChildCount(): Int =
+    if (useInlinePresentation) 0 else reactChildCount()
+
+  override fun getChildAt(index: Int): View? =
+    if (useInlinePresentation) null else reactChildAt(index)
+
+  internal fun reactChildCount(): Int =
     mHostView.childCount +
       (if (inlineOverlayView != null) 1 else 0) +
       (if (dialogOverlayView != null) 1 else 0)
 
-  override fun getChildAt(index: Int): View? {
+  internal fun reactChildAt(index: Int): View? {
     if (index < mHostView.childCount) return mHostView.getChildAt(index)
     val overlayIndex = index - mHostView.childCount
     if (inlineOverlayView != null && overlayIndex == 0) return inlineOverlayView
