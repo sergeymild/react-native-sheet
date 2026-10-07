@@ -158,6 +158,13 @@ public class SheetViewController: UIViewController {
     private var prePanHeight: CGFloat = 0
     private var isPanning: Bool = false
 
+    private var scrollHandoffEnabled = false
+    private var scrollOffsetObservation: NSKeyValueObservation?
+    private var panStartedInScrollView = false
+    private var isSheetDrivingPan = false
+    private var pinsScrollToTop = false
+    private var lastPanPoint: CGPoint = .zero
+
     public var contentBackgroundColor: UIColor? {
         get { self.contentViewController.contentBackgroundColor }
         set { self.contentViewController.contentBackgroundColor = newValue }
@@ -239,8 +246,62 @@ public class SheetViewController: UIViewController {
 
     /// Handle a scroll view in the child view controller by watching for the offset for the scrollview and taking priority when at the top (so pulling up/down can grow/shrink the sheet instead of bouncing the child's scroll view)
     public func handleScrollView(_ scrollView: UIScrollView) {
-        scrollView.panGestureRecognizer.require(toFail: panGestureRecognizer)
         self.childScrollView = scrollView
+        self.scrollOffsetObservation = nil
+        self.scrollHandoffEnabled = self.orderedSizes.count > 1 && !isScrollViewInverted(scrollView)
+        guard self.scrollHandoffEnabled else {
+            scrollView.panGestureRecognizer.require(toFail: panGestureRecognizer)
+            return
+        }
+        self.scrollOffsetObservation = scrollView.observe(\.contentOffset, options: [.new]) {
+            [weak self] scrollView, _ in
+            guard let self, self.pinsScrollToTop else { return }
+            let top = -scrollView.contentInset.top
+            if scrollView.contentOffset.y != top {
+                scrollView.contentOffset.y = top
+            }
+        }
+    }
+
+    private func pinChildScrollViewToTop() {
+        guard let scrollView = self.childScrollView else { return }
+        scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: -scrollView.contentInset.top), animated: false)
+    }
+
+    private func updateScrollHandoff(_ gesture: UIPanGestureRecognizer, point: CGPoint) -> Bool {
+        guard let scrollView = self.childScrollView else { return true }
+        let maxSheetHeight = self.height(for: self.orderedSizes.last)
+        let currentHeight = self.contentViewHeightConstraint.constant
+        let isAtMax = currentHeight >= maxSheetHeight - 0.5
+        let deltaY = point.y - self.lastPanPoint.y
+        let isMovingDown = deltaY != 0 ? deltaY > 0 : gesture.velocity(in: self.view).y > 0
+        self.lastPanPoint = point
+
+        let sheetShouldDrive = !isAtMax || (isMovingDown && isScrollViewAtVisualTop(scrollView))
+        if gesture.state == .began || sheetShouldDrive != self.isSheetDrivingPan {
+            self.isSheetDrivingPan = sheetShouldDrive
+            self.firstPanPoint = point
+            if sheetShouldDrive {
+                self.prePanHeight = currentHeight
+                self.pinChildScrollViewToTop()
+            } else {
+                self.contentViewHeightConstraint.constant = maxSheetHeight
+                self.contentViewController.view.transform = .identity
+            }
+            self.pinsScrollToTop = sheetShouldDrive
+        }
+        return sheetShouldDrive
+    }
+
+    private func finishScrollHandoffPan() {
+        guard let lastSize = self.orderedSizes.last else { return }
+        self.isPanning = false
+        self.pinsScrollToTop = false
+        let previousSize = self.currentSize
+        self.currentSize = lastSize
+        if previousSize != lastSize {
+            self.sizeChanged?(self, lastSize, self.height(for: lastSize))
+        }
     }
 
     /// Change the sizes the sheet should try to pin to
@@ -373,6 +434,24 @@ public class SheetViewController: UIViewController {
                 // to JS so a swipe-to-dismiss isn't mistaken for a tap.
                 self.cancelAncestorRNTouchHandlers()
             }
+            self.panStartedInScrollView = self.scrollHandoffEnabled && self.isPanInChildScrollView(gesture)
+            self.lastPanPoint = point
+        }
+
+        if self.panStartedInScrollView {
+            switch gesture.state {
+            case .began, .changed:
+                if !self.updateScrollHandoff(gesture, point: point) { return }
+            case .ended, .cancelled, .failed:
+                if !self.isSheetDrivingPan {
+                    self.finishScrollHandoffPan()
+                    return
+                }
+                // cancels the scroll view's deceleration after its own pan ends
+                DispatchQueue.main.async { [weak self] in self?.pinChildScrollViewToTop() }
+            default:
+                break
+            }
         }
 
         let minHeight: CGFloat = self.height(for: self.orderedSizes.first)
@@ -408,6 +487,7 @@ public class SheetViewController: UIViewController {
                     self.overlayView.alpha = 1
                 }, completion: { _ in
                     self.isPanning = false
+                    self.pinsScrollToTop = false
                 })
 
             case .began, .changed:
@@ -452,7 +532,7 @@ public class SheetViewController: UIViewController {
 
 
                 var newSize = self.currentSize
-                if point.y < 0 {
+                if point.y - self.firstPanPoint.y < 0 {
                     // We need to move to the next larger one
                     newSize = self.orderedSizes.last ?? self.currentSize
                     for size in self.orderedSizes.reversed() {
@@ -491,6 +571,7 @@ public class SheetViewController: UIViewController {
                     self.view.layoutIfNeeded()
                 }, completion: { complete in
                     self.isPanning = false
+                    self.pinsScrollToTop = false
                     if previousSize != newSize {
                         self.sizeChanged?(self, newSize, newContentHeight)
                     }
@@ -705,6 +786,10 @@ extension SheetViewController: UIGestureRecognizerDelegate {
             return true
         }
 
+        if self.scrollHandoffEnabled {
+            return abs(velocity.y) > abs(velocity.x)
+        }
+
         if !(abs(velocity.y) > abs(velocity.x) && isScrollViewAtVisualTop(childScrollView)) {
             return false
         }
@@ -715,6 +800,20 @@ extension SheetViewController: UIGestureRecognizerDelegate {
         } else {
             return true
         }
+    }
+
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard self.scrollHandoffEnabled,
+              gestureRecognizer === self.panGestureRecognizer,
+              let childScrollView = self.childScrollView else { return false }
+        return otherGestureRecognizer === childScrollView.panGestureRecognizer
+    }
+
+    private func isPanInChildScrollView(_ gesture: UIPanGestureRecognizer) -> Bool {
+        guard let childScrollView = self.childScrollView,
+              let point = (gesture as? InitialTouchPanGestureRecognizer)?.initialTouchLocation else { return false }
+        let pointInChildScrollView = self.view.convert(point, to: childScrollView).y - childScrollView.contentOffset.y
+        return pointInChildScrollView > 0 && pointInChildScrollView < childScrollView.bounds.height
     }
 
     private func isScrollViewInverted(_ scrollView: UIScrollView) -> Bool {

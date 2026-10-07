@@ -21,6 +21,7 @@ public final class HostFittedSheet: UIView {
   @objc
   public var onSheetDismiss: (() -> Void)?
   private var _reactSubview: UIView?
+  private var _reactSubviewBoundsObservation: NSKeyValueObservation?
   private var _overlaySubview: UIView?
   private var _isPresented = false
   private var _sheetSize: CGFloat?
@@ -163,6 +164,13 @@ public final class HostFittedSheet: UIView {
     _touchHandlerAttachedView = subview
     viewController.view.insertSubview(subview, at: 0)
     _reactSubview = subview
+    _reactSubviewBoundsObservation = subview.observe(\.bounds, options: [.old, .new]) {
+      [weak self] _, change in
+      guard let self, self._footer, self._isPresented,
+            let old = change.oldValue, let new = change.newValue,
+            old.height != new.height, new.height > 0 else { return }
+      self.layoutFooter()
+    }
   }
 
   public override func removeReactSubview(_ subview: UIView!) {
@@ -178,6 +186,8 @@ public final class HostFittedSheet: UIView {
     }
 
     detachTouchHandler()
+    _reactSubviewBoundsObservation?.invalidate()
+    _reactSubviewBoundsObservation = nil
     _reactSubview?.removeFromSuperview()
     _reactSubview = nil
   }
@@ -306,7 +316,8 @@ public final class HostFittedSheet: UIView {
 
   private func layoutFooter() {
     guard _footer, let host = viewController.view.superview else { return }
-    let height = _sheetSize ?? 0
+    let contentHeight = _reactSubview?.bounds.height ?? 0
+    let height = contentHeight > 0 ? contentHeight : (_sheetSize ?? 0)
     viewController.view.frame = CGRect(
       x: 0,
       y: host.bounds.height - height,
