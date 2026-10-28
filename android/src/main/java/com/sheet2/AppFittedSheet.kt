@@ -412,19 +412,20 @@ open class AppFittedSheet(context: Context) :
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {}
 
   companion object {
+    // Other dialog fragments (an Alert still closing, for example) can sit above the sheet
+    // in the same fragment manager, so look for the topmost sheet, not the topmost fragment.
+    private fun presentedSheet(activity: AppCompatActivity): FragmentModalBottomSheet? =
+      activity.supportFragmentManager.fragments
+        .lastOrNull { it is FragmentModalBottomSheet && !it.isRemoving } as? FragmentModalBottomSheet
+
     fun dismissAll(activity: AppCompatActivity) {
-      val fragment = activity.supportFragmentManager.fragments.lastOrNull()
-      if (fragment is FragmentModalBottomSheet) {
-        fragment.dismissAll = true
-        fragment.dismissAllowingStateLoss()
-      }
+      val fragment = presentedSheet(activity) ?: return
+      fragment.dismissAll = true
+      fragment.dismissAllowingStateLoss()
     }
 
     fun dismissPresented(activity: AppCompatActivity) {
-      val fragment = activity.supportFragmentManager.fragments.lastOrNull()
-      if (fragment is FragmentModalBottomSheet) {
-        fragment.dismissAllowingStateLoss()
-      }
+      presentedSheet(activity)?.dismissAllowingStateLoss()
     }
   }
 }
